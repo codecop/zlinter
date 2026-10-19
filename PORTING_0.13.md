@@ -94,7 +94,7 @@ Key ZLS API differences to investigate:
   - Changes: `.name = .tests` → `.name = "tests"`, removed `.fingerprint`
   - Status: DONE
 
-### Phase 2: ZON Parser (BLOCKER-1 resolution) — **PENDING**
+### Phase 2: ZON Parser (BLOCKER-1 resolution) — **COMPLETED**
 
 - [x] **TASK-2.1:** Research ZLS 0.13 for internal ZON parser availability
   - Check: ZLS 0.13.0 package at `C:\Users\pkofler\AppData\Local\zig\p\122073c0...` for any `zon` module or parser
@@ -119,10 +119,10 @@ Key ZLS API differences to investigate:
   - 0.14: `std.zon.parse.Status`
   - 0.13: No `std.zon` — use custom diagnostics type or `void`
 
-- [ ] **TASK-2.4:** Update `parseFileAlloc` file reading for 0.13
-  - File: `src/lib/zon.zig:18-48`
-  - 0.13: `file.reader().readAllArrayList(&array_list, max_size)` then `toOwnedSliceSentinel(0)`
-  - Same as 0.14 pattern — verify it compiles
+- [x] **TASK-2.4:** Update `parseFileAlloc` file reading for 0.13
+  - File: `src/lib/zon.zig:64`
+  - Fixed: `.init(gpa)` shorthand not valid in 0.13 — changed to `std.ArrayList(u8).init(gpa)`
+  - Verified: file reading APIs work in Zig 0.13.0 — Status: DONE
 
 ### Phase 3: Build System Port — **PENDING**
 
@@ -366,7 +366,7 @@ zig build integration-check --summary all
 | Phase | Status | Tasks Done | Tasks Total |
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
-| Phase 2: ZON Parser | IN PROGRESS | 3/4 | 4 |
+| Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | PENDING | 0/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
@@ -374,7 +374,7 @@ zig build integration-check --summary all
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **9/97** | **97** |
+| **Total** | | **10/97** | **97** |
 
 ### Files Changed So Far
 

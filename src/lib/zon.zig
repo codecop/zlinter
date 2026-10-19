@@ -61,7 +61,7 @@ pub fn parseFileAlloc(
     });
     defer file.close();
 
-    var array_list: std.ArrayList(u8) = .init(gpa);
+    var array_list = std.ArrayList(u8).init(gpa);
     defer array_list.deinit();
 
     var file_reader = file.reader();
