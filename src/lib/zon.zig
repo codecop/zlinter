@@ -454,6 +454,90 @@ test "parseFileAlloc" {
     try std.testing.expect(it.next() == null);
 }
 
+
+pub const stringify = struct {
+    pub fn serialize(val: anytype, writer: anytype) !void {
+        const T = @TypeOf(val);
+        const info = @typeInfo(T);
+
+        switch (info) {
+            .Struct => |s| {
+                try writer.writeAll(".{");
+                inline for (s.fields, 0..) |field, i| {
+                    if (i > 0) try writer.writeAll(", ");
+                    try writer.print(".{s} = ", .{field.name});
+                    try serialize(@field(val, field.name), writer);
+                }
+                try writer.writeAll("}");
+            },
+            .Optional => |_| {
+                if (val) |v| {
+                    try serialize(v, writer);
+                } else {
+                    try writer.writeAll("null");
+                }
+            },
+            .Pointer => |ptr| {
+                switch (ptr.size) {
+                    .Slice => {
+                        if (ptr.child == u8) {
+                            try writeZonString(val, writer);
+                        } else {
+                            try writer.writeAll(".{");
+                            for (val, 0..) |item, i| {
+                                if (i > 0) try writer.writeAll(", ");
+                                try serialize(item, writer);
+                            }
+                            try writer.writeAll("}");
+                        }
+                    },
+                    .One => {
+                        try serialize(val.*, writer);
+                    },
+                    else => @compileError("Unsupported pointer type in ZON serialization"),
+                }
+            },
+            .Array => |arr| {
+                _ = arr;
+                try writer.writeAll(".{");
+                for (val, 0..) |item, i| {
+                    if (i > 0) try writer.writeAll(", ");
+                    try serialize(item, writer);
+                }
+                try writer.writeAll("}");
+            },
+            .Enum => {
+                try writer.print(".{s}", .{@tagName(val)});
+            },
+            .Bool => {
+                try writer.writeAll(if (val) "true" else "false");
+            },
+            .Int, .ComptimeInt => {
+                try writer.print("{d}", .{val});
+            },
+            .Float, .ComptimeFloat => {
+                try writer.print("{d}", .{val});
+            },
+            else => @compileError("Unsupported type in ZON serialization: " ++ @typeName(T)),
+        }
+    }
+
+    fn writeZonString(str: []const u8, writer: anytype) !void {
+        try writer.writeAll("\"");
+        for (str) |c| {
+            switch (c) {
+                '"' => try writer.writeAll("\\\""),
+                '\\' => try writer.writeAll("\\\\"),
+                '\n' => try writer.writeAll("\\n"),
+                '\r' => try writer.writeAll("\\r"),
+                '\t' => try writer.writeAll("\\t"),
+                else => try writer.writeByte(c),
+            }
+        }
+        try writer.writeAll("\"");
+    }
+};
+
 const session = @import("session.zig");
 const std = @import("std");
 const testing = @import("testing.zig");

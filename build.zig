@@ -549,15 +549,17 @@ pub fn build(b: *std.Build) void {
 
 fn toZonString(val: anytype, allocator: std.mem.Allocator) []const u8 {
     if (version.zig == .@"0.13") {
-        return allocator.dupe(u8, ".{}") catch @panic("OOM");
+        var list = std.ArrayList(u8).init(allocator);
+        zon_lib.stringify.serialize(val, list.writer()) catch @panic("Invalid rule config");
+        return list.toOwnedSlice() catch @panic("OOM");
     }
-    var zon = std.ArrayListUnmanaged(u8){};
-    defer zon.deinit(allocator);
+    var zon_buf = std.ArrayListUnmanaged(u8){};
+    defer zon_buf.deinit(allocator);
 
-    std.zon.stringify.serialize(val, .{}, zon.writer(allocator)) catch
+    std.zon.stringify.serialize(val, .{}, zon_buf.writer(allocator)) catch
         @panic("Invalid rule config");
 
-    return zon.toOwnedSlice(allocator) catch @panic("OOM");
+    return zon_buf.toOwnedSlice(allocator) catch @panic("OOM");
 }
 
 fn buildStep(
@@ -1320,5 +1322,6 @@ const BuildInfo = @import("src/lib/BuildInfo.zig");
 const std = @import("std");
 const isLintableFilePath = @import("src/lib/files.zig").isLintableFilePath;
 const shims = @import("src/lib/shims.zig");
+const zon_lib = @import("src/lib/zon.zig");
 
 pub const version = @import("./src/lib/version.zig");
