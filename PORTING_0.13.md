@@ -169,11 +169,15 @@ Key ZLS API differences to investigate:
   - Change: Replaced `b.addLibrary` with `b.addStaticLibrary`, extracted to variable, added `zls` import via `root_module.addImport()`, appended `.compiled(zlinter_lib)` to include list
   - Status: DONE
 
-- [ ] **TASK-3.7:** Port `build.zig` â€” `addWatchInput` function
-  - File: `build.zig:~480-530`
+- [x] **TASK-3.7:** Port `build.zig` — `addWatchInput` function
+  - File: `build.zig` (addWatchInput at ~625, docs section at ~528)
   - 0.14: Uses `step.addDirectoryWatchInput()`, `step.addWatchInput()`, `step.addDirectoryWatchInputFromPath()`
   - 0.13: These methods **do not exist** on `Step`
-  - **Major change:** Need alternative or skip watch input support for 0.13
+  - **Change:** Added early return `if (version.zig == .@"0.13") return;` in addWatchInput (watch mode unsupported in 0.13)
+  - Added `.@"0.13" => unreachable` to inner version switch
+  - Guarded `step.addDirectoryWatchInput()` in docs section with version check
+  - Replaced `getPath3()` with `getPath2()` + `std.fs.cwd().openDir()` in docs section for 0.13
+  - Status: DONE
 
 - [ ] **TASK-3.8:** Port `build.zig` â€” `ZlinterRun.create()` and `make()`
   - File: `build.zig:~600-750`
@@ -379,14 +383,14 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | IN PROGRESS | 6/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 7/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **17/97** | **97** |
+| **Total** | | **18/97** | **97** |
 
 ### Files Changed So Far
 

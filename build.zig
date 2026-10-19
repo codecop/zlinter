@@ -525,10 +525,11 @@ pub fn build(b: *std.Build) void {
         install_step.step.dependOn(step);
 
         const rules_lazy_path = b.path("src/rules");
-        const rules_path = rules_lazy_path.getPath3(b, step);
-        _ = step.addDirectoryWatchInput(rules_lazy_path) catch @panic("OOM");
-
-        var rules_dir = rules_path.root_dir.handle.openDir(rules_path.subPathOrDot(), .{ .iterate = true }) catch @panic("unable to open rules/ directory");
+        if (version.zig != .@"0.13") {
+            _ = step.addDirectoryWatchInput(rules_lazy_path) catch @panic("OOM");
+        }
+        const rules_path_str = rules_lazy_path.getPath2(b, step);
+        var rules_dir = std.fs.cwd().openDir(rules_path_str, .{ .iterate = true }) catch @panic("unable to open rules/ directory");
         defer rules_dir.close();
         {
             var it = rules_dir.walk(b.allocator) catch @panic("OOM");
@@ -628,6 +629,8 @@ fn addWatchInput(
     file_or_dir: std.Build.LazyPath,
     kind: enum { none, lintable_file },
 ) !void {
+    if (version.zig == .@"0.13") return;
+
     const src_dir_path = file_or_dir.getPath3(b, step);
 
     var src_dir = src_dir_path.root_dir.handle.openDir(
@@ -639,6 +642,7 @@ fn addWatchInput(
             return;
         },
         else => switch (version.zig) {
+            .@"0.13" => unreachable,
             .@"0.14" => @panic(b.fmt("Unable to open directory '{}': {s}", .{ src_dir_path, @errorName(e) })),
             .@"0.15", .@"0.16" => @panic(b.fmt("Unable to open directory '{f}': {t}", .{ src_dir_path, e })),
         },
