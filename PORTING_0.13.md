@@ -96,10 +96,10 @@ Key ZLS API differences to investigate:
 
 ### Phase 2: ZON Parser (BLOCKER-1 resolution) — **PENDING**
 
-- [ ] **TASK-2.1:** Research ZLS 0.13 for internal ZON parser availability
+- [x] **TASK-2.1:** Research ZLS 0.13 for internal ZON parser availability
   - Check: ZLS 0.13.0 package at `C:\Users\pkofler\AppData\Local\zig\p\122073c0...` for any `zon` module or parser
-  - If found: Use it in `src/lib/zon.zig`
-  - If not found: Proceed to TASK-2.2
+  - **Result: NOT FOUND.** ZLS 0.13 exports no `zon` module. Zero `std.zon` usage in ZLS 0.13 source. `std/zon.zig` does not exist in Zig 0.13 stdlib.
+  - Proceeding to TASK-2.2 (write minimal ZON parser)
 
 - [ ] **TASK-2.2:** Implement minimal ZON parser for rule configs
   - File: `src/lib/zon.zig` (rewrite for 0.13)
