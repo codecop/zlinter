@@ -425,10 +425,14 @@ pub fn build(b: *std.Build) void {
     const lint_cmd = b.step("lint", "Lint the linters own source code.");
     lint_cmd.dependOn(step: {
         var include = shims.ArrayList(LintIncludeSource).empty;
-        include.append(b.allocator, .compiled(b.addLibrary(.{
+        const zlinter_lib = b.addStaticLibrary(.{
             .name = "zlinter",
-            .root_module = zlinter_lib_module,
-        }))) catch @panic("OOM");
+            .root_source_file = b.path("src/lib/zlinter.zig"),
+            .target = target,
+            .optimize = optimize,
+        });
+        zlinter_lib.root_module.addImport("zls", zls_module);
+        include.append(b.allocator, .compiled(zlinter_lib)) catch @panic("OOM");
 
         var exclude = shims.ArrayList(LintExcludeSource).empty;
 
