@@ -385,16 +385,14 @@ pub fn build(b: *std.Build) void {
     const build_website = b.step("website", "Build website.");
     const wasm_exe = b.addExecutable(.{
         .name = "wasm",
-        .root_module = b.createModule(.{
-            .root_source_file = b.path("src/exe/wasm.zig"),
-            .imports = &.{zlinter_import},
-            .target = b.resolveTargetQuery(.{
-                .cpu_arch = .wasm32,
-                .os_tag = .freestanding,
-            }),
-            .optimize = .ReleaseSmall,
+        .root_source_file = b.path("src/exe/wasm.zig"),
+        .target = b.resolveTargetQuery(.{
+            .cpu_arch = .wasm32,
+            .os_tag = .freestanding,
         }),
+        .optimize = .ReleaseSmall,
     });
+    wasm_exe.root_module.addImport(zlinter_import.name, zlinter_import.module);
     wasm_exe.entry = .disabled;
     wasm_exe.rdynamic = true;
     const install_wasm_step = b.addInstallArtifact(wasm_exe, .{ .dest_dir = .{
@@ -506,14 +504,13 @@ pub fn build(b: *std.Build) void {
     // ------------------------------------------------------------------------
     const docs_cmd = b.step("docs", "Regenerate docs (should be run before every commit)");
     docs_cmd.dependOn(step: {
-        const doc_build_run = b.addRunArtifact(b.addExecutable(.{
+        const doc_build_exe = b.addExecutable(.{
             .name = "build_docs",
-            .root_module = b.createModule(.{
-                .root_source_file = b.path("build_docs.zig"),
-                .target = b.graph.host,
-                .optimize = .Debug,
-            }),
-        }));
+            .root_source_file = b.path("build_docs.zig"),
+            .target = b.graph.host,
+            .optimize = .Debug,
+        });
+        const doc_build_run = b.addRunArtifact(doc_build_exe);
         var step = &doc_build_run.step;
 
         var install_step = b.addInstallFileWithDir(
@@ -572,15 +569,18 @@ fn buildStep(
     // --------------------------------------------------------------------
     // Generate linter exe
     // --------------------------------------------------------------------
-    const exe_module = b.createModule(.{
+    const zlinter_exe = b.addExecutable(.{
+        .name = "zlinter",
         .root_source_file = exe_file,
         .target = options.target,
         .optimize = options.optimize,
-        .imports = &.{zlinter_import},
+        // TODO: Look into why 0.15 is segfaulting on linux without this:
+        .use_llvm = true,
     });
     if (version.zig == .@"0.15" and options.target.result.os.tag == .windows) {
-        exe_module.linkSystemLibrary("advapi32", .{});
+        zlinter_exe.root_module.linkSystemLibrary("advapi32", .{});
     }
+    zlinter_exe.root_module.addImport(zlinter_import.name, zlinter_import.module);
 
     // --------------------------------------------------------------------
     // Generate dynamic rules and rules config
@@ -595,17 +595,7 @@ fn buildStep(
             rules,
         ),
     );
-    exe_module.addImport("rules", rules_module);
-
-    // --------------------------------------------------------------------
-    // Generate linter exe
-    // --------------------------------------------------------------------
-    const zlinter_exe = b.addExecutable(.{
-        .name = "zlinter",
-        .root_module = exe_module,
-        // TODO: Look into why 0.15 is segfaulting on linux without this:
-        .use_llvm = true,
-    });
+    zlinter_exe.root_module.addImport("rules", rules_module);
 
     const zlinter_run = ZlinterRun.create(
         b,
@@ -778,14 +768,13 @@ fn addBuildRulesStep(
     root_source_path: std.Build.LazyPath,
     rules: []const BuiltRule,
 ) std.Build.LazyPath {
-    var run = b.addRunArtifact(b.addExecutable(.{
+    const build_rules_exe = b.addExecutable(.{
         .name = "build_rules",
-        .root_module = b.createModule(.{
-            .root_source_file = root_source_path,
-            .target = b.graph.host,
-            .optimize = .Debug,
-        }),
-    }));
+        .root_source_file = root_source_path,
+        .target = b.graph.host,
+        .optimize = .Debug,
+    });
+    var run = b.addRunArtifact(build_rules_exe);
 
     const output = run.addOutputFileArg("rules.zig");
     for (rules) |rule|

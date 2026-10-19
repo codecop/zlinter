@@ -124,7 +124,7 @@ Key ZLS API differences to investigate:
   - Fixed: `.init(gpa)` shorthand not valid in 0.13 — changed to `std.ArrayList(u8).init(gpa)`
   - Verified: file reading APIs work in Zig 0.13.0 — Status: DONE
 
-### Phase 3: Build System Port — **IN PROGRESS (4/18)**
+### Phase 3: Build System Port — **IN PROGRESS (5/18)**
 
 - [x] **TASK-3.1:** Port `build.zig` — `zls_version` switch
   - File: `build.zig:3-7`
@@ -151,11 +151,15 @@ Key ZLS API differences to investigate:
   - Extracted `zls_module` to a variable; after `addTest`, added imports via `root_module.addImport()` for both test executables
   - Status: DONE
 
-- [ ] **TASK-3.5:** Port `build.zig` — `b.addExecutable()` calls
+- [x] **TASK-3.5:** Port `build.zig` — `b.addExecutable()` calls
   - File: `build.zig` (wasm exe, docs exe, build_rules exe)
   - 0.14: `b.addExecutable(.{ .name = "wasm", .root_module = b.createModule(.{...}) })`
   - 0.13: `b.addExecutable(.{ .name = "wasm", .root_source_file = b.path("..."), .target = ..., .optimize = ... })`
   - **Major change:** 0.13 `ExecutableOptions` has `root_source_file`, not `root_module`
+  - Ported all 4 `addExecutable` calls: wasm_exe, build_docs, zlinter_exe, build_rules
+  - Imports added via `exe.root_module.addImport()` after creation
+  - `linkSystemLibrary` moved to `zlinter_exe.root_module.linkSystemLibrary()`
+  - Status: DONE
 
 - [ ] **TASK-3.6:** Port `build.zig` — `b.addLibrary()` calls
   - File: `build.zig` (lint step)
@@ -373,14 +377,14 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | IN PROGRESS | 4/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 5/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **14/97** | **97** |
+| **Total** | | **15/97** | **97** |
 
 ### Files Changed So Far
 
