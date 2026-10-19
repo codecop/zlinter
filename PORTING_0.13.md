@@ -188,10 +188,11 @@ Key ZLS API differences to investigate:
   - `exe.step.inputs` â€” API may differ
   - `LazyPath.getPath3()` â€” may not exist in 0.13; use `getPath()` instead
 
-- [ ] **TASK-3.9:** Port `build.zig` â€” `buildStep()` function
-  - File: `build.zig:~380-450`
-  - `exe_module.addImport("rules", rules_module)` â€” 0.13: `module.addImport(name, module)` should work
-  - `b.addExecutable(.{ .name = "zlinter", .root_module = exe_module, .use_llvm = true })` â€” port to 0.13 API
+- [x] **TASK-3.9:** Port `build.zig` â€” `buildStep()` function
+  - File: `build.zig:563-620`
+  - Already ported in TASK-3.5: `b.addExecutable` uses `.root_source_file` (0.13 API), imports via `zlinter_exe.root_module.addImport()`
+  - Verified: `ExecutableOptions` fields match Zig 0.13 API (`.root_source_file`, `.target`, `.optimize`, `.use_llvm`)
+  - Status: DONE
 
 - [ ] **TASK-3.10:** Port `build.zig` â€” `createRulesModule()` function
   - File: `build.zig:~560-600`
