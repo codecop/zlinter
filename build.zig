@@ -78,9 +78,9 @@ pub const BuilderOptions = struct {
 /// Create a step builder for zlinter
 pub fn builder(b: *std.Build, options: BuilderOptions) StepBuilder {
     return .{
-        .rules = .empty,
-        .exclude = .empty,
-        .include = .empty,
+        .rules = .{},
+        .exclude = .{},
+        .include = .{},
         .options = .{
             .optimize = options.optimize,
             .target = options.target orelse b.graph.host,
@@ -260,9 +260,13 @@ pub fn build(b: *std.Build) void {
     // Generate dynamic rules list and configs
     // --------------------------------------------------------------------
     // zlinter-disable-next-line no_undefined - immediately set in inline loop
-    var rules: [@typeInfo(BuiltinLintRule).@"enum".fields.len]BuiltRule = undefined;
+    const builtin_rule_fields = switch (version.zig) {
+        .@"0.13" => @typeInfo(BuiltinLintRule).Enum.fields,
+        else => @typeInfo(BuiltinLintRule).@"enum".fields,
+    };
+    var rules: [builtin_rule_fields.len]BuiltRule = undefined;
     // zlinter-disable-next-line no_undefined - immediately set in inline loop
-    var rule_imports: [@typeInfo(BuiltinLintRule).@"enum".fields.len]std.Build.Module.Import = undefined;
+    var rule_imports: [builtin_rule_fields.len]std.Build.Module.Import = undefined;
 
     inline for (std.meta.fields(BuiltinLintRule), 0..) |enum_type, i| {
         const rule_module = b.createModule(.{
@@ -424,7 +428,7 @@ pub fn build(b: *std.Build) void {
 
     const lint_cmd = b.step("lint", "Lint the linters own source code.");
     lint_cmd.dependOn(step: {
-        var include = shims.ArrayList(LintIncludeSource).empty;
+        var include = shims.ArrayList(LintIncludeSource){};
         const zlinter_lib = b.addStaticLibrary(.{
             .name = "zlinter",
             .root_source_file = b.path("src/lib/zlinter.zig"),
@@ -432,9 +436,9 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
         });
         zlinter_lib.root_module.addImport("zls", zls_module);
-        include.append(b.allocator, .compiled(zlinter_lib)) catch @panic("OOM");
+        include.append(b.allocator, LintIncludeSource.compiled(zlinter_lib)) catch @panic("OOM");
 
-        var exclude = shims.ArrayList(LintExcludeSource).empty;
+        var exclude = shims.ArrayList(LintExcludeSource){};
 
         // Also lint all files within project, not just those resolved to our compiled source.
         include.append(b.allocator, .{ .path = b.path("./") }) catch @panic("OOM");
@@ -544,7 +548,10 @@ pub fn build(b: *std.Build) void {
 }
 
 fn toZonString(val: anytype, allocator: std.mem.Allocator) []const u8 {
-    var zon = std.ArrayListUnmanaged(u8).empty;
+    if (version.zig == .@"0.13") {
+        return allocator.dupe(u8, ".{}") catch @panic("OOM");
+    }
+    var zon = std.ArrayListUnmanaged(u8){};
     defer zon.deinit(allocator);
 
     std.zon.stringify.serialize(val, .{}, zon.writer(allocator)) catch
@@ -797,7 +804,7 @@ fn createRulesModule(
     rules: []const BuiltRule,
     build_rules_output: std.Build.LazyPath,
 ) *std.Build.Module {
-    var rule_imports = std.ArrayListUnmanaged(std.Build.Module.Import).empty;
+    var rule_imports = std.ArrayListUnmanaged(std.Build.Module.Import){};
     for (rules) |r| rule_imports.append(b.allocator, r.import) catch @panic("OOM");
     defer rule_imports.deinit(b.allocator);
 
@@ -861,9 +868,12 @@ const ZlinterRun = struct {
                 .id = .custom,
                 .name = "Run zlinter",
                 .owner = owner,
-                .makeFn = make,
+                .makeFn = switch (version.zig) {
+                    .@"0.13" => make013,
+                    else => make,
+                },
             }),
-            .argv = .empty,
+            .argv = .{},
             .exclude = exclude,
             .include = include,
         };
@@ -877,8 +887,18 @@ const ZlinterRun = struct {
         if (owner.graph.global_cache_root.path) |p|
             self.addArgs(&.{ "--global_cache_root", p });
 
-        if (owner.graph.zig_lib_directory.path) |p|
-            self.addArgs(&.{ "--zig_lib_directory", p });
+        switch (version.zig) {
+            .@"0.13" => {
+                if (owner.zig_lib_dir) |lib_dir| {
+                    const p = lib_dir.getPath2(owner, &self.step);
+                    self.addArgs(&.{ "--zig_lib_directory", p });
+                }
+            },
+            else => {
+                if (owner.graph.zig_lib_directory.path) |p|
+                    self.addArgs(&.{ "--zig_lib_directory", p });
+            },
+        }
 
         const bin_file = exe.getEmittedBin();
         bin_file.addStepDependencies(&self.step);
@@ -914,30 +934,45 @@ const ZlinterRun = struct {
 
         const b = step.owner;
 
-        var list: shims.ArrayList([]const u8) = try .initCapacity(
+        var list: shims.ArrayList([]const u8) = try shims.ArrayList([]const u8).initCapacity(
             b.allocator,
             paths.len,
         );
         defer list.deinit(b.allocator);
 
         for (paths) |path| {
-            list.appendAssumeCapacity(
-                path.getPath3(b, step).subPathOrDot(),
-            );
+            if (version.zig == .@"0.13") {
+                switch (path) {
+                    .src_path => |sp| list.appendAssumeCapacity(if (sp.sub_path.len == 0) "." else sp.sub_path),
+                    else => list.appendAssumeCapacity(path.getPath2(b, step)),
+                }
+            } else {
+                list.appendAssumeCapacity(
+                    path.getPath3(b, step).subPathOrDot(),
+                );
+            }
         }
 
         return try list.toOwnedSlice(b.allocator);
     }
 
+    fn make013(step: *std.Build.Step, _: std.Progress.Node) !void {
+        return makeImpl(step);
+    }
+
     fn make(step: *std.Build.Step, _: std.Build.Step.MakeOptions) !void {
+        return makeImpl(step);
+    }
+
+    fn makeImpl(step: *std.Build.Step) !void {
         const run: *ZlinterRun = @alignCast(@fieldParentPtr("step", step));
         const b = run.step.owner;
         const arena = b.allocator;
 
         var cwd_buff: [std.fs.max_path_bytes]u8 = undefined;
-        const cwd: BuildCwd = .init(&cwd_buff);
+        const cwd: BuildCwd = BuildCwd.init(&cwd_buff);
 
-        var includes: shims.ArrayList(std.Build.LazyPath) = try .initCapacity(
+        var includes: shims.ArrayList(std.Build.LazyPath) = try shims.ArrayList(std.Build.LazyPath).initCapacity(
             b.allocator,
             @max(1, run.include.len),
         );
@@ -946,40 +981,45 @@ const ZlinterRun = struct {
         for (run.include) |source| {
             switch (source) {
                 .compiled_unit => |info| {
-                    var exe = info.compile_step;
+                    const exe = info.compile_step;
 
-                    // TODO: Use graph for import map.
-                    const graph = exe.root_module.getGraph();
-                    _ = graph;
-
-                    var inputs = exe.step.inputs;
-                    std.debug.assert(inputs.populated());
-
-                    var it = inputs.table.iterator();
-                    while (it.next()) |entry| {
-                        const p = entry.key_ptr.*;
-                        sub_paths: for (entry.value_ptr.items) |sub_path| {
-                            var buf: [std.fs.max_path_bytes]u8 = undefined;
-                            const joined_path = if (p.sub_path.len == 0) sub_path else p: {
-                                const fmt = "{s}" ++ std.fs.path.sep_str ++ "{s}";
-                                break :p std.fmt.bufPrint(
-                                    &buf,
-                                    fmt,
-                                    .{ p.sub_path, sub_path },
-                                ) catch {
-                                    std.debug.print(
-                                        "Warning: Name too long - " ++ fmt,
-                                        .{ p.sub_path, sub_path },
-                                    );
-                                    continue :sub_paths;
-                                };
-                            };
-                            std.debug.assert(joined_path.len > 0);
-
-                            if (!try isLintableFilePath(joined_path)) continue :sub_paths;
-
-                            if (cwd.relativePath(b, joined_path)) |path| {
+                    if (version.zig == .@"0.13") {
+                        if (exe.root_module.root_source_file) |root_file| {
+                            const path_str = root_file.getPath2(b, step);
+                            if (cwd.relativePath(b, path_str)) |path| {
                                 try includes.append(b.allocator, path);
+                            }
+                        }
+                    } else {
+                        var inputs = exe.step.inputs;
+                        std.debug.assert(inputs.populated());
+
+                        var it = inputs.table.iterator();
+                        while (it.next()) |entry| {
+                            const p = entry.key_ptr.*;
+                            sub_paths: for (entry.value_ptr.items) |sub_path| {
+                                var buf: [std.fs.max_path_bytes]u8 = undefined;
+                                const joined_path = if (p.sub_path.len == 0) sub_path else p: {
+                                    const fmt = "{s}" ++ std.fs.path.sep_str ++ "{s}";
+                                    break :p std.fmt.bufPrint(
+                                        &buf,
+                                        fmt,
+                                        .{ p.sub_path, sub_path },
+                                    ) catch {
+                                        std.debug.print(
+                                            "Warning: Name too long - " ++ fmt,
+                                            .{ p.sub_path, sub_path },
+                                        );
+                                        continue :sub_paths;
+                                    };
+                                };
+                                std.debug.assert(joined_path.len > 0);
+
+                                if (!try isLintableFilePath(joined_path)) continue :sub_paths;
+
+                                if (cwd.relativePath(b, joined_path)) |path| {
+                                    try includes.append(b.allocator, path);
+                                }
                             }
                         }
                     }
@@ -994,7 +1034,7 @@ const ZlinterRun = struct {
             includes.appendAssumeCapacity(b.path("./"));
         }
 
-        var excludes: shims.ArrayList(std.Build.LazyPath) = try .initCapacity(b.allocator, run.exclude.len);
+        var excludes: shims.ArrayList(std.Build.LazyPath) = try shims.ArrayList(std.Build.LazyPath).initCapacity(b.allocator, run.exclude.len);
         defer excludes.deinit(b.allocator);
         for (run.exclude) |exclude| {
             switch (exclude) {
@@ -1021,7 +1061,7 @@ const ZlinterRun = struct {
                     try argv_list.append(arena, bytes);
                 },
                 .artifact => |artifact| {
-                    if (artifact.rootModuleTarget().os.tag == .windows) {
+                    if (version.zig != .@"0.13" and artifact.rootModuleTarget().os.tag == .windows) {
                         // Windows doesn't have rpaths so add .dll search paths to PATH environment variable
                         const chase_dynamics = true;
                         const compiles = artifact.getCompileDependencies(chase_dynamics);
@@ -1042,7 +1082,10 @@ const ZlinterRun = struct {
                             }
                         }
                     }
-                    const file_path = artifact.installed_path orelse artifact.generated_bin.?.path.?;
+                    const file_path = switch (version.zig) {
+                        .@"0.13" => artifact.getEmittedBin().getPath2(b, &run.step),
+                        else => artifact.installed_path orelse artifact.generated_bin.?.path.?,
+                    };
                     try argv_list.append(arena, b.dupe(file_path));
                 },
             }
@@ -1055,7 +1098,7 @@ const ZlinterRun = struct {
             return run.step.fail("Host cannot spawn zlinter:\n\t{s}", .{
                 std.Build.Step.allocPrintCmd(
                     arena,
-                    b.build_root.path,
+                    b.build_root.path orelse ".",
                     argv_list.items,
                 ) catch @panic("OOM"),
             });
@@ -1065,14 +1108,14 @@ const ZlinterRun = struct {
             std.debug.print("zlinter command:\n\t{s}\n", .{
                 std.Build.Step.allocPrintCmd(
                     arena,
-                    b.build_root.path,
+                    b.build_root.path orelse ".",
                     argv_list.items,
                 ) catch @panic("OOM"),
             });
         }
 
         var child = std.process.Child.init(argv_list.items, arena);
-        child.cwd = b.build_root.path;
+        child.cwd = b.build_root.path orelse ".";
         child.cwd_dir = b.build_root.handle;
         child.env_map = env_map;
         // As we're using stdout and stderr inherit we don't want to update
@@ -1099,7 +1142,7 @@ const ZlinterRun = struct {
 
             var stdin_file = child.stdin.?;
             switch (version.zig) {
-                .@"0.14" => {
+                .@"0.13", .@"0.14" => {
                     var writer = stdin_file.writer();
                     writer.writeInt(usize, build_info_zon_bytes.len, .little) catch @panic("stdin write failed");
                     writer.writeAll(build_info_zon_bytes) catch @panic("stdin write failed");
@@ -1134,7 +1177,7 @@ const ZlinterRun = struct {
                     return step.fail("zlinter command crashed:\n\t{s}", .{
                         std.Build.Step.allocPrintCmd(
                             arena,
-                            b.build_root.path,
+                            b.build_root.path orelse ".",
                             argv_list.items,
                         ) catch @panic("OOM"),
                     });
@@ -1144,7 +1187,7 @@ const ZlinterRun = struct {
                 return step.fail("zlinter was terminated unexpectedly:\n\t{s}", .{
                     std.Build.Step.allocPrintCmd(
                         arena,
-                        b.build_root.path,
+                        b.build_root.path orelse ".",
                         argv_list.items,
                     ) catch @panic("OOM"),
                 });
@@ -1154,6 +1197,32 @@ const ZlinterRun = struct {
 };
 
 fn readHtmlTemplate(b: *std.Build, path: std.Build.LazyPath) ![]const u8 {
+    if (version.zig == .@"0.13") {
+        const abs_path = path.getPath2(b, null);
+        var file = try std.fs.openFileAbsolute(abs_path, .{});
+        defer file.close();
+        const max_bytes = 128 * 1024;
+        const bytes = try file.readToEndAlloc(b.allocator, max_bytes);
+        defer b.allocator.free(bytes);
+        const replacement = b.fmt("{d}", .{std.time.milliTimestamp()});
+        const needle = "{{build_timestamp}}";
+        const buffer = try b.allocator.alloc(u8, std.mem.replacementSize(
+            u8,
+            bytes,
+            needle,
+            replacement,
+        ));
+        errdefer b.allocator.free(buffer);
+        const replacements = std.mem.replace(
+            u8,
+            bytes,
+            needle,
+            replacement,
+            buffer,
+        );
+        if (replacements == 0) @panic("Failed to replace template timestamps");
+        return buffer;
+    }
     const rules_path = path.getPath3(b, null);
 
     var file = try rules_path.root_dir.handle.openFile(rules_path.subPathOrDot(), .{});

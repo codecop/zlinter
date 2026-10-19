@@ -185,8 +185,7 @@ pub fn isContainerNamespace(tree: Ast, container_decl: Ast.full.ContainerDecl) b
 /// out this can be used to consistently return an unmanaged version.
 pub fn ArrayList(T: type) type {
     return comptime switch (version.zig) {
-        .@"0.14" => std.ArrayListUnmanaged(T),
-        .@"0.13", .@"0.15", .@"0.16" => std.ArrayList(T),
+        .@"0.13", .@"0.14", .@"0.15", .@"0.16" => std.ArrayListUnmanaged(T),
     };
 }
 
