@@ -124,11 +124,12 @@ Key ZLS API differences to investigate:
   - Fixed: `.init(gpa)` shorthand not valid in 0.13 — changed to `std.ArrayList(u8).init(gpa)`
   - Verified: file reading APIs work in Zig 0.13.0 — Status: DONE
 
-### Phase 3: Build System Port — **PENDING**
+### Phase 3: Build System Port — **IN PROGRESS (1/18)**
 
-- [ ] **TASK-3.1:** Port `build.zig` — `zls_version` switch
+- [x] **TASK-3.1:** Port `build.zig` — `zls_version` switch
   - File: `build.zig:3-7`
   - Change: Add `.@"0.13" => "0.13.0"` to the switch
+  - Status: DONE
 
 - [ ] **TASK-3.2:** Port `build.zig` — `b.addModule()` calls
   - File: `build.zig` (multiple locations)
@@ -367,18 +368,19 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | PENDING | 0/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 1/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **10/97** | **97** |
+| **Total** | | **11/97** | **97** |
 
 ### Files Changed So Far
 
 ```
+build.zig                       — added .@"0.13" => "0.13.0" to zls_version switch
 build.zig.zon                   — 0.13 ZON syntax, ZLS 0.13.0 dep
 integration_tests/build.zig.zon — 0.13 ZON syntax
 src/lib/version.zig             — added .@"0.13" enum value
