@@ -114,7 +114,7 @@ Key ZLS API differences to investigate:
   - Alternative: Use `std.json` and switch config format
   - Status: DONE — Custom recursive descent parser (~350 lines) handling structs, enums (incl. `.@"quoted"`), bools, ints, floats, strings, slices, optionals, and nested structs. 9/9 standalone tests pass.
 
-- [ ] **TASK-2.3:** Update `zon.Diagnostics` type for 0.13
+- [x] **TASK-2.3:** Update `zon.Diagnostics` type for 0.13
   - File: `src/lib/zon.zig:1-4`
   - 0.14: `std.zon.parse.Status`
   - 0.13: No `std.zon` — use custom diagnostics type or `void`
@@ -366,7 +366,7 @@ zig build integration-check --summary all
 | Phase | Status | Tasks Done | Tasks Total |
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
-| Phase 2: ZON Parser | IN PROGRESS | 1/4 | 4 |
+| Phase 2: ZON Parser | IN PROGRESS | 3/4 | 4 |
 | Phase 3: Build System | PENDING | 0/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
@@ -374,7 +374,7 @@ zig build integration-check --summary all
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **8/97** | **97** |
+| **Total** | | **9/97** | **97** |
 
 ### Files Changed So Far
 

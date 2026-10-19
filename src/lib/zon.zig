@@ -1,4 +1,10 @@
-pub const Diagnostics = struct {
+pub const Diagnostics = switch (version.zig) {
+    .@"0.13" => CustomDiagnostics,
+    .@"0.14" => std.zon.parse.Status,
+    .@"0.15", .@"0.16" => std.zon.parse.Diagnostics,
+};
+
+pub const CustomDiagnostics = struct {
     errors: [32]Error = undefined,
     error_count: usize = 0,
 
@@ -6,19 +12,19 @@ pub const Diagnostics = struct {
         msg: []const u8,
     };
 
-    pub fn add(self: *Diagnostics, msg: []const u8) void {
+    pub fn add(self: *CustomDiagnostics, msg: []const u8) void {
         if (self.error_count < self.errors.len) {
             self.errors[self.error_count] = .{ .msg = msg };
             self.error_count += 1;
         }
     }
 
-    pub fn iterateErrors(self: *Diagnostics) ErrorIterator {
+    pub fn iterateErrors(self: *CustomDiagnostics) ErrorIterator {
         return .{ .diagnostics = self, .index = 0 };
     }
 
     pub const ErrorIterator = struct {
-        diagnostics: *Diagnostics,
+        diagnostics: *CustomDiagnostics,
         index: usize,
 
         pub fn next(self: *ErrorIterator) ?Error {
@@ -30,7 +36,7 @@ pub const Diagnostics = struct {
     };
 
     pub fn format(
-        self: Diagnostics,
+        self: CustomDiagnostics,
         comptime fmt: []const u8,
         options: std.fmt.FormatOptions,
         writer: anytype,
@@ -83,9 +89,9 @@ const Parser = struct {
     gpa: std.mem.Allocator,
     source: [:0]const u8,
     pos: usize = 0,
-    diagnostics: ?*Diagnostics,
+    diagnostics: ?*CustomDiagnostics,
 
-    fn init(gpa: std.mem.Allocator, source: [:0]const u8, diagnostics: ?*Diagnostics) Parser {
+    fn init(gpa: std.mem.Allocator, source: [:0]const u8, diagnostics: ?*CustomDiagnostics) Parser {
         return .{
             .gpa = gpa,
             .source = source,
@@ -424,7 +430,7 @@ test "parseFileAlloc" {
         ),
     );
 
-    var diagnostics = Diagnostics{};
+    var diagnostics = CustomDiagnostics{};
     try testing.writeFile(
         tmp_dir.dir,
         "b.zon",
@@ -451,3 +457,4 @@ test "parseFileAlloc" {
 const session = @import("session.zig");
 const std = @import("std");
 const testing = @import("testing.zig");
+const version = @import("version.zig");
