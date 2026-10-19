@@ -101,7 +101,7 @@ Key ZLS API differences to investigate:
   - **Result: NOT FOUND.** ZLS 0.13 exports no `zon` module. Zero `std.zon` usage in ZLS 0.13 source. `std/zon.zig` does not exist in Zig 0.13 stdlib.
   - Proceeding to TASK-2.2 (write minimal ZON parser)
 
-- [ ] **TASK-2.2:** Implement minimal ZON parser for rule configs
+- [x] **TASK-2.2:** Implement minimal ZON parser for rule configs
   - File: `src/lib/zon.zig` (rewrite for 0.13)
   - Scope: Parse `.{ .field = value, ... }` syntax with:
     - String values: `.{ .name = "value" }`
@@ -112,6 +112,7 @@ Key ZLS API differences to investigate:
     - Nested structs: `.{ .field = .{ .sub = 1 } }`
   - Use `std.zon.parse.fromSlice` equivalent API surface
   - Alternative: Use `std.json` and switch config format
+  - Status: DONE — Custom recursive descent parser (~350 lines) handling structs, enums (incl. `.@"quoted"`), bools, ints, floats, strings, slices, optionals, and nested structs. 9/9 standalone tests pass.
 
 - [ ] **TASK-2.3:** Update `zon.Diagnostics` type for 0.13
   - File: `src/lib/zon.zig:1-4`
@@ -365,7 +366,7 @@ zig build integration-check --summary all
 | Phase | Status | Tasks Done | Tasks Total |
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
-| Phase 2: ZON Parser | PENDING | 0/4 | 4 |
+| Phase 2: ZON Parser | IN PROGRESS | 1/4 | 4 |
 | Phase 3: Build System | PENDING | 0/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
@@ -373,7 +374,7 @@ zig build integration-check --summary all
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **7/97** | **97** |
+| **Total** | | **8/97** | **97** |
 
 ### Files Changed So Far
 
@@ -382,6 +383,7 @@ build.zig.zon                   — 0.13 ZON syntax, ZLS 0.13.0 dep
 integration_tests/build.zig.zon — 0.13 ZON syntax
 src/lib/version.zig             — added .@"0.13" enum value
 src/lib/shims.zig               — added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
+src/lib/zon.zig                 — minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 PORTING_0.13.md                 — this document
 ```
 
