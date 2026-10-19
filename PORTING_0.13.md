@@ -124,7 +124,7 @@ Key ZLS API differences to investigate:
   - Fixed: `.init(gpa)` shorthand not valid in 0.13 â€” changed to `std.ArrayList(u8).init(gpa)`
   - Verified: file reading APIs work in Zig 0.13.0 â€” Status: DONE
 
-### Phase 3: Build System Port â€” **IN PROGRESS (8/18)**
+### Phase 3: Build System Port â€” **IN PROGRESS (9/18)**
 
 - [x] **TASK-3.1:** Port `build.zig` â€” `zls_version` switch
   - File: `build.zig:3-7`
@@ -194,10 +194,13 @@ Key ZLS API differences to investigate:
   - Verified: `ExecutableOptions` fields match Zig 0.13 API (`.root_source_file`, `.target`, `.optimize`, `.use_llvm`)
   - Status: DONE
 
-- [ ] **TASK-3.10:** Port `build.zig` â€” `createRulesModule()` function
-  - File: `build.zig:~560-600`
-  - `std.ArrayListUnmanaged(std.Build.Module.Import)` â€” 0.13: use `std.ArrayList`
-  - `module.addImport(name, module)` â€” verify 0.13 signature
+- [x] **TASK-3.10:** Port `build.zig` â€” `createRulesModule()` function
+  - File: `build.zig:801-837`
+  - Change: Replaced `std.ArrayListUnmanaged(std.Build.Module.Import)` with managed `std.ArrayList(std.Build.Module.Import)` (0.13 API)
+  - Updated `append()`, `deinit()`, `toOwnedSlice()` calls to managed API (no allocator parameter)
+  - Verified: `module.addImport(name, module)` signature matches Zig 0.13 API
+  - Status: DONE
+
 
 - [ ] **TASK-3.11:** Port `build.zig` â€” `toZonString()` function
   - File: `build.zig:~340-350`
@@ -384,14 +387,14 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | IN PROGRESS | 8/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 9/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **20/97** | **97** |
+| **Total** | | **21/97** | **97** |
 
 ### Files Changed So Far
 

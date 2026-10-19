@@ -804,16 +804,16 @@ fn createRulesModule(
     rules: []const BuiltRule,
     build_rules_output: std.Build.LazyPath,
 ) *std.Build.Module {
-    var rule_imports = std.ArrayListUnmanaged(std.Build.Module.Import){};
-    for (rules) |r| rule_imports.append(b.allocator, r.import) catch @panic("OOM");
-    defer rule_imports.deinit(b.allocator);
+    var rule_imports = std.ArrayList(std.Build.Module.Import).init(b.allocator);
+    for (rules) |r| rule_imports.append(r.import) catch @panic("OOM");
+    defer rule_imports.deinit();
 
     const rules_imports = std.mem.concat(
         b.allocator,
         std.Build.Module.Import,
         &.{
             &[1]std.Build.Module.Import{zlinter_import},
-            rule_imports.toOwnedSlice(b.allocator) catch @panic("OOM"),
+            rule_imports.toOwnedSlice() catch @panic("OOM"),
         },
     ) catch @panic("OOM");
     defer b.allocator.free(rules_imports);
