@@ -224,17 +224,19 @@ pub fn build(b: *std.Build) void {
     const test_coverage = b.option(bool, "coverage", "Generate a coverage report with kcov");
     const test_focus_on_rule = b.option([]const u8, "test_focus_on_rule", "Only run integration tests for this rule");
 
+    const zls_module = b.dependency("zls", .{
+        .target = target,
+        .optimize = optimize,
+        .@"version-string" = zls_version,
+    }).module("zls");
+
     const zlinter_lib_module = b.addModule("zlinter", .{
         .root_source_file = b.path("src/lib/zlinter.zig"),
         .target = target,
         .optimize = optimize,
         .imports = &.{.{
             .name = "zls",
-            .module = b.dependency("zls", .{
-                .target = target,
-                .optimize = optimize,
-                .@"version-string" = zls_version,
-            }).module("zls"),
+            .module = zls_module,
         }},
     });
     if (version.zig == .@"0.15" and target.result.os.tag == .windows) {
@@ -247,9 +249,12 @@ pub fn build(b: *std.Build) void {
     };
 
     const unit_tests_exe = b.addTest(.{
-        .root_module = zlinter_lib_module,
+        .root_source_file = b.path("src/lib/zlinter.zig"),
+        .target = target,
+        .optimize = optimize,
         .use_llvm = test_coverage,
     });
+    unit_tests_exe.root_module.addImport("zls", zls_module);
 
     // --------------------------------------------------------------------
     // Generate dynamic rules list and configs
@@ -348,9 +353,12 @@ pub fn build(b: *std.Build) void {
     for (rule_imports) |rule_import| {
         const test_rule_exe = b.addTest(.{
             .name = b.fmt("{s}_unit_test_coverage", .{rule_import.name}),
-            .root_module = rule_import.module,
+            .root_source_file = rule_import.module.root_source_file.?,
+            .target = target,
+            .optimize = optimize,
             .use_llvm = test_coverage,
         });
+        test_rule_exe.root_module.addImport("zlinter", zlinter_lib_module);
 
         if (test_coverage orelse false) {
             const cover_run = std.Build.Step.Run.create(b, "Unit test coverage");

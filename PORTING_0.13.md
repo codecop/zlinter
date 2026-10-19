@@ -124,7 +124,7 @@ Key ZLS API differences to investigate:
   - Fixed: `.init(gpa)` shorthand not valid in 0.13 — changed to `std.ArrayList(u8).init(gpa)`
   - Verified: file reading APIs work in Zig 0.13.0 — Status: DONE
 
-### Phase 3: Build System Port — **IN PROGRESS (3/18)**
+### Phase 3: Build System Port — **IN PROGRESS (4/18)**
 
 - [x] **TASK-3.1:** Port `build.zig` — `zls_version` switch
   - File: `build.zig:3-7`
@@ -143,11 +143,13 @@ Key ZLS API differences to investigate:
   - Verified: All 9 `b.createModule()` calls use `.root_source_file`, `.target`, `.optimize`, `.imports` — all valid 0.13 `Module.CreateOptions` fields. No changes needed.
   - Status: DONE
 
-- [ ] **TASK-3.4:** Port `build.zig` — `b.addTest()` calls
+- [x] **TASK-3.4:** Port `build.zig` — `b.addTest()` calls
   - File: `build.zig:135-138` and similar
   - 0.14: `b.addTest(.{ .root_module = zlinter_lib_module, .use_llvm = test_coverage })`
   - 0.13: `b.addTest(.{ .root_source_file = b.path("src/lib/zlinter.zig"), .target = target, .optimize = optimize })`
-  - **Major change:** 0.13 `TestOptions` has `root_source_file`, not `root_module`
+  - **Major change:** 0.13 `TestOptions` has `root_source_file`, not `root_module` (no imports field)
+  - Extracted `zls_module` to a variable; after `addTest`, added imports via `root_module.addImport()` for both test executables
+  - Status: DONE
 
 - [ ] **TASK-3.5:** Port `build.zig` — `b.addExecutable()` calls
   - File: `build.zig` (wasm exe, docs exe, build_rules exe)
@@ -371,14 +373,14 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | IN PROGRESS | 3/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 4/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **13/97** | **97** |
+| **Total** | | **14/97** | **97** |
 
 ### Files Changed So Far
 
