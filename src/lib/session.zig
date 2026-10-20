@@ -222,6 +222,13 @@ pub const LintContext = struct {
         };
 
         self.analyser = switch (version.zig) {
+            .@"0.13" => zls.Analyser.init(
+                gpa,
+                &self.document_store,
+                &self.intern_pool,
+                null,
+                false,
+            ),
             .@"0.14" => zls.Analyser.init(
                 gpa,
                 &self.document_store,

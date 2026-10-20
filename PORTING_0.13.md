@@ -282,7 +282,7 @@ Key ZLS API differences to investigate:
   - Verified: `zig build-exe build_docs.zig -fno-emit-bin` compiles cleanly
   - Status: DONE
 
-### Phase 4: Library Source Port **PENDING**
+### Phase 4: Library Source Port **IN PROGRESS**
 
 - [x] **TASK-4.1:** Update `src/lib/ast.zig` `iterateChildren()` for 0.13
   - File: `src/lib/ast.zig:91-114`
@@ -303,10 +303,11 @@ Key ZLS API differences to investigate:
   - `LintContext.diagnostics_collection` field is `void` for 0.13 (type doesn't exist in ZLS 0.13)
   - Status: DONE
 
-- [ ] **TASK-4.4:** Update `src/lib/session.zig` `Analyser.init()`
+- [x] **TASK-4.4:** Update `src/lib/session.zig` `Analyser.init()`
   - File: `src/lib/session.zig:217-230`
   - 0.14: `zls.Analyser.init(gpa, &document_store, &intern_pool, null)`
-  - 0.13: ZLS 0.13 signature may differ
+  - 0.13: ZLS 0.13 signature is `init(gpa, store, ip, root_handle, dangerous_comptime_experiments_do_not_enable)` (5 params)
+  - Status: DONE - Added `.@"0.13"` case with `null` root_handle and `false` for dangerous_comptime_experiments_do_not_enable
 
 - [ ] **TASK-4.5:** Update `src/lib/session.zig` `resolveTypeOfNode()`
   - File: `src/lib/session.zig:326-330`
@@ -434,13 +435,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 3/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 4/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **30/97** | **97** |
+| **Total** | | **31/97** | **97** |
 
 ### Files Changed So Far
 
@@ -453,7 +454,7 @@ integration_tests/build.zig.zon 0.13 ZON syntax
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
 src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
-src/lib/session.zig             DocumentStore config version-aware for 0.13 (no diagnostics_collection field)
+src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 PORTING_0.13.md                 this document
 ```
