@@ -91,14 +91,20 @@ pub const LintDocument = struct {
     }
 
     /// For debugging purposes only, should never be left in
-    pub fn dumpType(self: *const LintDocument, t: zls.Analyser.Type, indent_size: u32) !void {
+    pub fn dumpType(self: *const LintDocument, analyser: *zls.Analyser, t: zls.Analyser.Type, indent_size: u32) !void {
         var buffer: [128]u8 = @splat(' ');
         const indent = buffer[0..indent_size];
 
         std.debug.print("{s}------------------------------------\n", .{indent});
         std.debug.print("{s}is_type_val: {}\n", .{ indent, t.is_type_val });
-        std.debug.print("{s}isContainerType: {}\n", .{ indent, t.isContainerType() });
-        std.debug.print("{s}isEnumLiteral: {}\n", .{ indent, t.isEnumLiteral() });
+        switch (version.zig) {
+            .@"0.13" => {},
+            .@"0.14", .@"0.15", .@"0.16" => std.debug.print("{s}isContainerType: {}\n", .{ indent, t.isContainerType() }),
+        }
+        std.debug.print("{s}isEnumLiteral: {}\n", .{ indent, switch (version.zig) {
+            .@"0.13" => t.isEnumLiteral(analyser),
+            .@"0.14", .@"0.15", .@"0.16" => t.isEnumLiteral(),
+        } });
         std.debug.print("{s}isEnumType: {}\n", .{ indent, t.isEnumType() });
         std.debug.print("{s}isFunc: {}\n", .{ indent, t.isFunc() });
         std.debug.print("{s}isGenericFunc: {}\n", .{ indent, t.isGenericFunc() });
@@ -111,22 +117,36 @@ pub const LintDocument = struct {
         std.debug.print("{s}isUnionType: {}\n", .{ indent, t.isUnionType() });
 
         if (t.data == .ip_index) {
-            std.debug.print("{s}Primitive: {}\n", .{ indent, t.data.ip_index.type });
-            if (t.data.ip_index.index) |tt| {
-                std.debug.print("{s}Value: {}\n", .{ indent, tt });
+            switch (version.zig) {
+                .@"0.13" => std.debug.print("{s}Primitive index: {}\n", .{ indent, t.data.ip_index.index }),
+                .@"0.14", .@"0.15", .@"0.16" => {
+                    std.debug.print("{s}Primitive: {}\n", .{ indent, t.data.ip_index.type });
+                    if (t.data.ip_index.index) |tt| {
+                        std.debug.print("{s}Value: {}\n", .{ indent, tt });
+                    }
+                },
             }
         }
 
-        const decl_literal = t.resolveDeclLiteralResultType();
-        if (!decl_literal.eql(t)) {
-            std.debug.print("{s}Decl literal result type:\n", .{indent});
-            try self.dumpType(decl_literal, indent_size + 4);
+        switch (version.zig) {
+            .@"0.13" => {},
+            .@"0.14", .@"0.15", .@"0.16" => {
+                const decl_literal = t.resolveDeclLiteralResultType();
+                if (!decl_literal.eql(t)) {
+                    std.debug.print("{s}Decl literal result type:\n", .{indent});
+                    try self.dumpType(analyser, decl_literal, indent_size + 4);
+                }
+            },
         }
 
-        if (t.instanceTypeVal(self.analyser)) |instance| {
+        const maybe_instance = switch (version.zig) {
+            .@"0.13", .@"0.15", .@"0.16" => try t.instanceTypeVal(analyser),
+            .@"0.14" => t.instanceTypeVal(analyser),
+        };
+        if (maybe_instance) |instance| {
             if (!instance.eql(t)) {
                 std.debug.print("{s}Instance result type:\n", .{indent});
-                try self.dumpType(instance, indent_size + 4);
+                try self.dumpType(analyser, instance, indent_size + 4);
             }
         }
     }
@@ -544,7 +564,7 @@ pub const LintContext = struct {
                 }
             } else if (try self.resolveTypeOfNode(doc, node)) |init_node_type| {
                 // std.debug.print("InitNode - ResolvedNode type: {}\n", .{init_node_type});
-                // try self.dumpType(init_node_type, 0);
+                // try doc.dumpType(&self.analyser, init_node_type, 0);
 
                 const decl = switch (version.zig) {
                     .@"0.13" => init_node_type,
@@ -552,7 +572,7 @@ pub const LintContext = struct {
                 };
 
                 // std.debug.print("InitNode - Resolved type: {}\n", .{decl});
-                // try self.dumpType(decl, 0);
+                // try doc.dumpType(&self.analyser, decl, 0);
 
                 const is_error_container = switch (version.zig) {
                     .@"0.13" => switch (decl.data) {

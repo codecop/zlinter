@@ -62,10 +62,10 @@ Key ZLS API differences to investigate:
 - [x] **TASK-1.2:** Update `build.zig.zon` for 0.13 syntax and ZLS dependency
   - File: `build.zig.zon`
   - Changes:
-    - `.name = .zlinter` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ `.name = "zlinter"` (0.13 requires string literal)
+    - `.name = .zlinter` ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ `.name = "zlinter"` (0.13 requires string literal)
     - Removed `.fingerprint` (not supported in 0.13)
     - Removed `.minimum_zig_version` (not supported in 0.13)
-    - ZLS dependency: `0.14.0` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ `0.13.0` (fetched, hash: `122073c0...`)
+    - ZLS dependency: `0.14.0` ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ `0.13.0` (fetched, hash: `122073c0...`)
   - Status: DONE
 
 - [x] **TASK-1.3:** Add `.@"0.13"` case to `shims.ArrayList()` in `src/lib/shims.zig`
@@ -91,7 +91,7 @@ Key ZLS API differences to investigate:
 
 - [x] **TASK-1.7:** Update `integration_tests/build.zig.zon` for 0.13 syntax
   - File: `integration_tests/build.zig.zon`
-  - Changes: `.name = .tests` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ `.name = "tests"`, removed `.fingerprint`
+  - Changes: `.name = .tests` ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ `.name = "tests"`, removed `.fingerprint`
   - Status: DONE
 
 ### Phase 2: ZON Parser (BLOCKER-1 resolution) **COMPLETED**
@@ -169,7 +169,7 @@ Key ZLS API differences to investigate:
   - Change: Replaced `b.addLibrary` with `b.addStaticLibrary`, extracted to variable, added `zls` import via `root_module.addImport()`, appended `.compiled(zlinter_lib)` to include list
   - Status: DONE
 
-- [x] **TASK-3.7:** Port `build.zig` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â `addWatchInput` function
+- [x] **TASK-3.7:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `addWatchInput` function
   - File: `build.zig` (addWatchInput at ~625, docs section at ~528)
   - 0.14: Uses `step.addDirectoryWatchInput()`, `step.addWatchInput()`, `step.addDirectoryWatchInputFromPath()`
   - 0.13: These methods **do not exist** on `Step`
@@ -318,7 +318,7 @@ Key ZLS API differences to investigate:
 - [x] **TASK-4.6:** Update `src/lib/session.zig` `resolveTypeOfTypeNode()`
   - File: `src/lib/session.zig:350-361`
   - `resolved_type.instanceTypeVal(&self.analyser)` 0.14 returns optional directly
-  - 0.13: Returns error union (`error{OutOfMemory}!?Type`) — added `.@"0.13"` alongside `.@"0.15", .@"0.16"` with `try`
+  - 0.13: Returns error union (`error{OutOfMemory}!?Type`) â€” added `.@"0.13"` alongside `.@"0.15", .@"0.16"` with `try`
   - `resolveDeclLiteralResultType()` does not exist in ZLS 0.13 (decl literals are a Zig 0.14 feature)
   - Added version switch: `.@"0.13" => instance_type` (no decl literal resolution), `.@"0.14", .@"0.15", .@"0.16" => instance_type.resolveDeclLiteralResultType()`
   - Status: DONE
@@ -333,9 +333,17 @@ Key ZLS API differences to investigate:
   - Fix: Restructured `is_error_container` computation with outer version switch - 0.13 checks `.other` variant for `error_set_decl`/`merge_error_sets` node tags, 0.14+ keeps existing `.container` logic
   - Status: DONE
 
-- [ ] **TASK-4.8:** Update `src/lib/session.zig` `dumpType()` debug method
+- [x] **TASK-4.8:** Update `src/lib/session.zig` `dumpType()` debug method
   - File: `src/lib/session.zig:94-140`
   - Uses `zls.Analyser.Type` methods verify all exist in ZLS 0.13
+  - Added `analyser: *zls.Analyser` parameter (LintDocument has no analyser field)
+  - Guarded `isContainerType()` with version switch (does not exist in ZLS 0.13)
+  - Made `isEnumLiteral()` version-aware (0.13 requires `analyser` parameter)
+  - Fixed `ip_index` access for 0.13 (`.type` field does not exist, `.index` is not optional)
+  - Guarded `resolveDeclLiteralResultType()` with version switch (does not exist in ZLS 0.13)
+  - Made `instanceTypeVal()` version-aware (0.13 returns error union, needs `try`)
+  - Updated commented-out call sites in `resolveTypeKind` to pass `&self.analyser`
+  - Status: DONE
 
 - [ ] **TASK-4.9:** Update `src/lib/session.zig` `zls.Config` fields
   - File: `src/lib/session.zig` (init function)
