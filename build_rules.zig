@@ -1,7 +1,7 @@
 //! Generates a rules zig file at build time that can be built into the linter.
 
 pub fn main() !void {
-    var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+    var debug_allocator: std.heap.GeneralPurposeAllocator(.{}) = .{};
     defer if (debug_allocator.deinit() == .leak) @panic("Memory leak");
 
     const gpa = debug_allocator.allocator();

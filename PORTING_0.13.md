@@ -268,10 +268,12 @@ Key ZLS API differences to investigate:
   - No changes needed - `BuildCwd` is already 0.13-compatible
   - Status: DONE
 
-- [ ] **TASK-3.17:** Port `build_rules.zig`
+- [x] **TASK-3.17:** Port `build_rules.zig`
   - File: `build_rules.zig`
-  - `std.process.cleanExit()` may not exist in 0.13; use `std.process.exit(0)` instead
-  - `std.heap.DebugAllocator(.{})` verify 0.13 API
+  - `std.process.cleanExit()` exists in 0.13 (std/process.zig:1759) - no change needed
+  - `std.heap.DebugAllocator(.{})` does not exist in 0.13 - replaced with `std.heap.GeneralPurposeAllocator(.{})` and `.init` with `.{}`
+  - Verified: `zig build-exe build_rules.zig` compiles cleanly
+  - Status: DONE
 
 - [ ] **TASK-3.18:** Port `build_docs.zig`
   - File: `build_docs.zig`
@@ -423,20 +425,21 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | IN PROGRESS | 12/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 13/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **24/97** | **97** |
+| **Total** | | **25/97** | **97** |
 
 ### Files Changed So Far
 
 ```
 build.zig                       added .@"0.13" => "0.13.0" to zls_version switch
 build.zig.zon                   0.13 ZON syntax, ZLS 0.13.0 dep
+build_rules.zig                 DebugAllocator -> GeneralPurposeAllocator for 0.13
 integration_tests/build.zig.zon 0.13 ZON syntax
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
