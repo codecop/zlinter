@@ -351,10 +351,13 @@ pub const LintContext = struct {
         const resolved_type = try self.resolveTypeOfNode(doc, node) orelse return null;
         const instance_type = if (resolved_type.isMetaType()) resolved_type else switch (version.zig) {
             .@"0.14" => resolved_type.instanceTypeVal(&self.analyser) orelse resolved_type,
-            .@"0.15", .@"0.16" => try resolved_type.instanceTypeVal(&self.analyser) orelse resolved_type,
+            .@"0.13", .@"0.15", .@"0.16" => try resolved_type.instanceTypeVal(&self.analyser) orelse resolved_type,
         };
 
-        return instance_type.resolveDeclLiteralResultType();
+        return switch (version.zig) {
+            .@"0.13" => instance_type,
+            .@"0.14", .@"0.15", .@"0.16" => instance_type.resolveDeclLiteralResultType(),
+        };
     }
 
     // TODO: Write tests and clean this up as they're not really all needed

@@ -315,10 +315,13 @@ Key ZLS API differences to investigate:
   - 0.13: ZLS 0.13 `resolveTypeOfNode` takes `NodeWithHandle { .node, .handle }` - same field names, struct literal coerces
   - Status: DONE - Added `.@"0.13"` alongside `.@"0.14"` in the version switch
 
-- [ ] **TASK-4.6:** Update `src/lib/session.zig` `resolveTypeOfTypeNode()`
-  - File: `src/lib/session.zig:335-343`
+- [x] **TASK-4.6:** Update `src/lib/session.zig` `resolveTypeOfTypeNode()`
+  - File: `src/lib/session.zig:350-361`
   - `resolved_type.instanceTypeVal(&self.analyser)` 0.14 returns optional directly
-  - 0.13: May return error union
+  - 0.13: Returns error union (`error{OutOfMemory}!?Type`) — added `.@"0.13"` alongside `.@"0.15", .@"0.16"` with `try`
+  - `resolveDeclLiteralResultType()` does not exist in ZLS 0.13 (decl literals are a Zig 0.14 feature)
+  - Added version switch: `.@"0.13" => instance_type` (no decl literal resolution), `.@"0.14", .@"0.15", .@"0.16" => instance_type.resolveDeclLiteralResultType()`
+  - Status: DONE
 
 - [ ] **TASK-4.7:** Update `src/lib/session.zig` container type resolution
   - File: `src/lib/session.zig:539-540`
@@ -436,13 +439,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 4/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 5/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **31/97** | **97** |
+| **Total** | | **32/97** | **97** |
 
 ### Files Changed So Far
 
@@ -455,7 +458,7 @@ integration_tests/build.zig.zon 0.13 ZON syntax
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
 src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
-src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature
+src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature, resolveTypeOfTypeNode() with 0.13 instanceTypeVal error union and no resolveDeclLiteralResultType
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 PORTING_0.13.md                 this document
 ```
