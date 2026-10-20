@@ -145,7 +145,7 @@ fn isTestOnlyCondition(tree: Ast, if_statement: Ast.full.If) bool {
 /// The context of all document and rule executions.
 pub const LintContext = struct {
     thread_pool: if (builtin.single_threaded) void else std.Thread.Pool,
-    diagnostics_collection: zls.DiagnosticsCollection,
+    diagnostics_collection: if (version.zig == .@"0.13") void else zls.DiagnosticsCollection,
     intern_pool: zls.analyser.InternPool,
     document_store: zls.DocumentStore,
     gpa: std.mem.Allocator,
@@ -159,7 +159,7 @@ pub const LintContext = struct {
     ) !void {
         self.* = .{
             .gpa = gpa,
-            .diagnostics_collection = .{ .allocator = gpa },
+            .diagnostics_collection = if (version.zig == .@"0.13") {} else .{ .allocator = gpa },
             .intern_pool = try .init(gpa),
             .thread_pool = undefined, // zlinter-disable-current-line no_undefined - set below
             .document_store = undefined, // zlinter-disable-current-line no_undefined - set below
@@ -173,44 +173,52 @@ pub const LintContext = struct {
                 .n_jobs = @min(4, std.Thread.getCpuCount() catch 1),
             }) catch @panic("Failed to init thread pool");
         }
-        self.document_store = zls.DocumentStore{
-            .allocator = gpa,
-            .diagnostics_collection = &self.diagnostics_collection,
-            .config = switch (version.zig) {
-                .@"0.15", .@"0.16" => .{
-                    .zig_exe_path = config.zig_exe_path,
-                    .zig_lib_dir = dir: {
-                        if (config.zig_lib_path) |zig_lib_path| {
-                            if (std.fs.openDirAbsolute(zig_lib_path, .{})) |zig_lib_dir| {
-                                break :dir .{
-                                    .handle = zig_lib_dir,
-                                    .path = zig_lib_path,
-                                };
-                            } else |err| {
-                                std.log.err("failed to open zig library directory '{s}': {s}", .{ zig_lib_path, @errorName(err) });
-                            }
-                        }
-                        break :dir null;
-                    },
-                    .build_runner_path = config.build_runner_path,
-                    .builtin_path = config.builtin_path,
-                    .global_cache_dir = dir: {
-                        if (config.global_cache_path) |global_cache_path| {
-                            if (std.fs.openDirAbsolute(global_cache_path, .{})) |global_cache_dir| {
-                                break :dir .{
-                                    .handle = global_cache_dir,
-                                    .path = global_cache_path,
-                                };
-                            } else |err| {
-                                std.log.err("failed to open zig library directory '{s}': {s}", .{ global_cache_path, @errorName(err) });
-                            }
-                        }
-                        break :dir null;
-                    },
-                },
-                .@"0.14" => .fromMainConfig(config),
+        self.document_store = switch (version.zig) {
+            .@"0.13" => zls.DocumentStore{
+                .allocator = gpa,
+                .config = .fromMainConfig(config),
+                .thread_pool = &self.thread_pool,
             },
-            .thread_pool = &self.thread_pool,
+            .@"0.14", .@"0.15", .@"0.16" => zls.DocumentStore{
+                .allocator = gpa,
+                .diagnostics_collection = &self.diagnostics_collection,
+                .config = switch (version.zig) {
+                    .@"0.15", .@"0.16" => .{
+                        .zig_exe_path = config.zig_exe_path,
+                        .zig_lib_dir = dir: {
+                            if (config.zig_lib_path) |zig_lib_path| {
+                                if (std.fs.openDirAbsolute(zig_lib_path, .{})) |zig_lib_dir| {
+                                    break :dir .{
+                                        .handle = zig_lib_dir,
+                                        .path = zig_lib_path,
+                                    };
+                                } else |err| {
+                                    std.log.err("failed to open zig library directory '{s}': {s}", .{ zig_lib_path, @errorName(err) });
+                                }
+                            }
+                            break :dir null;
+                        },
+                        .build_runner_path = config.build_runner_path,
+                        .builtin_path = config.builtin_path,
+                        .global_cache_dir = dir: {
+                            if (config.global_cache_path) |global_cache_path| {
+                                if (std.fs.openDirAbsolute(global_cache_path, .{})) |global_cache_dir| {
+                                    break :dir .{
+                                        .handle = global_cache_dir,
+                                        .path = global_cache_path,
+                                    };
+                                } else |err| {
+                                    std.log.err("failed to open zig library directory '{s}': {s}", .{ global_cache_path, @errorName(err) });
+                                }
+                            }
+                            break :dir null;
+                        },
+                    },
+                    .@"0.14" => .fromMainConfig(config),
+                    .@"0.13" => unreachable,
+                },
+                .thread_pool = &self.thread_pool,
+            },
         };
 
         self.analyser = switch (version.zig) {
@@ -231,7 +239,7 @@ pub const LintContext = struct {
     }
 
     pub fn deinit(self: *LintContext) void {
-        self.diagnostics_collection.deinit();
+        if (version.zig != .@"0.13") self.diagnostics_collection.deinit();
         self.intern_pool.deinit(self.gpa);
         self.document_store.deinit();
         self.analyser.deinit();

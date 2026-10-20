@@ -295,10 +295,13 @@ Key ZLS API differences to investigate:
   - Add `.@"0.13"` alongside `.@"0.14"` in all switch branches
   - Status: DONE - Added `.@"0.13"` alongside `.@"0.14"` in 7 version switch branches (deferBlock errdefer/defer, fnDecl, fullStatement catch/defer/errdefer, fnCall)
 
-- [ ] **TASK-4.3:** Update `src/lib/session.zig` `DocumentStore` config
+- [x] **TASK-4.3:** Update `src/lib/session.zig` `DocumentStore` config
   - File: `src/lib/session.zig:176-215`
   - 0.14: `.fromMainConfig(config)`
-  - 0.13: ZLS 0.13 `DocumentStore` config structure may differ
+  - 0.13: ZLS 0.13 `DocumentStore.Config` has same `fromMainConfig()` method with `?[]const u8` fields
+  - ZLS 0.13 `DocumentStore` has NO `diagnostics_collection` field - made DocumentStore init version-aware
+  - `LintContext.diagnostics_collection` field is `void` for 0.13 (type doesn't exist in ZLS 0.13)
+  - Status: DONE
 
 - [ ] **TASK-4.4:** Update `src/lib/session.zig` `Analyser.init()`
   - File: `src/lib/session.zig:217-230`
@@ -431,13 +434,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 1/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 3/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **27/97** | **97** |
+| **Total** | | **30/97** | **97** |
 
 ### Files Changed So Far
 
@@ -450,6 +453,7 @@ integration_tests/build.zig.zon 0.13 ZON syntax
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
 src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
+src/lib/session.zig             DocumentStore config version-aware for 0.13 (no diagnostics_collection field)
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 PORTING_0.13.md                 this document
 ```
