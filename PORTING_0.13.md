@@ -355,9 +355,10 @@ Key ZLS API differences to investigate:
   - No changes needed - `zls.Config` fields are already 0.13-compatible
   - Status: DONE
 
-- [ ] **TASK-4.10:** Update `src/lib/session.zig` `zls.URI.fromPath()`
-  - File: `src/lib/session.zig:253`
-  - Verify 0.13 API
+- [x] **TASK-4.10:** Update `src/lib/session.zig` `zls.URI.fromPath()`
+  - File: `src/lib/session.zig:288`
+  - Verified: ZLS 0.13 `URI.fromPath(allocator: std.mem.Allocator, path: []const u8) ![]const u8` has identical signature to 0.14. No changes needed.
+  - Status: DONE
 
 - [ ] **TASK-4.11:** Update `src/lib/explorer.zig` `tree.render()` and `renderError()`
   - File: `src/lib/explorer.zig:33-34, 133-140`
@@ -458,13 +459,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 7/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 8/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **34/97** | **97** |
+| **Total** | | **35/97** | **97** |
 
 ### Files Changed So Far
 
