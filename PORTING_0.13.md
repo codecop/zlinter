@@ -124,7 +124,7 @@ Key ZLS API differences to investigate:
   - Fixed: `.init(gpa)` shorthand not valid in 0.13 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â changed to `std.ArrayList(u8).init(gpa)`
   - Verified: file reading APIs work in Zig 0.13.0 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Status: DONE
 
-### Phase 3: Build System Port ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â **IN PROGRESS (10/18)**
+### Phase 3: Build System Port ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â **IN PROGRESS (11/18)**
 
 - [x] **TASK-3.1:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `zls_version` switch
   - File: `build.zig:3-7`
@@ -210,11 +210,13 @@ Key ZLS API differences to investigate:
   - Updated toZonString() in build.zig to use custom serializer for 0.13
   - Verified: no new compilation errors
 
-- [ ] **TASK-3.12:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `buildBuiltinRule()` and `buildCustomRule()`
-  - File: `build.zig:~420-480`
-  - `b.dependencyFromBuildZig(@This(), .{})` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â exists in 0.13
-  - `b.createModule()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â exists in 0.13
-  - Should be mostly compatible
+- [x] **TASK-3.12:** Port `build.zig` - `buildBuiltinRule()` and `buildCustomRule()`
+  - File: `build.zig:724-781`
+  - Verified: `b.createModule()` uses `.root_source_file`, `.target`, `.optimize`, `.imports` (all valid 0.13 API)
+  - Verified: `b.dependencyFromBuildZig(@This(), .{})` exists in 0.13
+  - Verified: `toZonString()` already ported for 0.13 (TASK-3.11)
+  - No changes needed - both functions are already 0.13-compatible
+  - Status: DONE
 
 - [ ] **TASK-3.13:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `addBuildRulesStep()`
   - File: `build.zig:~490-510`
@@ -390,14 +392,14 @@ zig build integration-check --summary all
 |-------|--------|-----------|-------------|
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
-| Phase 3: Build System | IN PROGRESS | 10/18 | 18 |
+| Phase 3: Build System | IN PROGRESS | 11/18 | 18 |
 | Phase 4: Library Source | PENDING | 0/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **22/97** | **97** |
+| **Total** | | **23/97** | **97** |
 
 ### Files Changed So Far
 
