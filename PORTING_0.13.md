@@ -345,9 +345,15 @@ Key ZLS API differences to investigate:
   - Updated commented-out call sites in `resolveTypeKind` to pass `&self.analyser`
   - Status: DONE
 
-- [ ] **TASK-4.9:** Update `src/lib/session.zig` `zls.Config` fields
+- [x] **TASK-4.9:** Update `src/lib/session.zig` `zls.Config` fields
   - File: `src/lib/session.zig` (init function)
   - Verify fields exist in ZLS 0.13 `Config`
+  - Verified: `zig_exe_path`, `zig_lib_path`, `global_cache_path` all exist in ZLS 0.13 `Config.zig`
+  - Verified: `DocumentStore.Config.fromMainConfig()` exists in ZLS 0.13 `DocumentStore.zig:51`
+  - Verified: `run_linter.zig:272-276` constructs `zls.Config` with only these 3 fields (all optional with defaults)
+  - Verified: `.@"0.13"` branch in `session.zig:199` already uses `.fromMainConfig(config)` correctly
+  - No changes needed - `zls.Config` fields are already 0.13-compatible
+  - Status: DONE
 
 - [ ] **TASK-4.10:** Update `src/lib/session.zig` `zls.URI.fromPath()`
   - File: `src/lib/session.zig:253`
@@ -452,13 +458,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 6/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 7/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **33/97** | **97** |
+| **Total** | | **34/97** | **97** |
 
 ### Files Changed So Far
 
