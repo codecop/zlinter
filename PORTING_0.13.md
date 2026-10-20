@@ -254,9 +254,19 @@ Key ZLS API differences to investigate:
   - No changes needed - all coverage and install APIs are already 0.13-compatible
   - Status: DONE
 
-- [ ] **TASK-3.16:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `BuildCwd` type
+- [x] **TASK-3.16:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `BuildCwd` type
   - File: `build.zig` (used in `ZlinterRun.make()`)
   - Verify this type exists or implement for 0.13
+  - Verified: `BuildCwd` is a custom struct defined in `build.zig:1259-1319`
+  - Verified: `std.process.getCwd(buff)` exists in 0.13 (std/process.zig:25)
+  - Verified: `std.fs.max_path_bytes` exists in 0.13 (std/fs.zig:55)
+  - Verified: `std.fs.path.relative(allocator, from, to)` exists in 0.13 (std/fs/path.zig:1069)
+  - Verified: `std.fs.Dir.access(sub_path, .{ .mode = .read_only })` exists in 0.13 (std/fs/Dir.zig:2397)
+  - Verified: `std.fs.path.isAbsolute()` exists in 0.13
+  - Verified: `std.Build.LazyPath.getPath2(b, step)` exists in 0.13 (std/Build.zig:2316)
+  - Verified: error set includes `error.Unexpected` and `error.CurrentWorkingDirectoryUnlinked` via `posix.GetCwdError`
+  - No changes needed - `BuildCwd` is already 0.13-compatible
+  - Status: DONE
 
 - [ ] **TASK-3.17:** Port `build_rules.zig`
   - File: `build_rules.zig`
