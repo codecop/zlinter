@@ -486,7 +486,10 @@ pub const LintContext = struct {
             } else if (shims.isIdentiferKind(tree, node, .type)) {
                 return .type;
             } else if (try self.resolveTypeOfNode(doc, node)) |type_node_type| {
-                const decl = type_node_type.resolveDeclLiteralResultType();
+                const decl = switch (version.zig) {
+                    .@"0.13" => type_node_type,
+                    .@"0.14", .@"0.15", .@"0.16" => type_node_type.resolveDeclLiteralResultType(),
+                };
                 if (decl.isUnionType()) {
                     return .union_instance;
                 } else if (decl.isEnumType()) {
@@ -543,13 +546,24 @@ pub const LintContext = struct {
                 // std.debug.print("InitNode - ResolvedNode type: {}\n", .{init_node_type});
                 // try self.dumpType(init_node_type, 0);
 
-                const decl = init_node_type.resolveDeclLiteralResultType();
+                const decl = switch (version.zig) {
+                    .@"0.13" => init_node_type,
+                    .@"0.14", .@"0.15", .@"0.16" => init_node_type.resolveDeclLiteralResultType(),
+                };
 
                 // std.debug.print("InitNode - Resolved type: {}\n", .{decl});
                 // try self.dumpType(decl, 0);
 
-                const is_error_container =
-                    if (std.meta.hasMethod(@TypeOf(decl), "isErrorSetType"))
+                const is_error_container = switch (version.zig) {
+                    .@"0.13" => switch (decl.data) {
+                        .other => |node_handle| !NodeIndexShim.init(node_handle.node).isRoot() and
+                            switch (shims.nodeTag(node_handle.handle.tree, node_handle.node)) {
+                                .error_set_decl, .merge_error_sets => true,
+                                else => false,
+                            },
+                        else => false,
+                    },
+                    .@"0.14", .@"0.15", .@"0.16" => if (std.meta.hasMethod(@TypeOf(decl), "isErrorSetType"))
                         decl.isErrorSetType(&self.analyser)
                     else switch (decl.data) {
                         .container => |container| result: {
@@ -567,7 +581,8 @@ pub const LintContext = struct {
                             break :result false;
                         },
                         else => false,
-                    };
+                    },
+                };
 
                 if (is_error_container) {
                     return .error_type;

@@ -1,7 +1,7 @@
 # Porting Zlinter to Zig 0.13 Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
-> Created: 2026-10-19 | Updated: 2026-10-19
+> Created: 2026-10-19 | Updated: 2026-10-20
 
 ---
 
@@ -323,10 +323,15 @@ Key ZLS API differences to investigate:
   - Added version switch: `.@"0.13" => instance_type` (no decl literal resolution), `.@"0.14", .@"0.15", .@"0.16" => instance_type.resolveDeclLiteralResultType()`
   - Status: DONE
 
-- [ ] **TASK-4.7:** Update `src/lib/session.zig` container type resolution
+- [x] **TASK-4.7:** Update `src/lib/session.zig` container type resolution
   - File: `src/lib/session.zig:539-540`
   - 0.14: `.{ container.toNode(), container.handle.tree }`
   - 0.13: ZLS 0.13 `Type.data.container` may have different structure
+  - ZLS 0.13 `Type.Data` has NO `.container` variant - container types use `.other: NodeWithHandle`
+  - ZLS 0.13 has NO `isErrorSetType()` method and NO `resolveDeclLiteralResultType()` method
+  - Fix: Added version-aware `resolveDeclLiteralResultType()` guards (2 callsites in resolveTypeKind)
+  - Fix: Restructured `is_error_container` computation with outer version switch - 0.13 checks `.other` variant for `error_set_decl`/`merge_error_sets` node tags, 0.14+ keeps existing `.container` logic
+  - Status: DONE
 
 - [ ] **TASK-4.8:** Update `src/lib/session.zig` `dumpType()` debug method
   - File: `src/lib/session.zig:94-140`
@@ -439,13 +444,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 5/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 6/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **32/97** | **97** |
+| **Total** | | **33/97** | **97** |
 
 ### Files Changed So Far
 
@@ -458,7 +463,7 @@ integration_tests/build.zig.zon 0.13 ZON syntax
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
 src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
-src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature, resolveTypeOfTypeNode() with 0.13 instanceTypeVal error union and no resolveDeclLiteralResultType
+src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature, resolveTypeOfTypeNode() with 0.13 instanceTypeVal error union and no resolveDeclLiteralResultType, resolveTypeKind() container type resolution version-aware for 0.13 (.other instead of .container, no isErrorSetType/resolveDeclLiteralResultType)
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 PORTING_0.13.md                 this document
 ```
