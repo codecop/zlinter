@@ -1,4 +1,4 @@
-# Porting Zlinter to Zig 0.13 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Analysis & Task List
+﻿# Porting Zlinter to Zig 0.13 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
 > Created: 2026-10-19 | Updated: 2026-10-19
@@ -222,11 +222,22 @@ Key ZLS API differences to investigate:
   - File: `build.zig:~490-510`
   - `b.addRunArtifact(b.addExecutable(...))` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â port executable creation to 0.13 API
 
-- [ ] **TASK-3.14:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `Step.Run` usage
+- [x] **TASK-3.14:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `Step.Run` usage
   - `run.addOutputFileArg()`, `run.addArg()`, `run.addFileArg()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify 0.13 API
   - `run.setCwd()`, `run.setEnvironmentVariable()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify 0.13 API
   - `run.expectExitCode()`, `run.expectStdOutEqual()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify 0.13 API
   - `run.has_side_effects` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify 0.13 API
+  - Verified: All 17 Step.Run methods/fields exist in Zig 0.13 std.Build.Step.Run with matching signatures
+  - Verified: std.Build.Step.Run.create() exists (Run.zig:148)
+  - Verified: addOutputFileArg(), addArg(), addFileArg() exist (Run.zig:202,379,253)
+  - Verified: setCwd(), setEnvironmentVariable() exist (Run.zig:396,437)
+  - Verified: expectExitCode(), expectStdOutEqual() exist (Run.zig:463,455)
+  - Verified: has_side_effects field exists (Run.zig:87)
+  - Verified: rename_step_with_output_arg field exists (Run.zig:58)
+  - Verified: addArgs(), addOutputDirectoryArg(), addDirectoryArg(), addPrefixedDirectoryArg(), addArtifactArg() exist
+  - Verified: b.addSystemCommand() and b.addRunArtifact() exist in 0.13 Build.zig (lines 961, 970)
+  - No changes needed - all Step.Run usage is already 0.13-compatible
+  - Status: DONE
 
 - [ ] **TASK-3.15:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â coverage and install steps
   - `b.addInstallDirectory()`, `b.addInstallFile()`, `b.addInstallFileWithDir()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â exist in 0.13
