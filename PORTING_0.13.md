@@ -1,4 +1,4 @@
-﻿# Porting Zlinter to Zig 0.13 Analysis & Task List
+# Porting Zlinter to Zig 0.13 Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
 > Created: 2026-10-19 | Updated: 2026-10-19
@@ -290,9 +290,10 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.15", .@"0.16"` to use `zls.ast.iterateChildren` directly (no fn_decl workaround needed)
   - Status: DONE
 
-- [ ] **TASK-4.2:** Update `src/lib/ast.zig` version switches for `data.lhs`/`data.rhs`
+- [x] **TASK-4.2:** Update `src/lib/ast.zig` version switches for `data.lhs`/`data.rhs`
   - File: `src/lib/ast.zig:131-136, 338-339, 419-432, 690-691`
   - Add `.@"0.13"` alongside `.@"0.14"` in all switch branches
+  - Status: DONE - Added `.@"0.13"` alongside `.@"0.14"` in 7 version switch branches (deferBlock errdefer/defer, fnDecl, fullStatement catch/defer/errdefer, fnCall)
 
 - [ ] **TASK-4.3:** Update `src/lib/session.zig` `DocumentStore` config
   - File: `src/lib/session.zig:176-215`
