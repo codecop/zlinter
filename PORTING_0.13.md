@@ -360,9 +360,11 @@ Key ZLS API differences to investigate:
   - Verified: ZLS 0.13 `URI.fromPath(allocator: std.mem.Allocator, path: []const u8) ![]const u8` has identical signature to 0.14. No changes needed.
   - Status: DONE
 
-- [ ] **TASK-4.11:** Update `src/lib/explorer.zig` `tree.render()` and `renderError()`
+- [x] **TASK-4.11:** Update `src/lib/explorer.zig` `tree.render()` and `renderError()`
   - File: `src/lib/explorer.zig:33-34, 133-140`
   - 0.13: Same API as 0.14 add `.@"0.13"` alongside `.@"0.14"`
+  - Added `.@"0.13"` to both switch prongs: `tree.render()` (line 33) and `tree.renderError()` (line 133)
+  - Status: DONE
 
 - [ ] **TASK-4.12:** Update `src/lib/rendering.zig` `Printer.initAuto()`
   - File: `src/lib/rendering.zig:248-260`
