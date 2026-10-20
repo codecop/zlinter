@@ -309,10 +309,11 @@ Key ZLS API differences to investigate:
   - 0.13: ZLS 0.13 signature is `init(gpa, store, ip, root_handle, dangerous_comptime_experiments_do_not_enable)` (5 params)
   - Status: DONE - Added `.@"0.13"` case with `null` root_handle and `false` for dangerous_comptime_experiments_do_not_enable
 
-- [ ] **TASK-4.5:** Update `src/lib/session.zig` `resolveTypeOfNode()`
+- [x] **TASK-4.5:** Update `src/lib/session.zig` `resolveTypeOfNode()`
   - File: `src/lib/session.zig:326-330`
   - 0.14: `self.analyser.resolveTypeOfNode(.{ .handle = doc.handle, .node = node })`
-  - 0.13: ZLS 0.13 API may differ
+  - 0.13: ZLS 0.13 `resolveTypeOfNode` takes `NodeWithHandle { .node, .handle }` - same field names, struct literal coerces
+  - Status: DONE - Added `.@"0.13"` alongside `.@"0.14"` in the version switch
 
 - [ ] **TASK-4.6:** Update `src/lib/session.zig` `resolveTypeOfTypeNode()`
   - File: `src/lib/session.zig:335-343`
