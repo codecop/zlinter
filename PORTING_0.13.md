@@ -284,10 +284,11 @@ Key ZLS API differences to investigate:
 
 ### Phase 4: Library Source Port **PENDING**
 
-- [ ] **TASK-4.1:** Update `src/lib/ast.zig` `iterateChildren()` for 0.13
+- [x] **TASK-4.1:** Update `src/lib/ast.zig` `iterateChildren()` for 0.13
   - File: `src/lib/ast.zig:91-114`
-  - 0.13: ZLS 0.13 may not have `zls.ast.iterateChildren()`
-  - **Need:** Implement manual child iteration using `std.zig.Ast` API
+  - ZLS 0.13 has `zls.ast.iterateChildren()` with the same signature and correctly handles `fn_decl`
+  - Added `.@"0.13"` alongside `.@"0.15", .@"0.16"` to use `zls.ast.iterateChildren` directly (no fn_decl workaround needed)
+  - Status: DONE
 
 - [ ] **TASK-4.2:** Update `src/lib/ast.zig` version switches for `data.lhs`/`data.rhs`
   - File: `src/lib/ast.zig:131-136, 338-339, 419-432, 690-691`
@@ -429,13 +430,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | PENDING | 0/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 1/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **26/97** | **97** |
+| **Total** | | **27/97** | **97** |
 
 ### Files Changed So Far
 
@@ -447,6 +448,7 @@ build_rules.zig                 DebugAllocator -> GeneralPurposeAllocator for 0.
 integration_tests/build.zig.zon 0.13 ZON syntax
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
+src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 PORTING_0.13.md                 this document
 ```

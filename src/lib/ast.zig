@@ -108,7 +108,7 @@ pub fn iterateChildren(
                 try zls.ast.iterateChildren(tree, node, context, Error, callback);
             }
         },
-        .@"0.15", .@"0.16" => try zls.ast.iterateChildren(tree, node, context, Error, callback),
+        .@"0.13", .@"0.15", .@"0.16" => try zls.ast.iterateChildren(tree, node, context, Error, callback),
     }
 }
 
