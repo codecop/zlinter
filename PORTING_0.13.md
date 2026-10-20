@@ -239,10 +239,20 @@ Key ZLS API differences to investigate:
   - No changes needed - all Step.Run usage is already 0.13-compatible
   - Status: DONE
 
-- [ ] **TASK-3.15:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â coverage and install steps
+- [x] **TASK-3.15:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â coverage and install steps
   - `b.addInstallDirectory()`, `b.addInstallFile()`, `b.addInstallFileWithDir()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â exist in 0.13
   - `b.findProgram()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â exists in 0.13
   - `merge_coverage.addOutputDirectoryArg()` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify 0.13 API
+  - Verified: All APIs exist in Zig 0.13 std.Build and std.Build.Step.Run
+  - Verified: addInstallDirectory Options (source_dir, install_dir, install_subdir) match 0.13 InstallDir.Options
+  - Verified: addInstallArtifact Options.dest_dir is Dir union with .override: InstallDir in 0.13
+  - Verified: addInstallFileWithDir takes (source, InstallDir, dest_rel_path) in 0.13
+  - Verified: findProgram(names, paths) signature matches 0.13
+  - Verified: addOutputDirectoryArg, addDirectoryArg, addPrefixedDirectoryArg exist in Run.zig 0.13
+  - Verified: rename_step_with_output_arg, has_side_effects fields exist in Run.zig 0.13
+  - Verified: addSystemCommand, setCwd exist in 0.13
+  - No changes needed - all coverage and install APIs are already 0.13-compatible
+  - Status: DONE
 
 - [ ] **TASK-3.16:** Port `build.zig` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â `BuildCwd` type
   - File: `build.zig` (used in `ZlinterRun.make()`)
