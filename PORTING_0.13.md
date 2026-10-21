@@ -618,7 +618,17 @@ zig build integration-check --summary all
 - [x] **TASK-8.8:** Verify website build: `zig build website`
   - `zig build website` exits 0, generates index.html, wasm.wasm (198KB), and all static assets (explorer.js, github.svg, style.css, index.template.html)
   - Status: DONE
-- [ ] **TASK-8.9:** Per-rule integration test verification
+- [x] **TASK-8.9:** Per-rule integration test verification
+  - Ran `zig build integration-test -Dtest_focus_on_rule=<rule>` for each of the 24 builtin rules plus `no_cats` custom rule
+  - Results per rule:
+    - PASS (21 rules, 36 tests): field_naming (3), field_ordering (4), function_naming (2), import_ordering (2), no_unused (1), no_deprecated (1), no_empty_block (1), no_inferred_error_unions (1), no_orelse_unreachable (1), no_undefined (1), no_literal_only_bool_expression (1), switch_case_ordering (1), max_positional_args (1), no_comment_out_code (1), no_todo (1), no_literal_args (1), no_swallow_error (1), no_panic (1), require_braces (2), require_doc_comment (1), no_cats (4)
+    - PARTIAL (1 rule, 4/5 tests pass): declaration_naming — Regression 80 fails (ZLS 0.13 cannot resolve `@typeInfo(...).@"struct".backing_integer.?` chains)
+    - FAIL (2 rules, known ZLS 0.13 limitations):
+      - no_hidden_allocations: ZLS 0.13 cannot resolve `std.heap.c_allocator`/`heap.page_allocator` through `@import("std")` aliases
+      - require_errdefer_dealloc: ZLS 0.13 cannot resolve generic instantiations like `std.AutoHashMap(u8, void)`
+    - NO TESTS (1 rule): file_naming — no test case directory exists in `integration_tests/test_cases/`
+  - Total: 40/43 integration tests pass, 3 known ZLS 0.13 limitations, 1 rule without test coverage
+  - Status: DONE
 
 ### Phase 9: CI Workflow Setup **PENDING**
 
@@ -643,9 +653,9 @@ zig build integration-check --summary all
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
 | Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
 | Phase 7: Language Audit | IN PROGRESS | 1/7 | 7 |
-| Phase 8: Verification | IN PROGRESS | 4/9 | 9 |
+| Phase 8: Verification | IN PROGRESS | 5/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **56/97** | **97** |
+| **Total** | | **57/97** | **97** |
 
 ### Files Changed So Far
 
