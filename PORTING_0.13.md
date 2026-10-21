@@ -427,10 +427,13 @@ Key ZLS API differences to investigate:
   - `no_deprecated.zig` lines 172/306: unguarded `lookupSymbolGlobal`/`getSymbolFieldAccesses` calls match ZLS 0.13 signatures
   - Status: DONE - No changes needed
 
-### Phase 6: Executable & Integration Tests **PENDING**
+### Phase 6: Executable & Integration Tests **IN PROGRESS**
 
 - [x] **TASK-6.1:** Update `src/exe/run_linter.zig` stdin reader (line 60-61)
-- [ ] **TASK-6.2:** Update `src/exe/run_linter.zig` diagnostics formatting (line 309-310)
+- [x] **TASK-6.2:** Update `src/exe/run_linter.zig` diagnostics formatting (line 309-310)
+  - Separated `.@"0.13"` from `.@"0.15", .@"0.16"` in the diagnostics format specifier version switch — 0.13's `CustomDiagnostics` uses `{}` (default format, matching 0.14) instead of `{f}` (float specifier)
+  - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig
+  - Status: DONE
 - [ ] **TASK-6.3:** Update `src/exe/run_linter.zig` file reading (line 522-540)
 - [ ] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)
 - [ ] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)
@@ -502,11 +505,11 @@ zig build integration-check --summary all
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
-| Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
+| Phase 6: Executable & Integration | IN PROGRESS | 2/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **45/97** | **97** |
+| **Total** | | **46/97** | **97** |
 
 ### Files Changed So Far
 
@@ -526,6 +529,7 @@ src/rules/no_hidden_allocations.zig  added .@"0.13" to field_access nodeData and
 src/rules/no_literal_only_bool_expression.zig  added .@"0.13" to comparison operator data.lhs/data.rhs version switch
 src/rules/no_orelse_unreachable.zig  added .@"0.13" to orelse rhs version switch
 src/rules/no_undefined.zig         added .@"0.13" to field_access nodeData lhs/rhs version switch
+src/exe/run_linter.zig          added .@"0.13" to stdin reader version switch (TASK-6.1), separated .@"0.13" diagnostics format specifier to use "{}" (TASK-6.2)
 PORTING_0.13.md                 this document
 ```
 

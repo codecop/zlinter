@@ -306,8 +306,8 @@ fn runLinterRules(
                                     switch (e) {
                                         error.ParseZon => {
                                             std.log.err("Failed to parse rule config: " ++ switch (zlinter.version.zig) {
-                                                .@"0.14" => "{}",
-                                                .@"0.13", .@"0.15", .@"0.16" => "{f}",
+                                                .@"0.14", .@"0.13" => "{}",
+                                                .@"0.15", .@"0.16" => "{f}",
                                             }, .{diagnostics});
                                         },
                                         else => {},
