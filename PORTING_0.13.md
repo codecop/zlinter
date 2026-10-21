@@ -370,7 +370,8 @@ Key ZLS API differences to investigate:
   - File: `src/lib/rendering.zig:248-260`
   - 0.13: Same API as 0.14 add `.@"0.13"` alongside `.@"0.14"`
 
-- [ ] **TASK-4.13:** Update `src/lib/zon.zig` see Phase 2 (BLOCKER-1)
+- [x] **TASK-4.13:** Update `src/lib/zon.zig` see Phase 2 (BLOCKER-1)
+  - Status: DONE - Custom ZON parser already implemented in Phase 2 (TASK-2.2). zon.zig has CustomDiagnostics, Parser, parseFileAlloc, parseFromSlice, stringify.serialize all working for 0.13.
 
 ### Phase 5: Rules Port **PENDING**
 
@@ -461,13 +462,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 9/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **36/97** | **97** |
+| **Total** | | **37/97** | **97** |
 
 ### Files Changed So Far
 
