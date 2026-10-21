@@ -513,7 +513,21 @@ Key ZLS API differences to investigate:
   - `no_hidden_allocations.zig:13` references `"DebugAllocator"` as a string literal for rule matching — not actual code usage
   - Verified: `zig ast-check` passes on run_linter.zig, build_docs.zig, build_rules.zig
   - Status: DONE
-- [ ] **TASK-7.5:** Audit `std.testing` API usage
+- [x] **TASK-7.5:** Audit `std.testing` API usage
+  - Searched all .zig source files for `std.testing` usage across 37 files
+  - APIs found and verified against Zig 0.13 `std/testing.zig`:
+    - `std.testing.allocator` (15+ occurrences) - EXISTS in 0.13 (line 9, `pub const allocator`)
+    - `std.testing.refAllDecls(@This())` (22+ occurrences in rule test blocks) - EXISTS in 0.13 (line 1112)
+    - `std.testing.expect(...)` (3 occurrences: files.zig, strings.zig, no_todo.zig, no_comment_out_code.zig) - EXISTS in 0.13 (line 539)
+    - `std.testing.expectEqual(...)` (testing.zig:70) - EXISTS in 0.13 (line 56, `pub inline fn`)
+    - `std.testing.expectEqualStrings(...)` (ansi.zig, rules.zig, no_deprecated.zig) - EXISTS in 0.13 (line 602)
+    - `std.testing.expectEqualDeep(...)` (Args.zig, ast.zig, comments.zig, rendering.zig, results.zig, testing.zig, zon.zig) - EXISTS in 0.13 (line 679, `pub inline fn`)
+    - `std.testing.expectError(...)` (Args.zig:816, zon.zig:447) - EXISTS in 0.13 (line 37)
+  - Also checked: `expectEqualSlices`, `expectFmt`, `expectStringStartsWith`, `expectStringEndsWith`, `expectEqualSentinel`, `refAllDeclsRecursive`, `failing_allocator` - all exist in 0.13 but are not used in the codebase
+  - All 7 `std.testing` APIs used in the codebase are compatible with Zig 0.13 - no changes needed
+  - Verified: `zig ast-check` passes on all files using `std.testing` APIs (testing.zig, ansi.zig, strings.zig, files.zig, results.zig, rules.zig, ast.zig, rendering.zig, session.zig, zon.zig, all 23 rule files, run_linter.zig, zlinter.zig, integration_test.zig)
+  - Pre-existing errors (unrelated to std.testing): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
+  - Status: DONE
 - [ ] **TASK-7.6:** Audit `std.json` usage
 - [ ] **TASK-7.7:** Audit `std.process` API usage
 
