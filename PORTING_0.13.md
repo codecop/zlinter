@@ -528,7 +528,21 @@ Key ZLS API differences to investigate:
   - Verified: `zig ast-check` passes on all files using `std.testing` APIs (testing.zig, ansi.zig, strings.zig, files.zig, results.zig, rules.zig, ast.zig, rendering.zig, session.zig, zon.zig, all 23 rule files, run_linter.zig, zlinter.zig, integration_test.zig)
   - Pre-existing errors (unrelated to std.testing): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
   - Status: DONE
-- [ ] **TASK-7.6:** Audit `std.json` usage
+- [x] **TASK-7.6:** Audit `std.json` usage
+  - Searched all .zig source files for `std.json` usage across 37 files
+  - Only `src/lib/explorer.zig` uses `std.json` directly (17 occurrences)
+  - `src/exe/wasm.zig` uses `zlinter.explorer.parseToJsonStringAlloc` indirectly (no direct std.json usage)
+  - APIs found and verified against Zig 0.13 `std/json.zig`:
+    - `std.json.stringifyAlloc(allocator, value, options)` - EXISTS in 0.13 (stringify.zig:87, `pub fn`)
+    - `std.json.Value` - EXISTS in 0.13 (dynamic.zig:18, `union(enum)` with `.null`, `.bool`, `.integer`, `.float`, `.number_string`, `.string`, `.array`, `.object`)
+    - `std.json.ObjectMap` - EXISTS in 0.13 (dynamic.zig:15, `StringArrayHashMap(Value)` with `.init(allocator)`, `.put(key, value)`)
+    - `std.json.Array` - EXISTS in 0.13 (dynamic.zig:16, `ArrayList(Value)` with `.init(allocator)`, `.append(value)`)
+    - Value variants used: `.object`, `.string`, `.bool`, `.integer`, `.number_string`, `.array` - all exist in 0.13
+    - `.integer` accepts `i64`; `Ast.TokenIndex` (`u32`) coerces implicitly - no issue
+  - All `std.json` APIs used in the codebase are compatible with Zig 0.13 - no changes needed
+  - Verified: `zig ast-check` passes on explorer.zig and wasm.zig
+  - Pre-existing errors (unrelated to std.json): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
+  - Status: DONE
 - [ ] **TASK-7.7:** Audit `std.process` API usage
 
 ### Phase 8: Verification & Testing (Local) **PENDING**
