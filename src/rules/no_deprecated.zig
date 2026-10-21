@@ -67,7 +67,7 @@ fn run(
                 doc,
                 node.toNodeIndex(),
                 switch (zlinter.version.zig) {
-                    .@"0.14" => shims.nodeData(tree, node.toNodeIndex()).rhs,
+                    .@"0.13", .@"0.14" => shims.nodeData(tree, node.toNodeIndex()).rhs,
                     .@"0.15", .@"0.16" => shims.nodeData(tree, node.toNodeIndex()).node_and_token.@"1",
                 },
                 &lint_problems,
@@ -86,7 +86,7 @@ fn run(
             ),
             else => {},
         }
-        if (zlinter.version.zig == .@"0.14") {
+        if (zlinter.version.zig == .@"0.13" or zlinter.version.zig == .@"0.14") {
             switch (tag) {
                 // -----------------------------------------------------------------
                 // 0.15 breaking changes - Add explicit breaking changes here:
@@ -262,7 +262,7 @@ fn getSymbolEnumLiteralDocComment(
     }
 
     var decl_with_handle = switch (zlinter.version.zig) {
-        .@"0.14" => try context.analyser.lookupSymbolFieldInit(
+        .@"0.13", .@"0.14" => try context.analyser.lookupSymbolFieldInit(
             doc.handle,
             name,
             ancestors.items[0..],
@@ -403,7 +403,7 @@ test "no_deprecated - regression test for #36" {
 }
 
 test "no_deprecated - explicit 0.15.x breaking changes" {
-    if (zlinter.version.zig != .@"0.14") return error.SkipZigTest;
+    if (zlinter.version.zig != .@"0.13" and zlinter.version.zig != .@"0.14") return error.SkipZigTest;
 
     try zlinter.testing.testRunRule(
         buildRule(.{}),

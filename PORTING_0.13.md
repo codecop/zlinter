@@ -384,7 +384,13 @@ Key ZLS API differences to investigate:
 - [x] **TASK-5.3:** Update `src/rules/import_ordering.zig` add `.@"0.13"` alongside `.@"0.14"` (line 241-242)
   - Added `.@"0.13"` alongside `.@"0.14"` in isImportCall builtin_call lhs version switch
   - Status: DONE
-- [ ] **TASK-5.4:** Update `src/rules/no_deprecated.zig` add `.@"0.13"` cases, fix ZLS API (lines 70-71, 89, 265-270, 406)
+- [x] **TASK-5.4:** Update `src/rules/no_deprecated.zig` add `.@"0.13"` cases, fix ZLS API (lines 70-71, 89, 265-270, 406)
+  - Added `.@"0.13"` alongside `.@"0.14"` in field_access nodeData version switch (line 70)
+  - Updated breaking-changes guard from `== .@"0.14"` to `== .@"0.13" or == .@"0.14"` (line 89)
+  - Added `.@"0.13"` alongside `.@"0.14"` in lookupSymbolFieldInit version switch (line 265) - ZLS 0.13 has same `(handle, name, nodes_slice)` signature as 0.14
+  - Updated test skip condition to allow 0.13 (line 406)
+  - Verified: `zig ast-check` passes, no compilation errors in no_deprecated.zig
+  - Status: DONE
 - [ ] **TASK-5.5:** Update `src/rules/no_empty_block.zig` add `.@"0.13"` alongside `.@"0.14"` (line 199-200)
 - [ ] **TASK-5.6:** Update `src/rules/no_hidden_allocations.zig` add `.@"0.13"` cases, fix ZLS API (lines 84-85, 102-103)
 - [ ] **TASK-5.7:** Update `src/rules/no_literal_only_bool_expression.zig` add `.@"0.13"` (line 76-77)
@@ -469,12 +475,12 @@ zig build integration-check --summary all
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
-| Phase 5: Rules | IN PROGRESS | 3/13 | 13 |
+| Phase 5: Rules | IN PROGRESS | 4/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **40/97** | **97** |
+| **Total** | | **41/97** | **97** |
 
 ### Files Changed So Far
 
@@ -489,6 +495,7 @@ src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, Array
 src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
 src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature, resolveTypeOfTypeNode() with 0.13 instanceTypeVal error union and no resolveDeclLiteralResultType, resolveTypeKind() container type resolution version-aware for 0.13 (.other instead of .container, no isErrorSetType/resolveDeclLiteralResultType)
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
+src/rules/no_deprecated.zig     added .@"0.13" to field_access nodeData, lookupSymbolFieldInit version switches; updated breaking-changes guard and test skip for 0.13
 PORTING_0.13.md                 this document
 ```
 
