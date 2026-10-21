@@ -543,7 +543,28 @@ Key ZLS API differences to investigate:
   - Verified: `zig ast-check` passes on explorer.zig and wasm.zig
   - Pre-existing errors (unrelated to std.json): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
   - Status: DONE
-- [ ] **TASK-7.7:** Audit `std.process` API usage
+- [x] **TASK-7.7:** Audit `std.process` API usage
+  - Searched all .zig source files for `std.process` usage across 7 files (excluding test fixtures)
+  - Files using `std.process`: `build.zig`, `build_docs.zig`, `build_rules.zig`, `src/exe/run_linter.zig`, `src/lib/files.zig`, `integration_tests/src/integration_test.zig`, `integration_tests/src/test_runner.zig`
+  - APIs found and verified against Zig 0.13 `std/process.zig` and `std/process/Child.zig`:
+    - `std.process.EnvMap` - EXISTS in 0.13 (process.zig:66, `pub const EnvMap = struct`)
+    - `std.process.getEnvMap(allocator)` - EXISTS in 0.13 (process.zig:284, `pub fn getEnvMap(allocator: Allocator) GetEnvMapError!EnvMap`)
+    - `std.process.can_spawn` - EXISTS in 0.13 (process.zig:1622, `pub const can_spawn`)
+    - `std.process.Child` - EXISTS in 0.13 (process.zig:14, `pub const Child = @import("process/Child.zig")`)
+    - `std.process.Child.init(argv, allocator)` - EXISTS in 0.13 (Child.zig:204, `pub fn init(argv: []const []const u8, allocator: mem.Allocator) ChildProcess`)
+    - `std.process.Child.run(args)` - EXISTS in 0.13 (Child.zig:371, `pub fn run(args: struct { ... }) RunError!RunResult`)
+    - `std.process.Child.RunResult` - EXISTS in 0.13 (Child.zig:307, `pub const RunResult = struct`)
+    - `std.process.getCwd(buffer)` - EXISTS in 0.13 (process.zig:25, `pub fn getCwd(out_buffer: []u8) ![]u8`)
+    - `std.process.getCwdAlloc(allocator)` - EXISTS in 0.13 (process.zig:34, `pub fn getCwdAlloc(allocator: Allocator) ![]u8`)
+    - `std.process.argsAlloc(allocator)` - EXISTS in 0.13 (process.zig:1183, `pub fn argsAlloc(allocator: Allocator) ![][:0]u8`)
+    - `std.process.argsFree(allocator, args)` - EXISTS in 0.13 (process.zig:1220, `pub fn argsFree(allocator: Allocator, args_alloc: []const [:0]u8) void`)
+    - `std.process.cleanExit()` - EXISTS in 0.13 (process.zig:1759, `pub fn cleanExit() void`)
+    - `std.process.exit(code)` - EXISTS in 0.13 (process.zig:16, `pub const exit = posix.exit`)
+  - All call-site signatures verified: `getCwd` with `*[max_path_bytes]u8` coerces to `[]u8`, `Child.run` options struct matches (`.allocator`, `.argv`, `.max_output_bytes`, `.env_map`), `argsAlloc`/`argsFree` pairing correct
+  - All `std.process` APIs used in the codebase are compatible with Zig 0.13 - no changes needed
+  - Verified: `zig ast-check` passes on all 7 affected files
+  - Pre-existing errors (unrelated to std.process): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
+  - Status: DONE
 
 ### Phase 8: Verification & Testing (Local) **PENDING**
 
