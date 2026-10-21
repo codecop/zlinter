@@ -407,7 +407,11 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.14"` in orelse rhs version switch (0.13 uses `data.rhs` like 0.14)
   - Verified: `zig ast-check` passes, no compilation errors in no_orelse_unreachable.zig
   - Status: DONE
-- [ ] **TASK-5.9:** Update `src/rules/no_swallow_error.zig` add `.@"0.13"` cases (lines 64-65, 151-155)
+- [x] **TASK-5.9:** Update `src/rules/no_swallow_error.zig` add `.@"0.13"` cases (lines 64-65, 151-155)
+  - Added `.@"0.13"` alongside `.@"0.14"` in catch rhs version switch (line 64)
+  - Added `.@"0.13"` alongside `.@"0.14"` in isEmptyOrUnreachableBlock lhs/rhs version switch (line 151)
+  - Verified: `zig ast-check` passes, no compilation errors in no_swallow_error.zig
+  - Status: DONE
 - [ ] **TASK-5.10:** Update `src/rules/no_undefined.zig` add `.@"0.13"` (line 125-126)
 - [ ] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
 - [ ] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
