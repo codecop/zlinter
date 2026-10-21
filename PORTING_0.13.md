@@ -403,7 +403,10 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.14"` in comparison operator data.lhs/data.rhs version switch
   - Verified: `zig ast-check` passes, no compilation errors in no_literal_only_bool_expression.zig
   - Status: DONE
-- [ ] **TASK-5.8:** Update `src/rules/no_orelse_unreachable.zig` add `.@"0.13"` (line 52-53)
+- [x] **TASK-5.8:** Update `src/rules/no_orelse_unreachable.zig` add `.@"0.13"` (line 52-53)
+  - Added `.@"0.13"` alongside `.@"0.14"` in orelse rhs version switch (0.13 uses `data.rhs` like 0.14)
+  - Verified: `zig ast-check` passes, no compilation errors in no_orelse_unreachable.zig
+  - Status: DONE
 - [ ] **TASK-5.9:** Update `src/rules/no_swallow_error.zig` add `.@"0.13"` cases (lines 64-65, 151-155)
 - [ ] **TASK-5.10:** Update `src/rules/no_undefined.zig` add `.@"0.13"` (line 125-126)
 - [ ] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
@@ -484,12 +487,12 @@ zig build integration-check --summary all
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
-| Phase 5: Rules | IN PROGRESS | 6/13 | 13 |
+| Phase 5: Rules | IN PROGRESS | 7/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **43/97** | **97** |
+| **Total** | | **44/97** | **97** |
 
 ### Files Changed So Far
 
@@ -507,6 +510,7 @@ src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, boo
 src/rules/no_deprecated.zig     added .@"0.13" to field_access nodeData, lookupSymbolFieldInit version switches; updated breaking-changes guard and test skip for 0.13
 src/rules/no_hidden_allocations.zig  added .@"0.13" to field_access nodeData and resolveVarDeclAlias version switches
 src/rules/no_literal_only_bool_expression.zig  added .@"0.13" to comparison operator data.lhs/data.rhs version switch
+src/rules/no_orelse_unreachable.zig  added .@"0.13" to orelse rhs version switch
 PORTING_0.13.md                 this document
 ```
 

@@ -49,7 +49,7 @@ fn run(
 
         const data = shims.nodeData(tree, node.toNodeIndex());
         const rhs = switch (zlinter.version.zig) {
-            .@"0.14" => data.rhs,
+            .@"0.13", .@"0.14" => data.rhs,
             .@"0.15", .@"0.16" => data.node_and_node.@"1",
         };
 
