@@ -238,7 +238,7 @@ fn isImportCall(tree: Ast, node: Ast.Node.Index) ?[]const u8 {
 
             const data = shims.nodeData(tree, node);
             const lhs_node = NodeIndexShim.initOptional(switch (zlinter.version.zig) {
-                .@"0.14" => data.lhs,
+                .@"0.13", .@"0.14" => data.lhs,
                 .@"0.15", .@"0.16" => data.opt_node_and_opt_node[0],
             }) orelse return null;
 

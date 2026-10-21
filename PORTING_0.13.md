@@ -381,7 +381,9 @@ Key ZLS API differences to investigate:
 - [x] **TASK-5.2:** Update `src/rules/function_naming.zig` add `.@"0.13"` alongside `.@"0.14"` (line 99-100)
   - Added `.@"0.13"` alongside `.@"0.14"` in fn_proto return_type version switch
   - Status: DONE
-- [ ] **TASK-5.3:** Update `src/rules/import_ordering.zig` add `.@"0.13"` alongside `.@"0.14"` (line 241-242)
+- [x] **TASK-5.3:** Update `src/rules/import_ordering.zig` add `.@"0.13"` alongside `.@"0.14"` (line 241-242)
+  - Added `.@"0.13"` alongside `.@"0.14"` in isImportCall builtin_call lhs version switch
+  - Status: DONE
 - [ ] **TASK-5.4:** Update `src/rules/no_deprecated.zig` add `.@"0.13"` cases, fix ZLS API (lines 70-71, 89, 265-270, 406)
 - [ ] **TASK-5.5:** Update `src/rules/no_empty_block.zig` add `.@"0.13"` alongside `.@"0.14"` (line 199-200)
 - [ ] **TASK-5.6:** Update `src/rules/no_hidden_allocations.zig` add `.@"0.13"` cases, fix ZLS API (lines 84-85, 102-103)
