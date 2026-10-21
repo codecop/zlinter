@@ -440,7 +440,11 @@ Key ZLS API differences to investigate:
   - Status: DONE
 - [x] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)`r`n  - Added `.@"0.13"` alongside `.@"0.14"` in the file writing version switch — 0.13 uses same old-style `file.writer()` API as 0.14 (no buffer parameter)`r`n  - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig`r`n  - Status: DONE
 - [x] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)`r`n  - Added separate `.@`"0.13"` case using `shims.ArrayList(u8){}` (0.13 `ArrayListUnmanaged` has no `.empty` constant, uses default field values instead) â€” same `renderError` API as 0.14`r`n  - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig`r`n  - Status: DONE
-- [ ] **TASK-6.6:** Update `src/exe/wasm.zig` verify 0.13 compatibility
+- [x] **TASK-6.6:** Update `src/exe/wasm.zig` verify 0.13 compatibility
+  - Verified: All APIs (`std.heap.wasm_allocator`, `ArenaAllocator.init`, `Allocator.dupeZ`, `@memcpy`, `builtin.cpu.arch.isWasm()`) exist in Zig 0.13
+  - Verified: `zig ast-check` passes on wasm.zig, no changes needed
+  - Status: DONE
+
 - [ ] **TASK-6.7:** Port `integration_tests/build.zig` build API changes
 - [ ] **TASK-6.8:** Port `integration_tests/build.zig.zon` **DONE** (TASK-1.7)
 - [ ] **TASK-6.9:** Update `integration_tests/src/test_runner.zig` verify API
@@ -508,11 +512,11 @@ zig build integration-check --summary all
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
-| Phase 6: Executable & Integration | IN PROGRESS | 5/12 | 12 |
+| Phase 6: Executable & Integration | IN PROGRESS | 6/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **49/97** | **97** |
+| **Total** | | **50/97** | **97** |
 
 ### Files Changed So Far
 
