@@ -35,7 +35,7 @@ fn run(
         switch (zlinter.version.zig) {
             .@"0.13" => {
                 const node_idx = node.toNodeIndex();
-                if (tree.nodes.items(.tag)[node_idx] != .@"switch") continue;
+                if (tree.nodes.items(.tag)[node_idx] != .@"switch" and tree.nodes.items(.tag)[node_idx] != .switch_comma) continue;
                 const data = tree.nodes.items(.data)[node_idx];
                 const cases_range = tree.extraData(data.rhs, Ast.Node.SubRange);
                 const case_count = cases_range.end - cases_range.start;

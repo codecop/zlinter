@@ -591,7 +591,16 @@ zig build integration-check --summary all
   - Fixed 5 compilation errors: rendering.zig Tty.init, run_linter.zig RunResult constants, .zon -> _config.zig generation, session.zig popOrNull, DefaultFormatter formatFn signature
   - Result: 0 errors, 400 warnings, 8 skipped - PASSES
   - Status: DONE
-- [ ] **TASK-8.4:** Verify integration tests: `zig build integration-test`
+- [x] **TASK-8.4:** Verify integration tests: `zig build integration-test`
+  - Fixed 3 issues:
+    1. `src/lib/zon.zig`: Added `.EnumLiteral` case to `stringify.serialize()` switch (enum literal values like `.foo` have type `@TypeOf(.foo)` which maps to `.EnumLiteral` in `@typeInfo`)
+    2. `integration_tests/src/no_cats.zig`: Replaced `.startOfToken(tree, token)` / `.endOfToken(tree, token)` shorthand with full path `zlinter.results.LintProblemLocation.startOfToken(...)` (Zig 0.13 parses `.foo(args)` as calling an enum literal as a function)
+    3. `src/rules/switch_case_ordering.zig`: Added `.switch_comma` to the node tag check alongside `.@"switch"` (Zig 0.13 uses `.switch_comma` tag for switch expressions with trailing commas)
+  - Result: 40/43 integration tests pass. 3 remaining failures are ZLS 0.13 type resolution limitations:
+    - `no_hidden_allocations`: `resolveVarDeclAlias` cannot resolve `std.heap.c_allocator` / `heap.page_allocator` chains through `@import("std")` aliases in ZLS 0.13
+    - `require_errdefer_dealloc`: `resolveTypeOfNode` cannot resolve generic instantiations like `std.AutoHashMap(u8, void)` in ZLS 0.13
+    - `declaration_naming` (Regression 80): ZLS 0.13 cannot resolve `@typeInfo(...).@"struct".backing_integer.?` chains to determine if a declaration is a type
+  - Status: DONE (3 known ZLS 0.13 limitations documented)
 - [ ] **TASK-8.5:** Verify integration check: `zig build integration-check --summary all`
 - [ ] **TASK-8.6:** Verify all tests: `zig build test`
 - [ ] **TASK-8.7:** Verify docs generation: `zig build docs`

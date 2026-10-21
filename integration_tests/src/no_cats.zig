@@ -36,8 +36,8 @@ fn run(
                 try lint_problems.append(gpa, .{
                     .rule_id = rule.rule_id,
                     .severity = config.severity,
-                    .start = .startOfToken(tree, token),
-                    .end = .endOfToken(tree, token),
+                    .start = zlinter.results.LintProblemLocation.startOfToken(tree, token),
+                    .end = zlinter.results.LintProblemLocation.endOfToken(tree, token),
                     .message = try gpa.dupe(u8, config.message orelse "I'm scared of cats"),
                 });
             }

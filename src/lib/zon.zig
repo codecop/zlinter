@@ -534,6 +534,9 @@ pub const stringify = struct {
             .Enum => {
                 try writer.print(".{s}", .{@tagName(val)});
             },
+            .EnumLiteral => {
+                try writer.print(".{s}", .{@tagName(val)});
+            },
             .Bool => {
                 try writer.writeAll(if (val) "true" else "false");
             },
