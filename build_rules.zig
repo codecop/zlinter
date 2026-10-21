@@ -12,12 +12,14 @@ pub fn main() !void {
     if (args.len < 2) fatal("Wrong number of arguments", .{});
 
     const output_file_path = args[1];
+    const rule_names = args[2..];
+
+    const is_013 = builtin.zig_version.major == 0 and builtin.zig_version.minor == 13;
+
     var output_file = std.fs.cwd().createFile(output_file_path, .{}) catch |err| {
         fatal("Unable to open '{s}': {s}", .{ output_file_path, @errorName(err) });
     };
     defer output_file.close();
-
-    const rule_names = args[2..];
 
     try output_file.writeAll(
         \\const zlinter = @import("zlinter");
@@ -43,9 +45,11 @@ pub fn main() !void {
 
     {
         for (rule_names) |rule_name| {
-            try output_file.writeAll(
-                try std.fmt.bufPrint(&buffer, "pub const @\"{s}\": @import(\"{s}\").Config = @import(\"{s}.zon\");\n", .{ rule_name, rule_name, rule_name }),
-            );
+            const import_line = if (is_013)
+                try std.fmt.bufPrint(&buffer, "pub const @\"{s}\": @import(\"{s}\").Config = @import(\"{s}_config.zig\").config;\n", .{ rule_name, rule_name, rule_name })
+            else
+                try std.fmt.bufPrint(&buffer, "pub const @\"{s}\": @import(\"{s}\").Config = @import(\"{s}.zon\");\n", .{ rule_name, rule_name, rule_name });
+            try output_file.writeAll(import_line);
         }
     }
 
@@ -99,4 +103,5 @@ fn fatal(comptime format: []const u8, args: anytype) noreturn {
     std.process.exit(exit_code_failure);
 }
 
+const builtin = @import("builtin");
 const std = @import("std");

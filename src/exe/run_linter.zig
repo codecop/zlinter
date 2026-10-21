@@ -122,14 +122,14 @@ fn run(gpa: std.mem.Allocator, args: zlinter.Args, printer: *zlinter.rendering.P
 
     if (args.help) {
         zlinter.Args.printHelp(printer);
-        return .success;
+        return RunResult.success;
     }
 
     if (args.unknown_args) |unknown_args| {
         for (unknown_args) |arg|
             printer.println(.err, "Unknown argument: {s}", .{arg});
         zlinter.Args.printHelp(printer);
-        return .usage_error;
+        return RunResult.usage_error;
     }
 
     // Key is file path and value are errors for the file.
@@ -454,11 +454,11 @@ fn runFormatter(
         for (flattened.items) |result| {
             for (result.problems) |problem| {
                 if (problem.severity == .@"error" and !problem.disabled_by_comment) {
-                    break :run_result .lint_error;
+                    break :run_result RunResult.lint_error;
                 }
             }
         }
-        break :run_result .success;
+        break :run_result RunResult.success;
     };
 
     try formatter.format(.{

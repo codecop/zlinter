@@ -248,13 +248,13 @@ pub const Printer = struct {
             .@"0.13", .@"0.14" => self.init(
                 .{ .context = .{ .file = std.io.getStdOut() } },
                 .{ .context = .{ .file = std.io.getStdErr() } },
-                .init(std.io.getStdOut()),
+                ansi.Tty.init(std.io.getStdOut()),
                 verbose,
             ),
             .@"0.15", .@"0.16" => self.init(
                 .{ .context = .{ .file = std.fs.File.stdout() } },
                 .{ .context = .{ .file = std.fs.File.stderr() } },
-                .init(std.fs.File.stdout()),
+                ansi.Tty.init(std.fs.File.stdout()),
                 verbose,
             ),
         }

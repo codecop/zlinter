@@ -468,7 +468,7 @@ pub fn build(b: *std.Build) void {
                     .no_literal_args,
                     .{ .target = target, .optimize = optimize, .zlinter_import = zlinter_import },
                     .{
-                        .exclude_fn_names = &.{
+                        .exclude_fn_names = &[_][]const u8{
                             "print",
                             "alloc",
                             "allocWithOptions",
@@ -542,7 +542,7 @@ pub fn build(b: *std.Build) void {
 fn toZonString(val: anytype, allocator: std.mem.Allocator) []const u8 {
     if (version.zig == .@"0.13") {
         var list = std.ArrayList(u8).init(allocator);
-        zon_lib.stringify.serialize(val, list.writer()) catch @panic("Invalid rule config");
+        zon_lib.stringify.serializeZig(val, list.writer()) catch @panic("Invalid rule config");
         return list.toOwnedSlice() catch @panic("OOM");
     }
     var zon_buf = std.ArrayListUnmanaged(u8){};
@@ -819,13 +819,22 @@ fn createRulesModule(
 
     for (rules) |rule| {
         const wf = b.addWriteFiles();
-        const import_name = b.fmt("{s}.zon", .{rule.import.name});
-        const path = wf.add(import_name, rule.zon_config_str);
-
-        module.addImport(
-            import_name,
-            b.createModule(.{ .root_source_file = path }),
-        );
+        if (version.zig == .@"0.13") {
+            const import_name = b.fmt("{s}_config.zig", .{rule.import.name});
+            const content = b.fmt("pub const config = {s};\n", .{rule.zon_config_str});
+            const path = wf.add(import_name, content);
+            module.addImport(
+                import_name,
+                b.createModule(.{ .root_source_file = path }),
+            );
+        } else {
+            const import_name = b.fmt("{s}.zon", .{rule.import.name});
+            const path = wf.add(import_name, rule.zon_config_str);
+            module.addImport(
+                import_name,
+                b.createModule(.{ .root_source_file = path }),
+            );
+        }
     }
 
     return module;

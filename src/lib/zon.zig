@@ -457,6 +457,14 @@ test "parseFileAlloc" {
 
 pub const stringify = struct {
     pub fn serialize(val: anytype, writer: anytype) !void {
+        try serializeInternal(val, writer, false);
+    }
+
+    pub fn serializeZig(val: anytype, writer: anytype) !void {
+        try serializeInternal(val, writer, true);
+    }
+
+    fn serializeInternal(val: anytype, writer: anytype, comptime zig_mode: bool) !void {
         const T = @TypeOf(val);
         const info = @typeInfo(T);
 
@@ -466,13 +474,13 @@ pub const stringify = struct {
                 inline for (s.fields, 0..) |field, i| {
                     if (i > 0) try writer.writeAll(", ");
                     try writer.print(".{s} = ", .{field.name});
-                    try serialize(@field(val, field.name), writer);
+                    try serializeInternal(@field(val, field.name), writer, zig_mode);
                 }
                 try writer.writeAll("}");
             },
             .Optional => |_| {
                 if (val) |v| {
-                    try serialize(v, writer);
+                    try serializeInternal(v, writer, zig_mode);
                 } else {
                     try writer.writeAll("null");
                 }
@@ -483,26 +491,43 @@ pub const stringify = struct {
                         if (ptr.child == u8) {
                             try writeZonString(val, writer);
                         } else {
-                            try writer.writeAll(".{");
+                            if (zig_mode) {
+                                try writer.writeAll("&.{");
+                            } else {
+                                try writer.writeAll(".{");
+                            }
                             for (val, 0..) |item, i| {
                                 if (i > 0) try writer.writeAll(", ");
-                                try serialize(item, writer);
+                                try serializeInternal(item, writer, zig_mode);
                             }
                             try writer.writeAll("}");
                         }
                     },
                     .One => {
-                        try serialize(val.*, writer);
+                        switch (@typeInfo(ptr.child)) {
+                            .Array => |arr| {
+                                if (arr.child == u8) {
+                                    try writeZonString(val.*[0..], writer);
+                                } else {
+                                    try serializeInternal(val.*, writer, zig_mode);
+                                }
+                            },
+                            else => try serializeInternal(val.*, writer, zig_mode),
+                        }
                     },
                     else => @compileError("Unsupported pointer type in ZON serialization"),
                 }
             },
             .Array => |arr| {
                 _ = arr;
-                try writer.writeAll(".{");
+                if (zig_mode) {
+                    try writer.writeAll("&.{");
+                } else {
+                    try writer.writeAll(".{");
+                }
                 for (val, 0..) |item, i| {
                     if (i > 0) try writer.writeAll(", ");
-                    try serialize(item, writer);
+                    try serializeInternal(item, writer, zig_mode);
                 }
                 try writer.writeAll("}");
             },

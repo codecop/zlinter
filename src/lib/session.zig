@@ -15,7 +15,7 @@ pub const LintDocument = struct {
     skipper: comments.LazyRuleSkipper,
 
     pub fn deinit(self: *LintDocument, gpa: std.mem.Allocator) void {
-        while (self.lineage.pop()) |connections| {
+        while (self.lineage.popOrNull()) |connections| {
             connections.deinit(gpa);
         }
 
@@ -179,7 +179,9 @@ pub const LintContext = struct {
     ) !void {
         self.* = .{
             .gpa = gpa,
-            .diagnostics_collection = if (version.zig == .@"0.13") {} else .{ .allocator = gpa },
+            .diagnostics_collection = if (version.zig == .@"0.13") {
+                // ZLS 0.13 has no diagnostics_collection
+            } else .{ .allocator = gpa },
             .intern_pool = try zls.analyser.InternPool.init(gpa),
             .thread_pool = undefined, // zlinter-disable-current-line no_undefined - set below
             .document_store = undefined, // zlinter-disable-current-line no_undefined - set below
