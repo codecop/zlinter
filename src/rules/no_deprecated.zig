@@ -42,7 +42,7 @@ fn run(
     defer arena_allocator.deinit();
     const arena = arena_allocator.allocator();
 
-    var node: NodeIndexShim = .root;
+    var node: NodeIndexShim = NodeIndexShim.root;
     while (node.index < handle.tree.nodes.len) : (node.index += 1) {
         defer _ = arena_allocator.reset(.retain_capacity);
 
@@ -92,8 +92,8 @@ fn run(
                 // 0.15 breaking changes - Add explicit breaking changes here:
                 // -----------------------------------------------------------------
                 .@"usingnamespace" => try lint_problems.append(gpa, .{
-                    .start = .startOfToken(tree, shims.nodeMainToken(tree, node.toNodeIndex())),
-                    .end = .endOfToken(tree, shims.nodeMainToken(tree, node.toNodeIndex())),
+                    .start = zlinter.results.LintProblemLocation.startOfToken(tree, shims.nodeMainToken(tree, node.toNodeIndex())),
+                    .end = zlinter.results.LintProblemLocation.endOfToken(tree, shims.nodeMainToken(tree, node.toNodeIndex())),
                     .message = try std.fmt.allocPrint(gpa, "Deprecated - `usingnamespace` keyword is removed in 0.15", .{}),
                     .rule_id = rule.rule_id,
                     .severity = config.severity,
@@ -101,8 +101,8 @@ fn run(
                 // I don't think await and async were in used in the compiler
                 // but for completeness lets include as they were in the AST:
                 .@"await" => try lint_problems.append(gpa, .{
-                    .start = .startOfNode(tree, node.toNodeIndex()),
-                    .end = .endOfNode(tree, node.toNodeIndex()),
+                    .start = zlinter.results.LintProblemLocation.startOfNode(tree, node.toNodeIndex()),
+                    .end = zlinter.results.LintProblemLocation.endOfNode(tree, node.toNodeIndex()),
                     .message = try std.fmt.allocPrint(gpa, "Deprecated - `await` keyword is removed in 0.15", .{}),
                     .rule_id = rule.rule_id,
                     .severity = config.severity,
@@ -112,8 +112,8 @@ fn run(
                 .async_call_comma,
                 .async_call,
                 => try lint_problems.append(gpa, .{
-                    .start = .startOfNode(tree, node.toNodeIndex()),
-                    .end = .endOfNode(tree, node.toNodeIndex()),
+                    .start = zlinter.results.LintProblemLocation.startOfNode(tree, node.toNodeIndex()),
+                    .end = zlinter.results.LintProblemLocation.endOfNode(tree, node.toNodeIndex()),
                     .message = try std.fmt.allocPrint(gpa, "Deprecated - `async` keyword is removed in 0.15", .{}),
                     .rule_id = rule.rule_id,
                     .severity = config.severity,
@@ -126,8 +126,8 @@ fn run(
                     const main_token = shims.nodeMainToken(tree, node.toNodeIndex());
                     if (std.mem.eql(u8, tree.tokenSlice(main_token), "@frameSize")) {
                         try lint_problems.append(gpa, .{
-                            .start = .startOfNode(tree, node.toNodeIndex()),
-                            .end = .endOfNode(tree, node.toNodeIndex()),
+                            .start = zlinter.results.LintProblemLocation.startOfNode(tree, node.toNodeIndex()),
+                            .end = zlinter.results.LintProblemLocation.endOfNode(tree, node.toNodeIndex()),
                             .message = try std.fmt.allocPrint(gpa, "Deprecated - @frameSize builtin is removed in 0.15", .{}),
                             .rule_id = rule.rule_id,
                             .severity = config.severity,
@@ -196,8 +196,8 @@ fn handleIdentifierAccess(
     if (try decl_with_handle.docComments(arena)) |comment| {
         if (getDeprecationFromDoc(comment)) |message| {
             try lint_problems.append(gpa, .{
-                .start = .startOfNode(doc.handle.tree, node_index),
-                .end = .endOfNode(doc.handle.tree, node_index),
+                .start = zlinter.results.LintProblemLocation.startOfNode(doc.handle.tree, node_index),
+                .end = zlinter.results.LintProblemLocation.endOfNode(doc.handle.tree, node_index),
                 .message = try std.fmt.allocPrint(gpa, "Deprecated - {s}", .{message}),
                 .rule_id = rule.rule_id,
                 .severity = config.severity,
@@ -227,8 +227,8 @@ fn handleEnumLiteral(
     const deprecated_message = getDeprecationFromDoc(doc_comment) orelse return;
 
     try lint_problems.append(gpa, .{
-        .start = .startOfNode(doc.handle.tree, node_index),
-        .end = .endOfNode(doc.handle.tree, node_index),
+        .start = zlinter.results.LintProblemLocation.startOfNode(doc.handle.tree, node_index),
+        .end = zlinter.results.LintProblemLocation.endOfNode(doc.handle.tree, node_index),
         .message = try std.fmt.allocPrint(gpa, "Deprecated: {s}", .{deprecated_message}),
         .rule_id = rule.rule_id,
         .severity = config.severity,
@@ -315,8 +315,8 @@ fn handleFieldAccess(
             const deprecated_message = getDeprecationFromDoc(doc_comment) orelse continue;
 
             try lint_problems.append(gpa, .{
-                .start = .startOfNode(doc.handle.tree, node_index),
-                .end = .endOfNode(doc.handle.tree, node_index),
+                .start = zlinter.results.LintProblemLocation.startOfNode(doc.handle.tree, node_index),
+                .end = zlinter.results.LintProblemLocation.endOfNode(doc.handle.tree, node_index),
                 .message = try std.fmt.allocPrint(gpa, "Deprecated: {s}", .{deprecated_message}),
                 .rule_id = rule.rule_id,
                 .severity = config.severity,

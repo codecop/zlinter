@@ -719,7 +719,7 @@ fn buildFilterIndex(cwd: []const u8, gpa: std.mem.Allocator, dir: std.fs.Dir, ar
 /// indices in the rules array. This is what allows people to filter runs with
 /// the `--rule` CLI argument.
 fn enabledRules(filter_rule_ids: ?[]const []const u8) std.StaticBitSet(rules.len) {
-    var bitset: std.StaticBitSet(rules.len) = .initFull();
+    var bitset: std.StaticBitSet(rules.len) = std.StaticBitSet(rules.len).initFull();
     if (filter_rule_ids == null) return bitset;
 
     bitset.toggleAll();
@@ -770,7 +770,7 @@ const SlowestItemQueue = struct {
     };
 
     fn init(gpa: std.mem.Allocator) SlowestItemQueue {
-        return .{ .queue = .init(gpa, {}) };
+        return .{ .queue = std.PriorityDequeue(Item, void, Item.compare).init(gpa, {}) };
     }
 
     fn deinit(self: *SlowestItemQueue) void {

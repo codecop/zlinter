@@ -144,7 +144,7 @@ pub const LintFileRenderer = struct {
         try writer.writeByte('\n');
 
         // LHS of arrows to impacted area
-        lhs_buffer = @splat(' ');
+        @memset(&lhs_buffer, ' ');
         try writer.writeAll(tty.ansiOrEmpty(&.{.gray}));
         try writer.writeAll(lhs_buffer[0..lhs.len]);
         try writer.writeAll("| ");
@@ -231,7 +231,7 @@ test "LintFileRenderer" {
     }
 }
 
-var printer_singleton: Printer = .empty;
+var printer_singleton: Printer = Printer.empty;
 /// Singleton printer for use for the lifetime of the process
 pub var process_printer = &printer_singleton;
 
@@ -276,7 +276,7 @@ pub const Printer = struct {
         err,
     };
 
-    const banner: [60]u8 = @splat('-');
+    const banner: [60]u8 = [_]u8{'-'} ** 60;
 
     pub inline fn printBanner(self: Printer, kind: Kind) void {
         return self.println(kind, &banner, .{});

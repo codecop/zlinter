@@ -7,10 +7,10 @@ pub const AllocatorKind = struct {
     file_ends_with: []const u8 = "/std/heap.zig",
     decl_name: []const u8 = "c_allocator",
 
-    pub const page_allocator: AllocatorKind = .init("/std/heap.zig", "page_allocator");
-    pub const c_allocator: AllocatorKind = .init("/std/heap.zig", "c_allocator");
-    pub const general_purpose_allocator: AllocatorKind = .init("/std/heap.zig", "GeneralPurposeAllocator");
-    pub const debug_allocator: AllocatorKind = .init("/std/heap.zig", "DebugAllocator");
+    pub const page_allocator: AllocatorKind = AllocatorKind.init("/std/heap.zig", "page_allocator");
+    pub const c_allocator: AllocatorKind = AllocatorKind.init("/std/heap.zig", "c_allocator");
+    pub const general_purpose_allocator: AllocatorKind = AllocatorKind.init("/std/heap.zig", "GeneralPurposeAllocator");
+    pub const debug_allocator: AllocatorKind = AllocatorKind.init("/std/heap.zig", "DebugAllocator");
 
     pub fn init(file_ends_with: []const u8, decl_name: []const u8) AllocatorKind {
         return .{ .file_ends_with = file_ends_with, .decl_name = decl_name };
@@ -24,10 +24,10 @@ pub const Config = struct {
 
     /// What kinds of allocators to detect.
     detect_allocators: []const AllocatorKind = &.{
-        .page_allocator,
-        .c_allocator,
-        .general_purpose_allocator,
-        .debug_allocator,
+        AllocatorKind.page_allocator,
+        AllocatorKind.c_allocator,
+        AllocatorKind.general_purpose_allocator,
+        AllocatorKind.debug_allocator,
     },
 
     /// Skip if found within `test { ... }` block.
@@ -63,7 +63,7 @@ fn run(
 
     const tree = doc.handle.tree;
 
-    const root: NodeIndexShim = .root;
+    const root: NodeIndexShim = NodeIndexShim.root;
     var it = try doc.nodeLineageIterator(root, gpa);
     defer it.deinit();
 
@@ -88,7 +88,7 @@ fn run(
         // is identifier a method on Allocator e.g., something.alloc(..) or something.create(..)
         const is_allocator_method = is_allocator_method: {
             const actual_name = tree.tokenSlice(identifier);
-            inline for (@typeInfo(std.mem.Allocator).@"struct".decls) |decl| {
+            inline for (@typeInfo(std.mem.Allocator).Struct.decls) |decl| {
                 if (comptime std.meta.hasMethod(std.mem.Allocator, decl.name)) {
                     if (std.mem.eql(u8, actual_name, decl.name)) break :is_allocator_method true;
                 }
@@ -104,8 +104,8 @@ fn run(
             })) |decl_handle| {
                 const uri = decl_handle.handle.uri;
 
-                const name: []const u8 = name: switch (decl_handle.decl) {
-                    .ast_node => |ast_node| {
+                const name: []const u8 = switch (decl_handle.decl) {
+                    .ast_node => |ast_node| blk: {
                         if (decl_handle.handle.tree.fullVarDecl(ast_node)) |var_decl| {
                             if (NodeIndexShim.initOptional(var_decl.ast.init_node)) |init_node| {
                                 _ = init_node;
@@ -117,11 +117,11 @@ fn run(
                             }
 
                             const name_token = var_decl.ast.mut_token + 1;
-                            break :name decl_handle.handle.tree.tokenSlice(name_token);
+                            break :blk decl_handle.handle.tree.tokenSlice(name_token);
                         }
-                        break :name null;
+                        break :blk null;
                     },
-                    else => break :name null,
+                    else => null,
                 } orelse continue :nodes;
                 break :decl_name_and_uri .{ name, uri };
             } else continue :nodes;
@@ -140,8 +140,8 @@ fn run(
         try lint_problems.append(gpa, .{
             .rule_id = rule.rule_id,
             .severity = config.severity,
-            .start = .startOfNode(tree, node.toNodeIndex()),
-            .end = .endOfNode(tree, node.toNodeIndex()),
+            .start = zlinter.results.LintProblemLocation.startOfNode(tree, node.toNodeIndex()),
+            .end = zlinter.results.LintProblemLocation.endOfNode(tree, node.toNodeIndex()),
             .message = try gpa.dupe(u8, "Avoid hidden heap memory management. Instead pass in an Allocator so that the caller knows where memory is being allocated."),
         });
     }

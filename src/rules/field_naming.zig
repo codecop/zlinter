@@ -154,7 +154,7 @@ fn run(
     const tree = doc.handle.tree;
     var buffer: [2]Ast.Node.Index = undefined;
 
-    var node: NodeIndexShim = .root;
+    var node: NodeIndexShim = NodeIndexShim.root;
     while (node.index < tree.nodes.len) : (node.index += 1) {
         const tag = shims.nodeTag(tree, node.toNodeIndex());
         if (tag == .error_set_decl) {
@@ -184,8 +184,8 @@ fn run(
                             try lint_problems.append(gpa, .{
                                 .rule_id = rule.rule_id,
                                 .severity = min_len.severity,
-                                .start = .startOfToken(tree, token),
-                                .end = .endOfToken(tree, token),
+                                .start = zlinter.results.LintProblemLocation.startOfToken(tree, token),
+                                .end = zlinter.results.LintProblemLocation.endOfToken(tree, token),
                                 .message = try std.fmt.allocPrint(gpa, "Error field names should have a length greater or equal to {d}", .{min_len.len}),
                             });
                         } else if (max_len.severity != .off and name_len > max_len.len) {
@@ -196,8 +196,8 @@ fn run(
                             try lint_problems.append(gpa, .{
                                 .rule_id = rule.rule_id,
                                 .severity = max_len.severity,
-                                .start = .startOfToken(tree, token),
-                                .end = .endOfToken(tree, token),
+                                .start = zlinter.results.LintProblemLocation.startOfToken(tree, token),
+                                .end = zlinter.results.LintProblemLocation.endOfToken(tree, token),
                                 .message = try std.fmt.allocPrint(gpa, "Error field names should have a length less or equal to {d}", .{max_len.len}),
                             });
                         }
@@ -206,8 +206,8 @@ fn run(
                             try lint_problems.append(gpa, .{
                                 .rule_id = rule.rule_id,
                                 .severity = config.error_field.severity,
-                                .start = .startOfToken(tree, token),
-                                .end = .endOfToken(tree, token),
+                                .start = zlinter.results.LintProblemLocation.startOfToken(tree, token),
+                                .end = zlinter.results.LintProblemLocation.endOfToken(tree, token),
                                 .message = try std.fmt.allocPrint(gpa, "Error fields should be {s}", .{config.error_field.style.name()}),
                             });
                         }
@@ -264,8 +264,8 @@ fn run(
                         try lint_problems.append(gpa, .{
                             .rule_id = rule.rule_id,
                             .severity = min_len.severity,
-                            .start = .startOfToken(tree, name_token),
-                            .end = .endOfToken(tree, name_token),
+                            .start = zlinter.results.LintProblemLocation.startOfToken(tree, name_token),
+                            .end = zlinter.results.LintProblemLocation.endOfToken(tree, name_token),
                             .message = try std.fmt.allocPrint(gpa, "{s} field names should have a length greater or equal to {d}", .{ container_kind.name(), min_len.len }),
                         });
                     } else if (max_len.severity != .off and name_len > max_len.len) {
@@ -276,8 +276,8 @@ fn run(
                         try lint_problems.append(gpa, .{
                             .rule_id = rule.rule_id,
                             .severity = max_len.severity,
-                            .start = .startOfToken(tree, name_token),
-                            .end = .endOfToken(tree, name_token),
+                            .start = zlinter.results.LintProblemLocation.startOfToken(tree, name_token),
+                            .end = zlinter.results.LintProblemLocation.endOfToken(tree, name_token),
                             .message = try std.fmt.allocPrint(gpa, "{s} field names should have a length less or equal to {d}", .{ container_kind.name(), max_len.len }),
                         });
                     }
@@ -286,8 +286,8 @@ fn run(
                         try lint_problems.append(gpa, .{
                             .rule_id = rule.rule_id,
                             .severity = style_with_severity.severity,
-                            .start = .startOfToken(tree, name_token),
-                            .end = .endOfToken(tree, name_token),
+                            .start = zlinter.results.LintProblemLocation.startOfToken(tree, name_token),
+                            .end = zlinter.results.LintProblemLocation.endOfToken(tree, name_token),
                             .message = try std.fmt.allocPrint(gpa, "{s} fields should be {s}", .{ container_kind.name(), style_with_severity.style.name() }),
                         });
                     }

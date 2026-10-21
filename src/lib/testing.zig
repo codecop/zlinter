@@ -171,7 +171,7 @@ pub fn expectSingleNodeOfTag(tree: Ast, comptime tags: []const Ast.Node.Tag) !As
 pub fn expectNodeOfTagFirst(doc: *const LintDocument, comptime tags: []const Ast.Node.Tag) !Ast.Node.Index {
     assertTestOnly();
 
-    var it = try doc.nodeLineageIterator(.root, std.testing.allocator);
+    var it = try doc.nodeLineageIterator(NodeIndexShim.root, std.testing.allocator);
     defer it.deinit();
 
     while (try it.next()) |node_and_children| {

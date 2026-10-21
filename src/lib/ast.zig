@@ -46,10 +46,10 @@ pub const NodeLineageIterator = struct {
     }
 
     pub fn next(self: *Self) error{OutOfMemory}!?struct { NodeIndexShim, NodeConnections } {
-        if (self.queue.pop()) |node_shim| {
+        if (self.queue.popOrNull()) |node_shim| {
             const connections = self.lineage.get(node_shim.index);
             for (connections.children orelse &.{}) |child| {
-                try self.queue.append(self.gpa, .init(child));
+                try self.queue.append(self.gpa, NodeIndexShim.init(child));
             }
             return .{ node_shim, connections };
         }
@@ -788,7 +788,7 @@ test "fnCall - direct call without params" {
         &.{},
     ).?;
 
-    try std.testing.expectEqualDeep(&.{}, call.params);
+    try std.testing.expectEqual(@as(usize, 0), call.params.len);
     try std.testing.expectEqualStrings(
         "call",
         doc.handle.tree.tokenSlice(call.call_identifier_token),

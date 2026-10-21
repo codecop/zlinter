@@ -44,7 +44,7 @@ fn run(
     var container_references = map: {
         var map = std.StringHashMapUnmanaged(void){};
 
-        var node: NodeIndexShim = .root;
+        var node: NodeIndexShim = NodeIndexShim.root;
         while (node.index < tree.nodes.len) : (node.index += 1) {
             switch (shims.nodeTag(tree, node.toNodeIndex())) {
                 .identifier => try map.put(gpa, tree.tokenSlice(shims.nodeMainToken(tree, node.toNodeIndex())), {}),
@@ -111,8 +111,8 @@ fn run(
             try lint_problems.append(gpa, .{
                 .rule_id = rule.rule_id,
                 .severity = config.container_declaration,
-                .start = .startOfToken(tree, first_token),
-                .end = .endOfToken(tree, last_token),
+                .start = zlinter.results.LintProblemLocation.startOfToken(tree, first_token),
+                .end = zlinter.results.LintProblemLocation.endOfToken(tree, last_token),
                 .message = try gpa.dupe(u8, "Unused declaration"),
                 .fix = .{
                     .start = start.line_start,
@@ -184,8 +184,8 @@ fn isFieldAccessOfRootContainer(
 fn isContainerRoot(container: anytype) bool {
     return switch (zlinter.version.zig) {
         .@"0.13" => NodeIndexShim.init(container.node).isRoot(),
-        .@"0.14" => container.toNode() == 0,
-        .@"0.15", .@"0.16" => container.scope_handle.toNode() == .root,
+        .@"0.14" => container.node == 0,
+        .@"0.15", .@"0.16" => container.scope_handle.node == 0,
     };
 }
 

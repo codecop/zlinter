@@ -73,14 +73,14 @@ fn run(
     var problem_nodes = shims.ArrayList(Ast.Node.Index){};
     defer problem_nodes.deinit(gpa);
 
-    const root: NodeIndexShim = .root;
+    const root: NodeIndexShim = NodeIndexShim.root;
     var it = try doc.nodeLineageIterator(
         root,
         gpa,
     );
     defer it.deinit();
 
-    var arena: std.heap.ArenaAllocator = .init(gpa);
+    var arena: std.heap.ArenaAllocator = std.heap.ArenaAllocator.init(gpa);
     defer arena.deinit();
 
     nodes: while (try it.next()) |tuple| {
@@ -115,8 +115,8 @@ fn run(
         try lint_problems.append(gpa, .{
             .rule_id = rule.rule_id,
             .severity = config.severity,
-            .start = .startOfNode(tree, node),
-            .end = .endOfNode(tree, node),
+            .start = zlinter.results.LintProblemLocation.startOfNode(tree, node),
+            .end = zlinter.results.LintProblemLocation.endOfNode(tree, node),
             .message = try std.fmt.allocPrint(gpa, "Missing `errdefer` cleanup", .{}),
         });
     }
@@ -142,7 +142,7 @@ fn processBlock(
     const tree = doc.handle.tree;
 
     // Populated with declarations that look like they should be cleaned up.
-    var cleanup_symbols: std.StringHashMap(Ast.Node.Index) = .init(arena);
+    var cleanup_symbols: std.StringHashMap(Ast.Node.Index) = std.StringHashMap(Ast.Node.Index).init(arena);
 
     var call_buffer: [1]Ast.Node.Index = undefined;
 
@@ -254,7 +254,7 @@ fn declRequiringCleanup(
             else => return null,
         },
     };
-    const node = scope_handle.toNode();
+    const node = scope_handle.node;
     const tag = shims.nodeTag(scope_handle.handle.tree, node);
     switch (tag) {
         .container_decl,

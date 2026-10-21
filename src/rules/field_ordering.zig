@@ -15,7 +15,7 @@ pub const Config = struct {
     },
 
     /// Order and severity for struct fields
-    struct_field_order: zlinter.rules.LintTextOrderWithSeverity = .off,
+    struct_field_order: zlinter.rules.LintTextOrderWithSeverity = zlinter.rules.LintTextOrderWithSeverity.off,
 
     /// Whether to check order of packed structs (e.g., `packed struct(u32) { .. }`).
     /// You probably never want to enforce order of packed structs, so best to
@@ -60,7 +60,7 @@ fn run(
 
     const tree = doc.handle.tree;
 
-    const root: NodeIndexShim = .root;
+    const root: NodeIndexShim = NodeIndexShim.root;
     var it = try doc.nodeLineageIterator(root, gpa);
     defer it.deinit();
 
@@ -116,15 +116,17 @@ fn run(
             // Declarations cannot appear between fields so once we see a field
             // simply read until we see something else to identify the chunk of
             // fields in source:
-            const name_token = token: switch (shims.nodeTag(tree, container_child)) {
-                .container_field_init,
-                .container_field_align,
-                .container_field,
-                => {
-                    seen_field = true;
-                    break :token shims.nodeMainToken(tree, container_child);
-                },
-                else => if (seen_field) break :children else continue :children,
+            const name_token = token: {
+                switch (shims.nodeTag(tree, container_child)) {
+                    .container_field_init,
+                    .container_field_align,
+                    .container_field,
+                    => {
+                        seen_field = true;
+                        break :token shims.nodeMainToken(tree, container_child);
+                    },
+                    else => if (seen_field) break :children else continue :children,
+                }
             };
 
             try actual_order.append(gpa, container_child);
@@ -226,14 +228,14 @@ fn nodeSpanIncludingComments(
     zlinter.results.LintProblemLocation,
 } {
     const first_token = firstTokenIncludingComments(tree, first_node);
-    const prev_end: zlinter.results.LintProblemLocation = .endOfToken(tree, first_token - 1);
+    const prev_end: zlinter.results.LintProblemLocation = zlinter.results.LintProblemLocation.endOfToken(tree, first_token - 1);
     const start: zlinter.results.LintProblemLocation = .{
         .byte_offset = prev_end.byte_offset + 1,
     };
 
     var last_token = tree.lastToken(last_node);
     if (options.consume_trailing_comma and tree.tokens.items(.tag)[last_token + 1] == .comma) last_token += 1;
-    const end: zlinter.results.LintProblemLocation = .endOfToken(tree, last_token);
+    const end: zlinter.results.LintProblemLocation = zlinter.results.LintProblemLocation.endOfToken(tree, last_token);
 
     return .{ start, end };
 }

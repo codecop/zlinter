@@ -21,7 +21,7 @@ pub const NodeIndexShim = struct {
     /// Supports init from Index, u32, see initOptional for optionals in 0.15
     pub inline fn init(node: anytype) NodeIndexShim {
         return switch (@typeInfo(@TypeOf(node))) {
-            .@"enum" => .{
+            .Enum => .{
                 .index = @intFromEnum(
                     if (std.meta.hasFn(@TypeOf(node), "unwrap"))
                         @compileError("OptionalIndex should use initOptional as zero does not mean root but emptiness in 0.14")
@@ -35,7 +35,7 @@ pub const NodeIndexShim = struct {
 
     pub inline fn initOptional(node: anytype) ?NodeIndexShim {
         return switch (@typeInfo(@TypeOf(node))) {
-            .@"enum" => .{
+            .Enum => .{
                 .index = if (std.meta.hasFn(@TypeOf(node), "unwrap"))
                     if (node.unwrap()) |n| @intFromEnum(n) else return null
                 else
@@ -47,7 +47,7 @@ pub const NodeIndexShim = struct {
 
     pub inline fn toNodeIndex(self: NodeIndexShim) Ast.Node.Index {
         return switch (@typeInfo(Ast.Node.Index)) {
-            .@"enum" => @enumFromInt(self.index), // >= 0.15.x
+            .Enum => @enumFromInt(self.index), // >= 0.15.x
             else => self.index, // == 0.13.x and 0.14.x
         };
     }

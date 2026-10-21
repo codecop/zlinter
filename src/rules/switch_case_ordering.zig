@@ -30,25 +30,51 @@ fn run(
 
     const tree = doc.handle.tree;
 
-    var node: NodeIndexShim = .root;
+    var node: NodeIndexShim = NodeIndexShim.root;
     while (node.index < tree.nodes.len) : (node.index += 1) {
-        const switch_info = tree.fullSwitch(node.toNodeIndex()) orelse continue;
-
-        for (switch_info.ast.cases, 0..) |case_node, i| {
-            const switch_case = tree.fullSwitchCase(case_node).?;
-
-            // If values is empty, this is an else case
-            if (switch_case.ast.values.len == 0) {
-                if (config.else_is_last != .off and i != switch_info.ast.cases.len - 1) {
-                    try lint_problems.append(gpa, .{
-                        .rule_id = rule.rule_id,
-                        .severity = config.else_is_last,
-                        .start = .startOfNode(tree, case_node),
-                        .end = .endOfNode(tree, case_node),
-                        .message = try gpa.dupe(u8, "`else` should be last in switch statements"),
-                    });
+        switch (zlinter.version.zig) {
+            .@"0.13" => {
+                const node_idx = node.toNodeIndex();
+                if (tree.nodes.items(.tag)[node_idx] != .@"switch") continue;
+                const data = tree.nodes.items(.data)[node_idx];
+                const cases_range = tree.extraData(data.rhs, Ast.Node.SubRange);
+                const case_count = cases_range.end - cases_range.start;
+                for (cases_range.start..cases_range.end, 0..) |extra_idx, i| {
+                    const case_node = tree.extra_data[extra_idx];
+                    const switch_case = tree.fullSwitchCase(case_node) orelse continue;
+                    if (switch_case.ast.values.len == 0) {
+                        if (config.else_is_last != .off and i != case_count - 1) {
+                            try lint_problems.append(gpa, .{
+                                .rule_id = rule.rule_id,
+                                .severity = config.else_is_last,
+                                .start = zlinter.results.LintProblemLocation.startOfNode(tree, case_node),
+                                .end = zlinter.results.LintProblemLocation.endOfNode(tree, case_node),
+                                .message = try gpa.dupe(u8, "`else` should be last in switch statements"),
+                            });
+                        }
+                    }
                 }
-            }
+            },
+            else => {
+                const switch_info = tree.fullSwitch(node.toNodeIndex()) orelse continue;
+
+                for (switch_info.ast.cases, 0..) |case_node, i| {
+                    const switch_case = tree.fullSwitchCase(case_node).?;
+
+                    // If values is empty, this is an else case
+                    if (switch_case.ast.values.len == 0) {
+                        if (config.else_is_last != .off and i != switch_info.ast.cases.len - 1) {
+                            try lint_problems.append(gpa, .{
+                                .rule_id = rule.rule_id,
+                                .severity = config.else_is_last,
+                                .start = zlinter.results.LintProblemLocation.startOfNode(tree, case_node),
+                                .end = zlinter.results.LintProblemLocation.endOfNode(tree, case_node),
+                                .message = try gpa.dupe(u8, "`else` should be last in switch statements"),
+                            });
+                        }
+                    }
+                }
+            },
         }
     }
 
@@ -67,6 +93,7 @@ test {
 }
 
 const std = @import("std");
+pub const Ast = std.zig.Ast;
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
 const NodeIndexShim = zlinter.shims.NodeIndexShim;

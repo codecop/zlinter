@@ -586,7 +586,7 @@ zig build integration-check --summary all
 ```
 
 - [x] **TASK-8.1:** Verify compilation: `zig build --help`
-- [ ] **TASK-8.2:** Verify unit tests: `zig build unit-test`
+- [x] **TASK-8.2:** Verify unit tests: `zig build unit-test`
 - [ ] **TASK-8.3:** Verify self-lint: `zig build lint`
 - [ ] **TASK-8.4:** Verify integration tests: `zig build integration-test`
 - [ ] **TASK-8.5:** Verify integration check: `zig build integration-check --summary all`

@@ -56,7 +56,7 @@ fn run(
     const tree = doc.handle.tree;
     var fn_buffer: [1]Ast.Node.Index = undefined;
 
-    var node: NodeIndexShim = .init(1);
+    var node: NodeIndexShim = NodeIndexShim.init(1);
     nodes: while (node.index < tree.nodes.len) : (node.index += 1) {
         const fn_proto = fnProto(tree, &fn_buffer, node.toNodeIndex()) orelse continue :nodes;
 
@@ -75,8 +75,8 @@ fn run(
         try lint_problems.append(gpa, .{
             .rule_id = rule.rule_id,
             .severity = config.severity,
-            .start = .startOfNode(tree, fn_proto.ast.params[0]),
-            .end = .endOfNode(tree, fn_proto.ast.params[fn_proto.ast.params.len - 1]),
+            .start = zlinter.results.LintProblemLocation.startOfNode(tree, fn_proto.ast.params[0]),
+            .end = zlinter.results.LintProblemLocation.endOfNode(tree, fn_proto.ast.params[fn_proto.ast.params.len - 1]),
             .message = try std.fmt.allocPrint(gpa, "Exceeded maximum positional arguments of {d}.", .{config.max}),
         });
     }

@@ -74,7 +74,7 @@ fn run(
 
     const tree = doc.handle.tree;
 
-    const root: NodeIndexShim = .root;
+    const root: NodeIndexShim = NodeIndexShim.root;
     var it = try doc.nodeLineageIterator(root, gpa);
     defer it.deinit();
 
@@ -86,8 +86,8 @@ fn run(
                 try lint_problems.append(gpa, .{
                     .rule_id = rule.rule_id,
                     .severity = config.fn_decl_block,
-                    .start = .startOfToken(tree, tree.firstToken(block)),
-                    .end = .endOfToken(tree, tree.lastToken(block)),
+                    .start = zlinter.results.LintProblemLocation.startOfToken(tree, tree.firstToken(block)),
+                    .end = zlinter.results.LintProblemLocation.endOfToken(tree, tree.lastToken(block)),
                     .message = try std.fmt.allocPrint(
                         gpa,
                         problem_msg_template,
@@ -111,7 +111,7 @@ fn run(
         if (severity == .off) continue :nodes;
 
         var expr_nodes_buffer: [2]Ast.Node.Index = undefined;
-        var expr_nodes: shims.ArrayList(Ast.Node.Index) = .initBuffer(&expr_nodes_buffer);
+        var expr_nodes: shims.ArrayList(Ast.Node.Index) = shims.ArrayList(Ast.Node.Index).initBuffer(&expr_nodes_buffer);
 
         switch (statement) {
             .@"if" => |info| {
@@ -147,8 +147,8 @@ fn run(
             try lint_problems.append(gpa, .{
                 .rule_id = rule.rule_id,
                 .severity = severity,
-                .start = .startOfToken(tree, tree.firstToken(expr_node)),
-                .end = .endOfToken(tree, tree.lastToken(expr_node)),
+                .start = zlinter.results.LintProblemLocation.startOfToken(tree, tree.firstToken(expr_node)),
+                .end = zlinter.results.LintProblemLocation.endOfToken(tree, tree.lastToken(expr_node)),
                 .message = try std.fmt.allocPrint(
                     gpa,
                     problem_msg_template,

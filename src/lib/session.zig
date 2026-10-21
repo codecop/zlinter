@@ -92,7 +92,7 @@ pub const LintDocument = struct {
 
     /// For debugging purposes only, should never be left in
     pub fn dumpType(self: *const LintDocument, analyser: *zls.Analyser, t: zls.Analyser.Type, indent_size: u32) !void {
-        var buffer: [128]u8 = @splat(' ');
+        var buffer: [128]u8 = [_]u8{' '} ** 128;
         const indent = buffer[0..indent_size];
 
         std.debug.print("{s}------------------------------------\n", .{indent});
@@ -180,7 +180,7 @@ pub const LintContext = struct {
         self.* = .{
             .gpa = gpa,
             .diagnostics_collection = if (version.zig == .@"0.13") {} else .{ .allocator = gpa },
-            .intern_pool = try .init(gpa),
+            .intern_pool = try zls.analyser.InternPool.init(gpa),
             .thread_pool = undefined, // zlinter-disable-current-line no_undefined - set below
             .document_store = undefined, // zlinter-disable-current-line no_undefined - set below
             .analyser = undefined, // zlinter-disable-current-line no_undefined - set below
@@ -196,7 +196,7 @@ pub const LintContext = struct {
         self.document_store = switch (version.zig) {
             .@"0.13" => zls.DocumentStore{
                 .allocator = gpa,
-                .config = .fromMainConfig(config),
+                .config = zls.DocumentStore.Config.fromMainConfig(config),
                 .thread_pool = &self.thread_pool,
             },
             .@"0.14", .@"0.15", .@"0.16" => zls.DocumentStore{
@@ -234,7 +234,7 @@ pub const LintContext = struct {
                             break :dir null;
                         },
                     },
-                    .@"0.14" => .fromMainConfig(config),
+                    .@"0.14" => zls.DocumentStore.Config.fromMainConfig(config),
                     .@"0.13" => unreachable,
                 },
                 .thread_pool = &self.thread_pool,
@@ -308,7 +308,7 @@ pub const LintContext = struct {
         errdefer gpa.free(doc.path);
         errdefer doc.lineage.deinit(gpa);
 
-        doc.skipper = .init(doc.comments, doc.handle.tree.source, gpa);
+        doc.skipper = comments.LazyRuleSkipper.init(doc.comments, doc.handle.tree.source, gpa);
         errdefer doc.skipper.deinit();
 
         {
@@ -327,7 +327,7 @@ pub const LintContext = struct {
 
             try queue.append(gpa, .{ .node = NodeIndexShim.root });
 
-            while (queue.pop()) |item| {
+            while (queue.popOrNull()) |item| {
                 const children = try ast.nodeChildrenAlloc(
                     gpa,
                     doc.handle.tree,
@@ -588,8 +588,8 @@ pub const LintContext = struct {
                     else switch (decl.data) {
                         .container => |container| result: {
                             const container_node, const container_tree = switch (version.zig) {
-                                .@"0.14" => .{ container.toNode(), container.handle.tree },
-                                .@"0.15", .@"0.16" => .{ container.scope_handle.toNode(), container.scope_handle.handle.tree },
+                                .@"0.14" => .{ container.node, container.handle.tree },
+                                .@"0.15", .@"0.16" => .{ container.scope_handle.node, container.scope_handle.handle.tree },
                             };
 
                             if (!NodeIndexShim.init(container_node).isRoot()) {
@@ -622,6 +622,14 @@ pub const LintContext = struct {
                     return if (init_node_type.is_type_val) .fn_type else .@"fn";
                 } else if (decl.isMetaType()) {
                     return .type;
+                } else if (decl.data == .pointer) {
+                    const elem_ty = decl.data.pointer.elem_ty.*;
+                    if (elem_ty.isTypeFunc()) {
+                        return if (init_node_type.is_type_val) .fn_type_returns_type else .fn_returns_type;
+                    } else if (elem_ty.isFunc()) {
+                        return if (init_node_type.is_type_val) .fn_type else .@"fn";
+                    }
+                    return .other;
                 } else {
                     if (init_node_type.is_type_val) {
                         switch (init_node_type.data) {
@@ -702,70 +710,70 @@ test "LintDocument.isEnclosedInTestBlock" {
     );
 
     try std.testing.expect(
-        !doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        !doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_not_in_test",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_without_name",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_if_condition_a",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_if_condition_b",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_if_condition_c",
         ))),
     );
 
     try std.testing.expect(
-        !doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        !doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_not_in_test_if_condition",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_nested_if_condition_a",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_nested_if_condition_b",
         ))),
     );
 
     try std.testing.expect(
-        doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_in_test_nested_if_condition_c",
         ))),
     );
 
     try std.testing.expect(
-        !doc.isEnclosedInTestBlock(.init(try testing.expectVarDecl(
+        !doc.isEnclosedInTestBlock(NodeIndexShim.init(try testing.expectVarDecl(
             doc.handle.tree,
             "is_not_in_test_nested_if_condition_a",
         ))),
@@ -1077,7 +1085,7 @@ test "LintContext.resolveTypeKind" {
             @panic("Fail");
 
         std.testing.expectEqual(test_case.kind, actual_kind) catch |e| {
-            const border: [50]u8 = @splat('-');
+            const border: [50]u8 = [_]u8{'-'} ** 50;
             std.debug.print("Node:\n{s}\n{s}\n{s}\n", .{ border, doc.handle.tree.getNodeSource(node), border });
             std.debug.print("Expected: {any}\n", .{test_case.kind});
             std.debug.print("Actual: {any}\n", .{actual_kind});

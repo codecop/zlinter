@@ -51,7 +51,7 @@ verbose: bool = false,
 /// a rule. This is typically just useful for internal testing.
 rule_config_overrides: ?*std.BufMap = null,
 
-build_info: BuildInfo = .default,
+build_info: BuildInfo = BuildInfo.default,
 
 /// Whether user has passed in the `--help` flag.
 help: bool = false,
@@ -151,7 +151,7 @@ pub fn allocParse(
         fix_passes_arg,
     };
 
-    const flags: std.StaticStringMap(State) = .initComptime(.{
+    const flags: std.StaticStringMap(State) = std.StaticStringMap(State).initComptime(.{
         .{ "", .parsing },
         .{ "--fix", .fix_arg },
         .{ "--verbose", .verbose_arg },

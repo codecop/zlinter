@@ -1385,8 +1385,8 @@ pub const LazyRuleSkipper = struct {
 
         const line_count = self.doc.line_starts.len;
         var index: Index = .{
-            .rules = .init(self.gpa),
-            .all = try .initFull(self.gpa, line_count + 1),
+            .rules = std.StringHashMap(std.bit_set.DynamicBitSet).init(self.gpa),
+            .all = try std.bit_set.DynamicBitSet.initFull(self.gpa, line_count + 1),
         };
         errdefer index.deinit();
 
@@ -1418,7 +1418,7 @@ pub const LazyRuleSkipper = struct {
 
                     const result = try index.rules.getOrPut(rule_id);
                     if (!result.found_existing) {
-                        result.value_ptr.* = try .initFull(self.gpa, line_count + 1);
+                        result.value_ptr.* = try std.bit_set.DynamicBitSet.initFull(self.gpa, line_count + 1);
                     }
                     result.value_ptr.setRangeValue(set.range, set.value);
                 }

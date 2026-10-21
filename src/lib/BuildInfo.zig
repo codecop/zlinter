@@ -46,10 +46,7 @@ pub fn consumeStdinAlloc(
         return error.InvalidArgs;
     };
 
-    return std.zon.parse.fromSlice(BuildInfo, gpa, buffer[0..size :0], null, .{
-        .ignore_unknown_fields = false,
-        .free_on_error = true,
-    }) catch |e| {
+    return zon.parseFromSlice(BuildInfo, gpa, buffer[0..size :0], null) catch |e| {
         switch (e) {
             error.ParseZon => {
                 printer.println(.err, "Failed to parse stdin zon content: {s}", .{@errorName(e)});
@@ -62,3 +59,4 @@ pub fn consumeStdinAlloc(
 
 const rendering = @import("rendering.zig");
 const std = @import("std");
+const zon = @import("zon.zig");

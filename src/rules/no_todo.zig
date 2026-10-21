@@ -77,8 +77,8 @@ fn run(
         try lint_problems.append(gpa, .{
             .rule_id = rule.rule_id,
             .severity = config.severity,
-            .start = .startOfComment(doc.comments, comment),
-            .end = .endOfComment(doc.comments, comment),
+            .start = zlinter.results.LintProblemLocation.startOfComment(doc.comments, comment),
+            .end = zlinter.results.LintProblemLocation.endOfComment(doc.comments, comment),
             .message = try gpa.dupe(u8, if (config.exclude_if_contains_issue_number or !config.exclude_if_contains_url)
                 "Avoid todo comments that don't link to a tracked issue"
             else

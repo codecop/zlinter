@@ -45,7 +45,7 @@ fn run(
 
     const tree = doc.handle.tree;
 
-    const root: NodeIndexShim = .root;
+    const root: NodeIndexShim = NodeIndexShim.root;
     var it = try doc.nodeLineageIterator(root, gpa);
     defer it.deinit();
 
@@ -125,8 +125,8 @@ fn run(
             try lint_problems.append(gpa, .{
                 .rule_id = rule.rule_id,
                 .severity = problem.severity,
-                .start = .startOfNode(tree, node.toNodeIndex()),
-                .end = .endOfNode(tree, node.toNodeIndex()),
+                .start = zlinter.results.LintProblemLocation.startOfNode(tree, node.toNodeIndex()),
+                .end = zlinter.results.LintProblemLocation.endOfNode(tree, node.toNodeIndex()),
                 .message = try gpa.dupe(u8, problem.message),
             });
         }

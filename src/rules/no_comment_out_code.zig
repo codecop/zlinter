@@ -79,8 +79,8 @@ fn run(
                     try lint_problems.append(gpa, .{
                         .rule_id = rule.rule_id,
                         .severity = config.severity,
-                        .start = .startOfComment(doc.comments, first_comment.?),
-                        .end = .endOfComment(doc.comments, last_comment.?),
+                        .start = zlinter.results.LintProblemLocation.startOfComment(doc.comments, first_comment.?),
+                        .end = zlinter.results.LintProblemLocation.endOfComment(doc.comments, last_comment.?),
                         .message = try gpa.dupe(u8, "Avoid code in comments"),
                     });
                 }
@@ -102,8 +102,8 @@ fn run(
             try lint_problems.append(gpa, .{
                 .rule_id = rule.rule_id,
                 .severity = config.severity,
-                .start = .startOfComment(doc.comments, first_comment.?),
-                .end = .endOfComment(doc.comments, last_comment.?),
+                .start = zlinter.results.LintProblemLocation.startOfComment(doc.comments, first_comment.?),
+                .end = zlinter.results.LintProblemLocation.endOfComment(doc.comments, last_comment.?),
                 .message = try gpa.dupe(u8, "Avoid code in comments"),
             });
         }
@@ -125,7 +125,7 @@ fn run(
 
 fn looksLikeCode(content: []const u8, gpa: std.mem.Allocator) !bool {
     if (content.len == 0) return false;
-    if (std.mem.containsAtLeastScalar(u8, content, 1, '`')) return false;
+    if (std.mem.indexOfScalar(u8, content, '`') != null) return false;
 
     const statement_container_fmt = "fn wrap() void {{\n{s}\n}}\n";
     const declaration_container_fmt = "{s}";

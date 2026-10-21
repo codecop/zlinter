@@ -191,7 +191,7 @@ const Parser = struct {
             if (c == '"') {
                 const result = self.source[start..self.pos];
                 self.pos += 1;
-                return result;
+                return try self.gpa.dupe(u8, result);
             }
             if (c == '\\') {
                 self.pos += 2;
