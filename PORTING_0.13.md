@@ -456,7 +456,9 @@ Key ZLS API differences to investigate:
   - Verified: `zig build --help` in integration_tests shows no errors from build.zig (remaining errors are pre-existing in zlinter lib source: comments.zig, Args.zig, zon.zig)
   - Status: DONE
 - [x] **TASK-6.8:** Port `integration_tests/build.zig.zon` **DONE** (TASK-1.7)
-- [ ] **TASK-6.9:** Update `integration_tests/src/test_runner.zig` verify API
+- [x] **TASK-6.9:** Update `integration_tests/src/test_runner.zig` verify API
+  - Verified: All APIs (`std.heap.FixedBufferAllocator.init`, `std.process.argsAlloc/Free`, `std.io.getStdOut().writer()`, `builtin.test_functions` with `TestFn.func: *const fn`, `std.fmt.format`, `std.fmt.bufPrint`, `std.mem.eql`, `std.ascii.toUpper`, `std.posix.exit`) exist in Zig 0.13 std lib. `zig ast-check` passes. No changes needed.
+  - Status: DONE
 - [ ] **TASK-6.10:** Update `integration_tests/src/integration_test.zig` verify API
 - [ ] **TASK-6.11:** Update `integration_tests/src/no_cats.zig` verify 0.13
 - [ ] **TASK-6.12:** Update `integration_tests/src/test_case_references.zig` verify 0.13
@@ -521,11 +523,11 @@ zig build integration-check --summary all
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
-| Phase 6: Executable & Integration | IN PROGRESS | 6/12 | 12 |
+| Phase 6: Executable & Integration | IN PROGRESS | 7/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **50/97** | **97** |
+| **Total** | | **51/97** | **97** |
 
 ### Files Changed So Far
 
