@@ -1,4 +1,4 @@
-﻿# Porting Zlinter to Zig 0.13 Analysis & Task List
+# Porting Zlinter to Zig 0.13 Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
 > Created: 2026-10-19 | Updated: 2026-10-21
@@ -417,7 +417,7 @@ Key ZLS API differences to investigate:
   - Verified: `zig ast-check` passes, no compilation errors in no_undefined.zig
   - Status: DONE
 - [x] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
-- [ ] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
+- [x] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
 - [ ] **TASK-5.13:** Audit remaining rule files for ZLS API usage
 
 ### Phase 6: Executable & Integration Tests **PENDING**

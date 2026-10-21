@@ -240,46 +240,51 @@ fn declRequiringCleanup(
     }) return null;
 
     const var_decl_type = try context.resolveTypeOfNode(doc, maybe_var_decl_node) orelse return null;
-    switch (var_decl_type.data) {
-        .container => |container| {
-            const scope_handle = switch (zlinter.version.zig) {
-                .@"0.14" => container,
-                .@"0.15", .@"0.16" => container.scope_handle,
+    const scope_handle = switch (zlinter.version.zig) {
+        .@"0.13" => switch (var_decl_type.data) {
+            .other => |node_handle| node_handle,
+            else => return null,
+        },
+        .@"0.14" => switch (var_decl_type.data) {
+            .container => |container| container,
+            else => return null,
+        },
+        .@"0.15", .@"0.16" => switch (var_decl_type.data) {
+            .container => |container| container.scope_handle,
+            else => return null,
+        },
+    };
+    const node = scope_handle.toNode();
+    const tag = shims.nodeTag(scope_handle.handle.tree, node);
+    switch (tag) {
+        .container_decl,
+        .container_decl_arg,
+        .container_decl_arg_trailing,
+        .container_decl_trailing,
+        .container_decl_two,
+        .container_decl_two_trailing,
+        => {
+            const scope_tree = scope_handle.handle.tree;
+
+            const has_deinit_method: bool = has_deinit_method: {
+                var buffer: [2]Ast.Node.Index = undefined;
+                const container_decl = scope_tree.fullContainerDecl(&buffer, node).?;
+                for (container_decl.ast.members) |member| {
+                    var fn_proto_buffer: [1]Ast.Node.Index = undefined;
+                    const fn_decl = zlinter.ast.fnDecl(scope_tree, member, &fn_proto_buffer) orelse continue;
+
+                    if (zlinter.ast.fnProtoVisibility(scope_tree, fn_decl.proto) == .private) continue;
+
+                    const name_token = fn_decl.proto.name_token orelse continue;
+                    const name = scope_tree.tokenSlice(name_token);
+
+                    if (std.mem.eql(u8, name, "deinit")) break :has_deinit_method true;
+                }
+                break :has_deinit_method false;
             };
-            const node = scope_handle.toNode();
-            const tag = shims.nodeTag(scope_handle.handle.tree, node);
-            switch (tag) {
-                .container_decl,
-                .container_decl_arg,
-                .container_decl_arg_trailing,
-                .container_decl_trailing,
-                .container_decl_two,
-                .container_decl_two_trailing,
-                => {
-                    const scope_tree = scope_handle.handle.tree;
+            if (!has_deinit_method) return null;
 
-                    const has_deinit_method: bool = has_deinit_method: {
-                        var buffer: [2]Ast.Node.Index = undefined;
-                        const container_decl = scope_tree.fullContainerDecl(&buffer, node).?;
-                        for (container_decl.ast.members) |member| {
-                            var fn_proto_buffer: [1]Ast.Node.Index = undefined;
-                            const fn_decl = zlinter.ast.fnDecl(scope_tree, member, &fn_proto_buffer) orelse continue;
-
-                            if (zlinter.ast.fnProtoVisibility(scope_tree, fn_decl.proto) == .private) continue;
-
-                            const name_token = fn_decl.proto.name_token orelse continue;
-                            const name = scope_tree.tokenSlice(name_token);
-
-                            if (std.mem.eql(u8, name, "deinit")) break :has_deinit_method true;
-                        }
-                        break :has_deinit_method false;
-                    };
-                    if (!has_deinit_method) return null;
-
-                    return .{ .decl_name_token = var_decl.ast.mut_token + 1 };
-                },
-                else => {},
-            }
+            return .{ .decl_name_token = var_decl.ast.mut_token + 1 };
         },
         else => {},
     }
