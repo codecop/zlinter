@@ -463,7 +463,10 @@ Key ZLS API differences to investigate:
   - Fixed 3 Zig 0.13 incompatibilities: `ArrayListUnmanaged(T).empty` -> `ArrayListUnmanaged(T){}` (3 occurrences), `Dir.readFileAlloc()` -> custom `readFileAlloc()` helper using `openFile`/`readToEndAlloc`, `Dir.copyFile()` -> custom `copyFile()` helper using `openFile`/`createFile`/buffered copy
   - Verified: `zig ast-check` passes, `zig test --test-no-exec` compiles cleanly
   - Status: DONE
-- [ ] **TASK-6.11:** Update `integration_tests/src/no_cats.zig` verify 0.13
+- [x] **TASK-6.11:** Update `integration_tests/src/no_cats.zig` verify 0.13
+  - Fixed: `ArrayListUnmanaged(T).empty` -> `ArrayListUnmanaged(T){}` (0.13 has no `.empty` constant on unmanaged ArrayList)
+  - Verified: `zig ast-check` passes, all other APIs are 0.13-compatible
+  - Status: DONE
 - [ ] **TASK-6.12:** Update `integration_tests/src/test_case_references.zig` verify 0.13
 
 ### Phase 7: Builtin Syntax & Language Changes **PENDING**
