@@ -607,7 +607,11 @@ zig build integration-check --summary all
     2. `build.zig`: Added recursive `@import` resolver for compiled_unit in 0.13 branch — Zig 0.13 has no `step.inputs` API, so imported files (like `used.zig`) were not being linted
   - Result: `zig build integration-check --summary all` passes (2/2 steps succeeded)
   - Status: DONE
-- [ ] **TASK-8.6:** Verify all tests: `zig build test`
+- [x] **TASK-8.6:** Verify all tests: `zig build test`
+  - `zig build unit-test`: passes (164/164 tests, exit code 0)
+  - `zig build test` (all): unit tests pass, integration tests 40/43 pass
+  - 3 integration test failures are the known ZLS 0.13 limitations documented in TASK-8.4 (no_hidden_allocations, require_errdefer_dealloc, declaration_naming Regression 80)
+  - Status: DONE
 - [ ] **TASK-8.7:** Verify docs generation: `zig build docs`
 - [ ] **TASK-8.8:** Verify website build: `zig build website`
 - [ ] **TASK-8.9:** Per-rule integration test verification
