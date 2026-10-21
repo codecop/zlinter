@@ -459,7 +459,10 @@ Key ZLS API differences to investigate:
 - [x] **TASK-6.9:** Update `integration_tests/src/test_runner.zig` verify API
   - Verified: All APIs (`std.heap.FixedBufferAllocator.init`, `std.process.argsAlloc/Free`, `std.io.getStdOut().writer()`, `builtin.test_functions` with `TestFn.func: *const fn`, `std.fmt.format`, `std.fmt.bufPrint`, `std.mem.eql`, `std.ascii.toUpper`, `std.posix.exit`) exist in Zig 0.13 std lib. `zig ast-check` passes. No changes needed.
   - Status: DONE
-- [ ] **TASK-6.10:** Update `integration_tests/src/integration_test.zig` verify API
+- [x] **TASK-6.10:** Update `integration_tests/src/integration_test.zig` verify API
+  - Fixed 3 Zig 0.13 incompatibilities: `ArrayListUnmanaged(T).empty` -> `ArrayListUnmanaged(T){}` (3 occurrences), `Dir.readFileAlloc()` -> custom `readFileAlloc()` helper using `openFile`/`readToEndAlloc`, `Dir.copyFile()` -> custom `copyFile()` helper using `openFile`/`createFile`/buffered copy
+  - Verified: `zig ast-check` passes, `zig test --test-no-exec` compiles cleanly
+  - Status: DONE
 - [ ] **TASK-6.11:** Update `integration_tests/src/no_cats.zig` verify 0.13
 - [ ] **TASK-6.12:** Update `integration_tests/src/test_case_references.zig` verify 0.13
 
@@ -523,11 +526,11 @@ zig build integration-check --summary all
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
-| Phase 6: Executable & Integration | IN PROGRESS | 7/12 | 12 |
+| Phase 6: Executable & Integration | IN PROGRESS | 8/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **51/97** | **97** |
+| **Total** | | **52/97** | **97** |
 
 ### Files Changed So Far
 
@@ -537,6 +540,7 @@ build.zig.zon                   0.13 ZON syntax, ZLS 0.13.0 dep
 build_docs.zig                  DebugAllocator -> GeneralPurposeAllocator, added .@"0.13" to version switches
 build_rules.zig                 DebugAllocator -> GeneralPurposeAllocator for 0.13
 integration_tests/build.zig.zon 0.13 ZON syntax
+integration_tests/src/integration_test.zig  ArrayListUnmanaged.empty -> {}, Dir.readFileAlloc/copyFile -> custom helpers for 0.13
 src/lib/version.zig             added .@"0.13" enum value
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
 src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
