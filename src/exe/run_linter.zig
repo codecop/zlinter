@@ -519,7 +519,7 @@ fn runFixes(
         defer file.close();
 
         const file_content = switch (zlinter.version.zig) {
-            .@"0.14" => try file.reader().readAllAlloc(gpa, zlinter.session.max_zig_file_size_bytes),
+            .@"0.13", .@"0.14" => try file.reader().readAllAlloc(gpa, zlinter.session.max_zig_file_size_bytes),
             .@"0.15", .@"0.16" => file_content: {
                 var file_reader_buffer: [1024]u8 = undefined;
                 var file_reader = file.reader(&file_reader_buffer);
