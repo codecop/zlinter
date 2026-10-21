@@ -1,4 +1,4 @@
-# Porting Zlinter to Zig 0.13 Analysis & Task List
+﻿# Porting Zlinter to Zig 0.13 Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
 > Created: 2026-10-19 | Updated: 2026-10-20
@@ -366,7 +366,7 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` to both switch prongs: `tree.render()` (line 33) and `tree.renderError()` (line 133)
   - Status: DONE
 
-- [ ] **TASK-4.12:** Update `src/lib/rendering.zig` `Printer.initAuto()`
+- [x] **TASK-4.12:** Update `src/lib/rendering.zig` `Printer.initAuto()`
   - File: `src/lib/rendering.zig:248-260`
   - 0.13: Same API as 0.14 add `.@"0.13"` alongside `.@"0.14"`
 
@@ -461,13 +461,13 @@ zig build integration-check --summary all
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 8/13 | 13 |
+| Phase 4: Library Source | IN PROGRESS | 9/13 | 13 |
 | Phase 5: Rules | PENDING | 0/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **35/97** | **97** |
+| **Total** | | **36/97** | **97** |
 
 ### Files Changed So Far
 

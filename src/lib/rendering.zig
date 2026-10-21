@@ -245,7 +245,7 @@ pub const Printer = struct {
 
     pub fn initAuto(self: *Printer, verbose: bool) void {
         switch (version.zig) {
-            .@"0.14" => self.init(
+            .@"0.13", .@"0.14" => self.init(
                 .{ .context = .{ .file = std.io.getStdOut() } },
                 .{ .context = .{ .file = std.io.getStdErr() } },
                 .init(std.io.getStdOut()),
