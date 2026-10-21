@@ -612,7 +612,9 @@ zig build integration-check --summary all
   - `zig build test` (all): unit tests pass, integration tests 40/43 pass
   - 3 integration test failures are the known ZLS 0.13 limitations documented in TASK-8.4 (no_hidden_allocations, require_errdefer_dealloc, declaration_naming Regression 80)
   - Status: DONE
-- [ ] **TASK-8.7:** Verify docs generation: `zig build docs`
+- [x] **TASK-8.7:** Verify docs generation: `zig build docs`
+  - `zig build docs` exits 0, generates RULES.md via build_docs.zig, no errors
+  - Status: DONE
 - [ ] **TASK-8.8:** Verify website build: `zig build website`
 - [ ] **TASK-8.9:** Per-rule integration test verification
 
