@@ -636,7 +636,10 @@ zig build integration-check --summary all
   - Copy from `.github/workflows/windows.yml`
   - Changes: branch `0.13.x`, Zig `0.13.0`, name `windows-0.13`
   - Same 4 test steps: `unit-test`, `lint`, `integration-test`, `integration-check --summary all`
-- [ ] **TASK-9.2:** Create `.github/workflows/linux-0.13.yml`
+- [x] **TASK-9.2:** Create `.github/workflows/linux-0.13.yml`
+  - Copy from `.github/workflows/linux.yml`
+  - Changes: branch `0.13.x`, Zig `0.13.0`, name `linux-0.13`, runner `ubuntu-latest`
+  - Same 4 test steps: `unit-test`, `lint`, `integration-test`, `integration-check --summary all`
 - [ ] **TASK-9.3:** Update `.github/workflows/deploy.yml` (optional)
 - [ ] **TASK-9.4:** Verify CI locally (simulate)
 
