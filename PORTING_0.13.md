@@ -391,7 +391,10 @@ Key ZLS API differences to investigate:
   - Updated test skip condition to allow 0.13 (line 406)
   - Verified: `zig ast-check` passes, no compilation errors in no_deprecated.zig
   - Status: DONE
-- [ ] **TASK-5.5:** Update `src/rules/no_empty_block.zig` add `.@"0.13"` alongside `.@"0.14"` (line 199-200)
+- [x] **TASK-5.5:** Update `src/rules/no_empty_block.zig` add `.@"0.13"` alongside `.@"0.14"` (line 199-200)
+  - Added `.@"0.13"` alongside `.@"0.14"` in fnDeclBlock fn_decl version switch
+  - Verified: `zig ast-check` passes, no compilation errors in no_empty_block.zig
+  - Status: DONE
 - [ ] **TASK-5.6:** Update `src/rules/no_hidden_allocations.zig` add `.@"0.13"` cases, fix ZLS API (lines 84-85, 102-103)
 - [ ] **TASK-5.7:** Update `src/rules/no_literal_only_bool_expression.zig` add `.@"0.13"` (line 76-77)
 - [ ] **TASK-5.8:** Update `src/rules/no_orelse_unreachable.zig` add `.@"0.13"` (line 52-53)
