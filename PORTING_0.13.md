@@ -412,7 +412,10 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.14"` in isEmptyOrUnreachableBlock lhs/rhs version switch (line 151)
   - Verified: `zig ast-check` passes, no compilation errors in no_swallow_error.zig
   - Status: DONE
-- [ ] **TASK-5.10:** Update `src/rules/no_undefined.zig` add `.@"0.13"` (line 125-126)
+- [x] **TASK-5.10:** Update `src/rules/no_undefined.zig` add `.@"0.13"` (line 125-126)
+  - Added `.@"0.13"` alongside `.@"0.14"` in field_access nodeData lhs/rhs version switch (0.13 uses `data.lhs`/`data.rhs` like 0.14)
+  - Verified: `zig ast-check` passes, no compilation errors in no_undefined.zig
+  - Status: DONE
 - [ ] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
 - [ ] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
 - [ ] **TASK-5.13:** Audit remaining rule files for ZLS API usage
@@ -491,12 +494,12 @@ zig build integration-check --summary all
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
-| Phase 5: Rules | IN PROGRESS | 7/13 | 13 |
+| Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **44/97** | **97** |
+| **Total** | | **45/97** | **97** |
 
 ### Files Changed So Far
 
@@ -515,6 +518,7 @@ src/rules/no_deprecated.zig     added .@"0.13" to field_access nodeData, lookupS
 src/rules/no_hidden_allocations.zig  added .@"0.13" to field_access nodeData and resolveVarDeclAlias version switches
 src/rules/no_literal_only_bool_expression.zig  added .@"0.13" to comparison operator data.lhs/data.rhs version switch
 src/rules/no_orelse_unreachable.zig  added .@"0.13" to orelse rhs version switch
+src/rules/no_undefined.zig         added .@"0.13" to field_access nodeData lhs/rhs version switch
 PORTING_0.13.md                 this document
 ```
 
