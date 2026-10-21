@@ -615,7 +615,9 @@ zig build integration-check --summary all
 - [x] **TASK-8.7:** Verify docs generation: `zig build docs`
   - `zig build docs` exits 0, generates RULES.md via build_docs.zig, no errors
   - Status: DONE
-- [ ] **TASK-8.8:** Verify website build: `zig build website`
+- [x] **TASK-8.8:** Verify website build: `zig build website`
+  - `zig build website` exits 0, generates index.html, wasm.wasm (198KB), and all static assets (explorer.js, github.svg, style.css, index.template.html)
+  - Status: DONE
 - [ ] **TASK-8.9:** Per-rule integration test verification
 
 ### Phase 9: CI Workflow Setup **PENDING**

@@ -226,7 +226,7 @@ Enforce a consistent, predictable order for fields in structs, enums, and unions
 
   * Order and severity for struct fields
 
-  * **Default:** `.off`
+  * **Default:** `zlinter.rules.LintTextOrderWithSeverity.off`
 
 * `exclude_packed_structs`
 
@@ -537,7 +537,7 @@ The caller should decide where and when to allocate not the callee.
 
   * What kinds of allocators to detect.
 
-  * **Default:** `&.{ .page_allocator, .c_allocator, .general_purpose_allocator, .debug_allocator, }`
+  * **Default:** `&.{ AllocatorKind.page_allocator, AllocatorKind.c_allocator, AllocatorKind.general_purpose_allocator, AllocatorKind.debug_allocator, }`
 
 * `exclude_tests`
 
@@ -724,6 +724,7 @@ pub fn divide(x: i32, y: i32) !i32 {
   return x / y;
 }
 ```
+
 
 **Config options:**
 
@@ -1010,6 +1011,7 @@ pub fn message(age: u8, allocator: std.mem.Allocator) error{ OutOfMemory, Invali
 }
 ```
 
+
 **Config options:**
 
 * `severity`
@@ -1029,3 +1031,4 @@ Enforces an order of values in `switch` statements.
   * The severity for when `else` is not last in a `switch` (off, warning, error).
 
   * **Default:** `.warning`
+
