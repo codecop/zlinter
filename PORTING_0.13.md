@@ -640,7 +640,9 @@ zig build integration-check --summary all
   - Copy from `.github/workflows/linux.yml`
   - Changes: branch `0.13.x`, Zig `0.13.0`, name `linux-0.13`, runner `ubuntu-latest`
   - Same 4 test steps: `unit-test`, `lint`, `integration-test`, `integration-check --summary all`
-- [ ] **TASK-9.3:** Update `.github/workflows/deploy.yml` (optional)
+- [x] **TASK-9.3:** Update `.github/workflows/deploy.yml` (optional)
+  - Changed Zig version from 0.14.1 to 0.13.0 in deploy.yml
+  - Status: DONE
 - [ ] **TASK-9.4:** Verify CI locally (simulate)
 
 ---
@@ -657,8 +659,8 @@ zig build integration-check --summary all
 | Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
 | Phase 7: Language Audit | IN PROGRESS | 1/7 | 7 |
 | Phase 8: Verification | IN PROGRESS | 5/9 | 9 |
-| Phase 9: CI Workflows | IN PROGRESS | 1/4 | 4 |
-| **Total** | | **58/97** | **97** |
+| Phase 9: CI Workflows | IN PROGRESS | 3/4 | 4 |
+| **Total** | | **59/97** | **97** |
 
 ### Files Changed So Far
 
@@ -681,6 +683,8 @@ src/rules/no_orelse_unreachable.zig  added .@"0.13" to orelse rhs version switch
 src/rules/no_undefined.zig         added .@"0.13" to field_access nodeData lhs/rhs version switch
 src/exe/run_linter.zig          added .@"0.13" to stdin reader version switch (TASK-6.1), separated .@"0.13" diagnostics format specifier to use "{}" (TASK-6.2), added .@"0.13" to file reading version switch (TASK-6.3), added .@"0.13" to file writing version switch (TASK-6.4)
 .github/workflows/windows-0.13.yml  new CI workflow for 0.13.x branch, Zig 0.13.0, Windows
+.github/workflows/linux-0.13.yml  new CI workflow for 0.13.x branch, Zig 0.13.0, Linux
+.github/workflows/deploy.yml     Zig version 0.14.1 -> 0.13.0 for 0.13.x branch
 PORTING_0.13.md                 this document
 ```
 
