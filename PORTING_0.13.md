@@ -566,7 +566,7 @@ Key ZLS API differences to investigate:
   - Pre-existing errors (unrelated to std.process): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
   - Status: DONE
 
-### Phase 8: Verification & Testing (Local) **PENDING**
+### Phase 8: Verification & Testing (Local) **IN PROGRESS**
 
 The CI pipeline (`.github/workflows/windows.yml`) defines the canonical test sequence.
 On Windows, the exact commands are:
@@ -587,7 +587,10 @@ zig build integration-check --summary all
 
 - [x] **TASK-8.1:** Verify compilation: `zig build --help`
 - [x] **TASK-8.2:** Verify unit tests: `zig build unit-test`
-- [ ] **TASK-8.3:** Verify self-lint: `zig build lint`
+- [x] **TASK-8.3:** Verify self-lint: `zig build lint`
+  - Fixed 5 compilation errors: rendering.zig Tty.init, run_linter.zig RunResult constants, .zon -> _config.zig generation, session.zig popOrNull, DefaultFormatter formatFn signature
+  - Result: 0 errors, 400 warnings, 8 skipped - PASSES
+  - Status: DONE
 - [ ] **TASK-8.4:** Verify integration tests: `zig build integration-test`
 - [ ] **TASK-8.5:** Verify integration check: `zig build integration-check --summary all`
 - [ ] **TASK-8.6:** Verify all tests: `zig build test`
@@ -618,9 +621,9 @@ zig build integration-check --summary all
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
 | Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
 | Phase 7: Language Audit | IN PROGRESS | 1/7 | 7 |
-| Phase 8: Verification | PENDING | 0/9 | 9 |
+| Phase 8: Verification | IN PROGRESS | 3/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **54/97** | **97** |
+| **Total** | | **55/97** | **97** |
 
 ### Files Changed So Far
 
