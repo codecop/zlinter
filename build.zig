@@ -1,12 +1,5 @@
 const @"build.zig" = @This();
 
-const zls_version: []const u8 = switch (version.zig) {
-    .@"0.16" => "0.16.0-dev",
-    .@"0.15" => "0.15.0",
-    .@"0.14" => "0.14.0",
-    .@"0.13" => "0.13.0",
-};
-
 pub const BuiltinLintRule = enum {
     field_naming,
     field_ordering,
@@ -227,7 +220,6 @@ pub fn build(b: *std.Build) void {
     const zls_module = b.dependency("zls", .{
         .target = target,
         .optimize = optimize,
-        .@"version-string" = zls_version,
     }).module("zls");
 
     const zlinter_lib_module = b.addModule("zlinter", .{

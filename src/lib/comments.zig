@@ -87,89 +87,99 @@ fn allocTokenize(source: [:0]const u8, gpa: std.mem.Allocator) error{OutOfMemory
     };
 
     var t = Tokenizer{};
-    state: switch (State.parsing) {
-        .parsing => switch (source[t.i]) {
-            0 => {},
-            '\n' => continue :state .consume_newline,
-            '/' => continue :state .consume_forward_slash,
-            else => {
-                t.i += 1;
-                continue :state .parsing;
+    var current_state: State = .parsing;
+    state: while (true) {
+        switch (current_state) {
+            .parsing => {
+                switch (source[t.i]) {
+                    0 => break :state,
+                    '\n' => current_state = .consume_newline,
+                    '/' => current_state = .consume_forward_slash,
+                    else => {
+                        t.i += 1;
+                        current_state = .parsing;
+                    },
+                }
             },
-        },
-        .consume_forward_slash => switch (source[t.i + 1]) {
-            '/' => continue :state .consume_comment,
-            else => {
-                t.i += 1;
-                continue :state .parsing;
+            .consume_forward_slash => {
+                switch (source[t.i + 1]) {
+                    '/' => current_state = .consume_comment,
+                    else => {
+                        t.i += 1;
+                        current_state = .parsing;
+                    },
+                }
             },
-        },
-        .consume_newline => {
-            t.i += 1;
-            t.line += 1;
-            try line_starts.append(gpa, t.i);
-            continue :state .parsing;
-        },
-        .consume_comment => {
-            std.debug.assert(source[t.i] == '/' and source[t.i + 1] == '/');
+            .consume_newline => {
+                t.i += 1;
+                t.line += 1;
+                try line_starts.append(gpa, t.i);
+                current_state = .parsing;
+            },
+            .consume_comment => {
+                std.debug.assert(source[t.i] == '/' and source[t.i + 1] == '/');
 
-            var start = t.i;
-            const tag: Token.Tag, const len: usize = switch (source[t.i + 2]) {
-                '/' => .{ .doc_comment, "///".len },
-                '!' => .{ .file_comment, "//!".len },
-                else => .{ .source_comment, "//".len },
-            };
-            t.i += len;
-            try tokens.append(gpa, .{
-                .tag = tag,
-                .first_byte = start,
-                .len = len,
-                .line = t.line,
-            });
+                var start = t.i;
+                const tag: Token.Tag, const len: usize = switch (source[t.i + 2]) {
+                    '/' => .{ .doc_comment, "///".len },
+                    '!' => .{ .file_comment, "//!".len },
+                    else => .{ .source_comment, "//".len },
+                };
+                t.i += len;
+                try tokens.append(gpa, .{
+                    .tag = tag,
+                    .first_byte = start,
+                    .len = len,
+                    .line = t.line,
+                });
 
-            start = t.i;
-            while (true) switch (source[t.i]) {
-                ':', '(', ')', '\t', ' ', '\n', '\r', 0 => |c| {
-                    if (start < t.i) {
-                        const token_slice = source[start..t.i];
-                        try tokens.append(gpa, .{
-                            .tag = Token.keywords.get(token_slice) orelse .word,
-                            .first_byte = start,
-                            .len = t.i - start,
-                            .line = t.line,
-                        });
-                    }
+                start = t.i;
+                while (true) switch (source[t.i]) {
+                    ':', '(', ')', '\t', ' ', '\n', '\r', 0 => |c| {
+                        if (start < t.i) {
+                            const token_slice = source[start..t.i];
+                            try tokens.append(gpa, .{
+                                .tag = Token.keywords.get(token_slice) orelse .word,
+                                .first_byte = start,
+                                .len = t.i - start,
+                                .line = t.line,
+                            });
+                        }
 
-                    switch (c) {
-                        0 => break,
-                        '\n' => continue :state .consume_newline,
-                        ':' => try tokens.append(gpa, .{
-                            .tag = .colon,
-                            .first_byte = t.i,
-                            .len = 1,
-                            .line = t.line,
-                        }),
-                        ')' => try tokens.append(gpa, .{
-                            .tag = .close_parenthesis,
-                            .first_byte = t.i,
-                            .len = 1,
-                            .line = t.line,
-                        }),
-                        '(' => try tokens.append(gpa, .{
-                            .tag = .open_parenthesis,
-                            .first_byte = t.i,
-                            .len = 1,
-                            .line = t.line,
-                        }),
-                        ' ', '\t', '\r' => {},
-                        else => unreachable,
-                    }
-                    t.i += 1;
-                    start = t.i;
-                },
-                else => t.i += 1,
-            };
-        },
+                        switch (c) {
+                            0 => break :state,
+                            '\n' => {
+                                current_state = .consume_newline;
+                                break;
+                            },
+                            ':' => try tokens.append(gpa, .{
+                                .tag = .colon,
+                                .first_byte = t.i,
+                                .len = 1,
+                                .line = t.line,
+                            }),
+                            ')' => try tokens.append(gpa, .{
+                                .tag = .close_parenthesis,
+                                .first_byte = t.i,
+                                .len = 1,
+                                .line = t.line,
+                            }),
+                            '(' => try tokens.append(gpa, .{
+                                .tag = .open_parenthesis,
+                                .first_byte = t.i,
+                                .len = 1,
+                                .line = t.line,
+                            }),
+                            ' ', '\t', '\r' => {},
+                            else => unreachable,
+                        }
+                        t.i += 1;
+                        start = t.i;
+                    },
+                    else => t.i += 1,
+                };
+            },
+        }
     }
     return .{ try tokens.toOwnedSlice(gpa), try line_starts.toOwnedSlice(gpa) };
 }
