@@ -601,7 +601,12 @@ zig build integration-check --summary all
     - `require_errdefer_dealloc`: `resolveTypeOfNode` cannot resolve generic instantiations like `std.AutoHashMap(u8, void)` in ZLS 0.13
     - `declaration_naming` (Regression 80): ZLS 0.13 cannot resolve `@typeInfo(...).@"struct".backing_integer.?` chains to determine if a declaration is a type
   - Status: DONE (3 known ZLS 0.13 limitations documented)
-- [ ] **TASK-8.5:** Verify integration check: `zig build integration-check --summary all`
+- [x] **TASK-8.5:** Verify integration check: `zig build integration-check --summary all`
+  - Fixed 2 issues:
+    1. `src/lib/zon.zig`: Added `writeEnumLiteral()` and `isZigKeyword()` to handle Zig keywords (like `error`) in enum literals — generated `.error` is invalid Zig, needs `.@"error"`
+    2. `build.zig`: Added recursive `@import` resolver for compiled_unit in 0.13 branch — Zig 0.13 has no `step.inputs` API, so imported files (like `used.zig`) were not being linted
+  - Result: `zig build integration-check --summary all` passes (2/2 steps succeeded)
+  - Status: DONE
 - [ ] **TASK-8.6:** Verify all tests: `zig build test`
 - [ ] **TASK-8.7:** Verify docs generation: `zig build docs`
 - [ ] **TASK-8.8:** Verify website build: `zig build website`
@@ -630,9 +635,9 @@ zig build integration-check --summary all
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
 | Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
 | Phase 7: Language Audit | IN PROGRESS | 1/7 | 7 |
-| Phase 8: Verification | IN PROGRESS | 3/9 | 9 |
+| Phase 8: Verification | IN PROGRESS | 4/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **55/97** | **97** |
+| **Total** | | **56/97** | **97** |
 
 ### Files Changed So Far
 
@@ -676,91 +681,4 @@ steps:
 
 For the 0.13 port, the same 4 steps apply but with Zig 0.13.0. The `--summary all` flag on `integration-check` shows all step summaries.
 
-### Local Verification (Windows, Zig 0.13.0)
-
-```powershell
-$zig = "C:\Program Files\zig-0.13.0\zig.exe"
-cd E:\Develop\Zig\zlinter
-
-# Pre-flight: build script compiles
-& $zig build --help
-
-# CI Step 1: Unit tests
-& $zig build unit-test
-
-# CI Step 2: Self-lint
-& $zig build lint
-
-# CI Step 3: Integration tests
-& $zig build integration-test
-
-# CI Step 4: Integration check
-& $zig build integration-check --summary all
-
-# Bonus: All-in-one
-& $zig build test
-
-# Bonus: Docs & website
-& $zig build docs
-& $zig build website
-```
-
-### Acceptance Criteria (matches CI pipeline)
-
-- [ ] `zig build unit-test` passes (CI step 1)
-- [ ] `zig build lint` runs on self without errors (CI step 2)
-- [ ] `zig build integration-test` passes (CI step 3)
-- [ ] `zig build integration-check --summary all` passes (CI step 4)
-- [ ] `zig build test` passes (all combined)
-- [ ] `zig build docs` regenerates RULES.md without diff
-- [ ] `zig build website` builds WASM binary
-- [ ] All 24 built-in rules produce correct results on test cases
-
-### Known Risks
-
-1. **ZON parser:** If ZLS 0.13 doesn't expose a parser, writing one is ~500 lines
-2. **ZLS API drift:** ZLS 0.13 analyser API may differ significantly from 0.14
-3. **Watch inputs:** 0.13 doesn't support `step.addWatchInput()` `--watch` mode may not work
-4. **AST node tags:** 0.13 has `usingnamespace` tag (removed in 0.15) rules may need to handle it
-5. **FnProto return type:** 0.13 `fn_proto.ast.return_type` is `Index` (not optional) simpler than 0.15+
-
----
-
-## Quick Reference: 0.13 vs 0.14 API Differences
-
-| API | Zig 0.13 | Zig 0.14 |
-|-----|----------|----------|
-| `b.addTest()` | `.root_source_file`, `.target`, `.optimize` | `.root_module`, `.use_llvm` |
-| `b.addExecutable()` | `.root_source_file`, `.target`, `.optimize` | `.root_module` |
-| `b.addStaticLibrary()` | `.root_source_file`, `.target`, `.optimize` | `.root_module` |
-| `b.addModule()` | `(name, .{ .root_source_file, .imports, ... })` | Same |
-| `b.createModule()` | `.{ .root_source_file, .imports, ... }` | Same |
-| `b.graph.host` | `ResolvedTarget` | Same |
-| `b.graph.zig_exe` | `[:0]const u8` | Same |
-| `b.graph.global_cache_root` | `Cache.Directory` | Same |
-| `b.graph.zig_lib_directory` | **Does not exist** | Exists |
-| `b.zig_lib_dir` | `?LazyPath` | May not exist |
-| `step.addWatchInput()` | **Does not exist** | Exists |
-| `step.addDirectoryWatchInput()` | **Does not exist** | Exists |
-| `LazyPath` | `.src_path { .owner, .sub_path }` | `.path { ... }` (different) |
-| `std.zon` | **Does not exist** | `std.zon.parse`, `std.zon.stringify` |
-| `std.ArrayList(T)` | Managed (has allocator) | Managed (has allocator) |
-| `std.ArrayListUnmanaged(T)` | Exists | Exists |
-| `std.io.getStdOut().writer()` | Exists (old API) | Exists (old API) |
-| `file.reader()` | Exists (old API) | Exists (old API) |
-| `Ast.Node.Index` | `u32` | `u32` |
-| `Ast.Node.Data` | `struct { lhs, rhs }` | `struct { lhs, rhs }` |
-| `Ast.render()` | `![]u8` | `![]u8` |
-| `Ast.renderError()` | `(err, writer)` | `(err, writer)` |
-| `tree.nodes.items(.tag)` | Exists | Exists |
-| `fn_proto.ast.return_type` | `Index` | `Index` |
-| `fullContainerDecl()` | Exists | Exists |
-| `fullFnProto()` | Exists | Exists |
-| `@intFromEnum(x)` | Type inferred | Type inferred |
-| `std.process.cleanExit()` | May not exist | Exists |
-| `std.heap.DebugAllocator(.{})` | Exists | Exists |
-| Node tag `usingnamespace` | **Exists** | Exists (deprecated) |
-| `build.zig.zon` `.name` | String literal `"name"` | Enum literal `.name` |
-| `build.zig.zon` `.fingerprint` | **Not supported** | Supported |
-| `build.zig.zon` `.minimum_zig_version` | **Not supported** | Supported |
-| `build.zig.zon` dep `.hash` format | Plain hex string | Prefixed format (`pkg-version-...`) |
+### Local Verification (Windows, 

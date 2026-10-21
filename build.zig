@@ -992,6 +992,52 @@ const ZlinterRun = struct {
                             if (cwd.relativePath(b, path_str)) |path| {
                                 try includes.append(b.allocator, path);
                             }
+                            // Recursively resolve @import statements to find all source files (0.13 has no step.inputs)
+                            {
+                                var visited = std.StringHashMap(void).init(b.allocator);
+                                defer visited.deinit();
+                                var import_stack = std.ArrayList([]const u8).init(b.allocator);
+                                defer import_stack.deinit();
+                                try import_stack.append(path_str);
+                                while (import_stack.popOrNull()) |current_path| {
+                                    const abs_path = if (std.fs.path.isAbsolute(current_path))
+                                        current_path
+                                    else
+                                        try std.fs.path.join(b.allocator, &.{ cwd.path, current_path });
+                                    defer if (!std.fs.path.isAbsolute(current_path)) b.allocator.free(abs_path);
+                                    if (visited.contains(abs_path)) continue;
+                                    try visited.put(abs_path, {});
+                                    const import_file = std.fs.cwd().openFile(abs_path, .{}) catch continue;
+                                    defer import_file.close();
+                                    const import_source = import_file.readToEndAlloc(b.allocator, 1024 * 1024) catch continue;
+                                    defer b.allocator.free(import_source);
+                                    var line_it = std.mem.splitScalar(u8, import_source, '\n');
+                                    while (line_it.next()) |line| {
+                                        const trimmed = std.mem.trim(u8, line, " \t\r");
+                                        if (std.mem.indexOf(u8, trimmed, "@import(")) |import_idx| {
+                                            const after = trimmed[import_idx + 8..];
+                                            if (std.mem.indexOfScalar(u8, after, '"')) |q1| {
+                                                const rest = after[q1 + 1..];
+                                                if (std.mem.indexOfScalar(u8, rest, '"')) |q2| {
+                                                    const import_path = rest[0..q2];
+                                                    if (std.mem.endsWith(u8, import_path, ".zig")) {
+                                                        const resolved = if (std.fs.path.isAbsolute(import_path))
+                                                            import_path
+                                                        else blk: {
+                                                            const dir = std.fs.path.dirname(abs_path) orelse ".";
+                                                            break :blk try std.fs.path.join(b.allocator, &.{ dir, import_path });
+                                                        };
+                                                        if (cwd.relativePath(b, resolved)) |lazy| {
+                                                            try includes.append(b.allocator, lazy);
+                                                        }
+                                                        try import_stack.append(resolved);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     } else {
                         var inputs = exe.step.inputs;

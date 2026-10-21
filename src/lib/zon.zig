@@ -532,10 +532,10 @@ pub const stringify = struct {
                 try writer.writeAll("}");
             },
             .Enum => {
-                try writer.print(".{s}", .{@tagName(val)});
+                try writeEnumLiteral(@tagName(val), writer, zig_mode);
             },
             .EnumLiteral => {
-                try writer.print(".{s}", .{@tagName(val)});
+                try writeEnumLiteral(@tagName(val), writer, zig_mode);
             },
             .Bool => {
                 try writer.writeAll(if (val) "true" else "false");
@@ -548,6 +548,31 @@ pub const stringify = struct {
             },
             else => @compileError("Unsupported type in ZON serialization: " ++ @typeName(T)),
         }
+    }
+
+    fn writeEnumLiteral(name: []const u8, writer: anytype, comptime zig_mode: bool) !void {
+        if (zig_mode and isZigKeyword(name)) {
+            try writer.print(".@\"{s}\"", .{name});
+        } else {
+            try writer.print(".{s}", .{name});
+        }
+    }
+
+    fn isZigKeyword(name: []const u8) bool {
+        const keywords = [_][]const u8{
+            "addrspace", "align", "allowzero", "and", "anyframe", "anytype",
+            "asm", "async", "await", "break", "callconv", "catch", "comptime",
+            "const", "continue", "defer", "else", "enum", "errdefer", "error",
+            "export", "extern", "false", "fn", "for", "if", "inline", "noalias",
+            "noinline", "nosuspend", "null", "opaque", "or", "orelse", "packed",
+            "pub", "resume", "return", "linksection", "struct", "suspend",
+            "switch", "test", "threadlocal", "true", "try", "type", "undefined",
+            "union", "unreachable", "usingnamespace", "var", "volatile", "while",
+        };
+        for (keywords) |kw| {
+            if (std.mem.eql(u8, name, kw)) return true;
+        }
+        return false;
     }
 
     fn writeZonString(str: []const u8, writer: anytype) !void {
