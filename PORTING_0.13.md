@@ -418,7 +418,14 @@ Key ZLS API differences to investigate:
   - Status: DONE
 - [x] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
 - [x] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
-- [ ] **TASK-5.13:** Audit remaining rule files for ZLS API usage
+- [x] **TASK-5.13:** Audit remaining rule files for ZLS API usage
+  - Audited all 23 rule files in `src/rules/`
+  - 11 files already have 0.13 version switches (TASK-5.1 through TASK-5.12)
+  - `no_unused.zig` lines 175/187: 0.13 correctly separate (uses `t.data` vs `t.resolveDeclLiteralResultType()`)
+  - `require_errdefer_dealloc.zig` line 248: 0.13 correctly separate (`.other` vs `.container` variant)
+  - 12 remaining files (declaration_naming, field_ordering, file_naming, max_positional_args, no_comment_out_code, no_inferred_error_unions, no_literal_args, no_panic, no_todo, require_braces, require_doc_comment, switch_case_ordering) use shims only - no version-dependent ZLS API calls
+  - `no_deprecated.zig` lines 172/306: unguarded `lookupSymbolGlobal`/`getSymbolFieldAccesses` calls match ZLS 0.13 signatures
+  - Status: DONE - No changes needed
 
 ### Phase 6: Executable & Integration Tests **PENDING**
 
