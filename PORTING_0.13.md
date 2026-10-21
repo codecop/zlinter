@@ -455,7 +455,7 @@ Key ZLS API differences to investigate:
   - Verified: `zig ast-check` passes on `integration_tests/build.zig`
   - Verified: `zig build --help` in integration_tests shows no errors from build.zig (remaining errors are pre-existing in zlinter lib source: comments.zig, Args.zig, zon.zig)
   - Status: DONE
-- [ ] **TASK-6.8:** Port `integration_tests/build.zig.zon` **DONE** (TASK-1.7)
+- [x] **TASK-6.8:** Port `integration_tests/build.zig.zon` **DONE** (TASK-1.7)
 - [ ] **TASK-6.9:** Update `integration_tests/src/test_runner.zig` verify API
 - [ ] **TASK-6.10:** Update `integration_tests/src/integration_test.zig` verify API
 - [ ] **TASK-6.11:** Update `integration_tests/src/no_cats.zig` verify 0.13
