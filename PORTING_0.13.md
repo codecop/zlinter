@@ -1,7 +1,7 @@
 ﻿# Porting Zlinter to Zig 0.13 Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
-> Created: 2026-10-19 | Updated: 2026-10-20
+> Created: 2026-10-19 | Updated: 2026-10-21
 
 ---
 
@@ -399,7 +399,10 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.14"` in field_access nodeData version switch (line 83)
   - Added `.@"0.13"` alongside `.@"0.14"` in resolveVarDeclAlias version switch (line 102) - ZLS 0.13 has same `NodeWithHandle { .node, .handle }` signature as 0.14
   - Status: DONE
-- [ ] **TASK-5.7:** Update `src/rules/no_literal_only_bool_expression.zig` add `.@"0.13"` (line 76-77)
+- [x] **TASK-5.7:** Update `src/rules/no_literal_only_bool_expression.zig` add `.@"0.13"` (line 76-77)
+  - Added `.@"0.13"` alongside `.@"0.14"` in comparison operator data.lhs/data.rhs version switch
+  - Verified: `zig ast-check` passes, no compilation errors in no_literal_only_bool_expression.zig
+  - Status: DONE
 - [ ] **TASK-5.8:** Update `src/rules/no_orelse_unreachable.zig` add `.@"0.13"` (line 52-53)
 - [ ] **TASK-5.9:** Update `src/rules/no_swallow_error.zig` add `.@"0.13"` cases (lines 64-65, 151-155)
 - [ ] **TASK-5.10:** Update `src/rules/no_undefined.zig` add `.@"0.13"` (line 125-126)
@@ -481,12 +484,12 @@ zig build integration-check --summary all
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
-| Phase 5: Rules | IN PROGRESS | 5/13 | 13 |
+| Phase 5: Rules | IN PROGRESS | 6/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **42/97** | **97** |
+| **Total** | | **43/97** | **97** |
 
 ### Files Changed So Far
 
@@ -503,6 +506,7 @@ src/lib/session.zig             DocumentStore config version-aware for 0.13, Ana
 src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
 src/rules/no_deprecated.zig     added .@"0.13" to field_access nodeData, lookupSymbolFieldInit version switches; updated breaking-changes guard and test skip for 0.13
 src/rules/no_hidden_allocations.zig  added .@"0.13" to field_access nodeData and resolveVarDeclAlias version switches
+src/rules/no_literal_only_bool_expression.zig  added .@"0.13" to comparison operator data.lhs/data.rhs version switch
 PORTING_0.13.md                 this document
 ```
 
