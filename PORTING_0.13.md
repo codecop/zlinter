@@ -467,7 +467,9 @@ Key ZLS API differences to investigate:
   - Fixed: `ArrayListUnmanaged(T).empty` -> `ArrayListUnmanaged(T){}` (0.13 has no `.empty` constant on unmanaged ArrayList)
   - Verified: `zig ast-check` passes, all other APIs are 0.13-compatible
   - Status: DONE
-- [ ] **TASK-6.12:** Update `integration_tests/src/test_case_references.zig` verify 0.13
+- [x] **TASK-6.12:** Update integration_tests/src/test_case_references.zig verify 0.13
+  - Verified: zig ast-check and zig build-obj -fno-emit-bin pass. No imports, no version-dependent APIs - plain declarations only (enums, struct, function). No changes needed.
+  - Status: DONE
 
 ### Phase 7: Builtin Syntax & Language Changes **PENDING**
 
@@ -529,11 +531,11 @@ zig build integration-check --summary all
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
-| Phase 6: Executable & Integration | IN PROGRESS | 8/12 | 12 |
+| Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **52/97** | **97** |
+| **Total** | | **53/97** | **97** |
 
 ### Files Changed So Far
 
