@@ -57,7 +57,7 @@ pub fn main() !u8 {
             &rules,
             gpa,
             switch (zlinter.version.zig) {
-                .@"0.14" => std.io.getStdIn().reader(),
+                .@"0.13", .@"0.14" => std.io.getStdIn().reader(),
                 .@"0.15", .@"0.16" => std.fs.File.stdin().deprecatedReader(),
             },
         ) catch |e| switch (e) {

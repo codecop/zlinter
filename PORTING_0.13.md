@@ -429,7 +429,7 @@ Key ZLS API differences to investigate:
 
 ### Phase 6: Executable & Integration Tests **PENDING**
 
-- [ ] **TASK-6.1:** Update `src/exe/run_linter.zig` stdin reader (line 60-61)
+- [x] **TASK-6.1:** Update `src/exe/run_linter.zig` stdin reader (line 60-61)
 - [ ] **TASK-6.2:** Update `src/exe/run_linter.zig` diagnostics formatting (line 309-310)
 - [ ] **TASK-6.3:** Update `src/exe/run_linter.zig` file reading (line 522-540)
 - [ ] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)
