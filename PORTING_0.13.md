@@ -479,7 +479,12 @@ Key ZLS API differences to investigate:
   - Result: ZERO occurrences of @intFromEnum, @enumFromInt, @enumToInt, or @intToEnum in the entire codebase
   - No changes needed - the codebase does not use any enum/int conversion builtins
   - Status: DONE
-- [ ] **TASK-7.2:** Audit all `@intCast` / `@truncate` / `@floatCast` calls
+- [x] **TASK-7.2:** Audit all @intCast / @truncate / @floatCast calls
+  - Searched all .zig source files for @intCast, @truncate, @floatCast
+  - Result: 2 occurrences of @intCast found, both in test fixture strings (multiline literals in function_naming.zig tests), not compiled code
+  - @truncate: zero occurrences, @floatCast: zero occurrences
+  - @intCast in Zig 0.13 uses result-location semantics (same as in fixtures) - no changes needed
+  - Status: DONE
 - [ ] **TASK-7.3:** Audit `std.ArrayList` vs `std.ArrayListUnmanaged` usage
 - [ ] **TASK-7.4:** Audit `std.heap.DebugAllocator` usage
 - [ ] **TASK-7.5:** Audit `std.testing` API usage
