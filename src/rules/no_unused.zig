@@ -32,7 +32,7 @@ fn run(
 
     if (config.container_declaration == .off) return null;
 
-    var lint_problems = shims.ArrayList(zlinter.results.LintProblem).empty;
+    var lint_problems = shims.ArrayList(zlinter.results.LintProblem){};
     defer lint_problems.deinit(gpa);
 
     const tree = doc.handle.tree;
@@ -42,7 +42,7 @@ fn run(
     // container, this is then used to check whether a root declaration is
     // being used.
     var container_references = map: {
-        var map = std.StringHashMapUnmanaged(void).empty;
+        var map = std.StringHashMapUnmanaged(void){};
 
         var node: NodeIndexShim = .root;
         while (node.index < tree.nodes.len) : (node.index += 1) {

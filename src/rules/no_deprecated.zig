@@ -32,7 +32,7 @@ fn run(
     const config = options.getConfig(Config);
     if (config.severity == .off) return null;
 
-    var lint_problems = shims.ArrayList(zlinter.results.LintProblem).empty;
+    var lint_problems = shims.ArrayList(zlinter.results.LintProblem){};
     defer lint_problems.deinit(gpa);
 
     const handle = doc.handle;
@@ -244,7 +244,7 @@ fn getSymbolEnumLiteralDocComment(
 ) error{OutOfMemory}!?[]const u8 {
     std.debug.assert(shims.nodeTag(doc.handle.tree, node) == .enum_literal);
 
-    var ancestors = shims.ArrayList(Ast.Node.Index).empty;
+    var ancestors = shims.ArrayList(Ast.Node.Index){};
     defer ancestors.deinit(arena);
 
     var current = node;

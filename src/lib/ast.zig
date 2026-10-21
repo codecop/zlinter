@@ -36,7 +36,7 @@ pub const NodeAncestorIterator = struct {
 pub const NodeLineageIterator = struct {
     const Self = @This();
 
-    queue: shims.ArrayList(NodeIndexShim) = .empty,
+    queue: shims.ArrayList(NodeIndexShim) = .{},
     lineage: *const NodeLineage,
     gpa: std.mem.Allocator,
 
@@ -72,7 +72,7 @@ pub fn nodeChildrenAlloc(
         }
     };
 
-    var children: shims.ArrayList(Ast.Node.Index) = .empty;
+    var children: shims.ArrayList(Ast.Node.Index) = .{};
     defer children.deinit(gpa);
 
     try iterateChildren(

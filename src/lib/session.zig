@@ -58,7 +58,7 @@ pub const LintDocument = struct {
     ) error{OutOfMemory}!ast.NodeLineageIterator {
         var it = ast.NodeLineageIterator{
             .gpa = gpa,
-            .queue = .empty,
+            .queue = .{},
             .lineage = &self.lineage,
         };
         try it.queue.append(gpa, node);
@@ -301,7 +301,7 @@ pub const LintContext = struct {
         doc.* = .{
             .path = try gpa.dupe(u8, path),
             .handle = handle,
-            .lineage = .empty,
+            .lineage = .{},
             .comments = src_comments,
             .skipper = undefined, // zlinter-disable-current-line no_undefined - set below
         };
@@ -322,7 +322,7 @@ pub const LintContext = struct {
                 node: NodeIndexShim,
             };
 
-            var queue = shims.ArrayList(QueueItem).empty;
+            var queue = shims.ArrayList(QueueItem){};
             defer queue.deinit(gpa);
 
             try queue.append(gpa, .{ .node = NodeIndexShim.root });

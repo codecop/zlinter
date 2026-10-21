@@ -190,7 +190,7 @@ test "LintFileRenderer" {
         try std.testing.expectEqualStrings("", renderer.getLine(2));
 
         {
-            var output = shims.ArrayList(u8).empty;
+            var output = shims.ArrayList(u8){};
             defer output.deinit(std.testing.allocator);
 
             try renderer.render(
@@ -209,7 +209,7 @@ test "LintFileRenderer" {
         }
 
         {
-            var output = shims.ArrayList(u8).empty;
+            var output = shims.ArrayList(u8){};
             defer output.deinit(std.testing.allocator);
 
             try renderer.render(
@@ -349,7 +349,7 @@ const FakeSink = struct {
         assertTestOnly();
 
         const array_sink = try allocator.create(shims.ArrayList(u8));
-        array_sink.* = .empty;
+        array_sink.* = .{};
 
         return .{
             .array_sink = array_sink,

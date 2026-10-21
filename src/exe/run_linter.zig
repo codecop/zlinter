@@ -364,7 +364,7 @@ fn runLinterRules(
         printer.println(.verbose, "    - {d} nodes", .{doc.handle.tree.nodes.len});
         printer.println(.verbose, "    - {d} tokens", .{doc.handle.tree.tokens.len});
 
-        var results = shims.ArrayList(zlinter.results.LintResult).empty;
+        var results = shims.ArrayList(zlinter.results.LintResult){};
         defer results.deinit(gpa);
 
         const tree = doc.handle.tree;
@@ -445,7 +445,7 @@ fn runFormatter(
     defer arena.deinit();
     const arena_allocator = arena.allocator();
 
-    var flattened = shims.ArrayList(zlinter.results.LintResult).empty;
+    var flattened = shims.ArrayList(zlinter.results.LintResult){};
     for (file_lint_problems.values()) |results| {
         try flattened.appendSlice(arena_allocator, results);
     }
@@ -486,7 +486,7 @@ fn runFixes(
 
     var it = file_lint_problems.iterator();
     while (it.next()) |entry| {
-        var lint_fixes = shims.ArrayList(zlinter.results.LintProblemFix).empty;
+        var lint_fixes = shims.ArrayList(zlinter.results.LintProblemFix){};
         defer lint_fixes.deinit(gpa);
 
         const results = entry.value_ptr.*;
@@ -538,7 +538,7 @@ fn runFixes(
         };
         defer gpa.free(file_content);
 
-        var output_slices = shims.ArrayList([]const u8).empty;
+        var output_slices = shims.ArrayList([]const u8){};
         defer output_slices.deinit(gpa);
 
         var file_fixes: usize = 0;
@@ -632,7 +632,7 @@ fn allocAstErrorMsg(
             return error_message.toOwnedSlice(allocator);
         },
         .@"0.14" => {
-            var error_message = shims.ArrayList(u8).empty;
+            var error_message = shims.ArrayList(u8){};
             defer error_message.deinit(allocator);
 
             try tree.renderError(err, error_message.writer(allocator));

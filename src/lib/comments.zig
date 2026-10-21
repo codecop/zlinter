@@ -72,10 +72,10 @@ const Tokenizer = struct {
 
 /// Returns tokens and line starts (line starts inclusive zero index)
 fn allocTokenize(source: [:0]const u8, gpa: std.mem.Allocator) error{OutOfMemory}!struct { []const Token, []const usize } {
-    var tokens = shims.ArrayList(Token).empty;
+    var tokens = shims.ArrayList(Token){};
     defer tokens.deinit(gpa);
 
-    var line_starts = shims.ArrayList(usize).empty;
+    var line_starts = shims.ArrayList(usize){};
     defer line_starts.deinit(gpa);
     try line_starts.append(gpa, 0); // First line starts on byte zero
 
@@ -435,7 +435,7 @@ fn testTokenize(
         defer std.testing.allocator.free(line_starts);
         defer std.testing.allocator.free(tokens);
 
-        var actual = shims.ArrayList(struct { u32, Token.Tag, []const u8 }).empty;
+        var actual = shims.ArrayList(struct { u32, Token.Tag, []const u8 }){};
         defer actual.deinit(std.testing.allocator);
         for (tokens) |token| try actual.append(std.testing.allocator, .{
             token.line,
@@ -703,13 +703,13 @@ const Parser = struct {
 pub fn allocParse(source: [:0]const u8, gpa: std.mem.Allocator) error{OutOfMemory}!CommentsDocument {
     const tokens, const line_starts = try allocTokenize(source, gpa);
 
-    var comments = shims.ArrayList(Comment).empty;
+    var comments = shims.ArrayList(Comment){};
     defer comments.deinit(gpa);
 
-    var enables = shims.ArrayList(struct { u32, []const u8 }).empty;
+    var enables = shims.ArrayList(struct { u32, []const u8 }){};
     defer enables.deinit(gpa);
 
-    var disables = shims.ArrayList(struct { u32, []const u8 }).empty;
+    var disables = shims.ArrayList(struct { u32, []const u8 }){};
     defer disables.deinit(gpa);
 
     var p = Parser{ .tokens = tokens };

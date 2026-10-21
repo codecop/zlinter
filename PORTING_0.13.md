@@ -62,10 +62,10 @@ Key ZLS API differences to investigate:
 - [x] **TASK-1.2:** Update `build.zig.zon` for 0.13 syntax and ZLS dependency
   - File: `build.zig.zon`
   - Changes:
-    - `.name = .zlinter` ÃÆÃâÃâ Ã¢â¬â¢ÃÆÃ¢â¬Å¡ÃâÃÂ¢ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃ¢â¬Å¡ÃâÃÂ ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¾ÃâÃÂ¢ `.name = "zlinter"` (0.13 requires string literal)
+    - `.name = .zlinter` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€Â ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â„Â¢ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¾ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ `.name = "zlinter"` (0.13 requires string literal)
     - Removed `.fingerprint` (not supported in 0.13)
     - Removed `.minimum_zig_version` (not supported in 0.13)
-    - ZLS dependency: `0.14.0` ÃÆÃâÃâ Ã¢â¬â¢ÃÆÃ¢â¬Å¡ÃâÃÂ¢ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃ¢â¬Å¡ÃâÃÂ ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¾ÃâÃÂ¢ `0.13.0` (fetched, hash: `122073c0...`)
+    - ZLS dependency: `0.14.0` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€Â ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â„Â¢ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¾ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ `0.13.0` (fetched, hash: `122073c0...`)
   - Status: DONE
 
 - [x] **TASK-1.3:** Add `.@"0.13"` case to `shims.ArrayList()` in `src/lib/shims.zig`
@@ -91,7 +91,7 @@ Key ZLS API differences to investigate:
 
 - [x] **TASK-1.7:** Update `integration_tests/build.zig.zon` for 0.13 syntax
   - File: `integration_tests/build.zig.zon`
-  - Changes: `.name = .tests` ÃÆÃâÃâ Ã¢â¬â¢ÃÆÃ¢â¬Å¡ÃâÃÂ¢ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃ¢â¬Å¡ÃâÃÂ ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¾ÃâÃÂ¢ `.name = "tests"`, removed `.fingerprint`
+  - Changes: `.name = .tests` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€Â ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â„Â¢ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¾ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ `.name = "tests"`, removed `.fingerprint`
   - Status: DONE
 
 ### Phase 2: ZON Parser (BLOCKER-1 resolution) **COMPLETED**
@@ -169,7 +169,7 @@ Key ZLS API differences to investigate:
   - Change: Replaced `b.addLibrary` with `b.addStaticLibrary`, extracted to variable, added `zls` import via `root_module.addImport()`, appended `.compiled(zlinter_lib)` to include list
   - Status: DONE
 
-- [x] **TASK-3.7:** Port `build.zig` ÃÆÃâÃâÃÂ¢ÃÆÃÂ¢ÃÂ¢Ã¢âÂ¬ÃÂ¡ÃâÃÂ¬ÃÆÃÂ¢ÃÂ¢Ã¢â¬Å¡ÃÂ¬ÃâÃÂ `addWatchInput` function
+- [x] **TASK-3.7:** Port `build.zig` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â `addWatchInput` function
   - File: `build.zig` (addWatchInput at ~625, docs section at ~528)
   - 0.14: Uses `step.addDirectoryWatchInput()`, `step.addWatchInput()`, `step.addDirectoryWatchInputFromPath()`
   - 0.13: These methods **do not exist** on `Step`
@@ -318,7 +318,7 @@ Key ZLS API differences to investigate:
 - [x] **TASK-4.6:** Update `src/lib/session.zig` `resolveTypeOfTypeNode()`
   - File: `src/lib/session.zig:350-361`
   - `resolved_type.instanceTypeVal(&self.analyser)` 0.14 returns optional directly
-  - 0.13: Returns error union (`error{OutOfMemory}!?Type`) Ã¢â¬â added `.@"0.13"` alongside `.@"0.15", .@"0.16"` with `try`
+  - 0.13: Returns error union (`error{OutOfMemory}!?Type`) ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â€Â added `.@"0.13"` alongside `.@"0.15", .@"0.16"` with `try`
   - `resolveDeclLiteralResultType()` does not exist in ZLS 0.13 (decl literals are a Zig 0.14 feature)
   - Added version switch: `.@"0.13" => instance_type` (no decl literal resolution), `.@"0.14", .@"0.15", .@"0.16" => instance_type.resolveDeclLiteralResultType()`
   - Status: DONE
@@ -431,15 +431,15 @@ Key ZLS API differences to investigate:
 
 - [x] **TASK-6.1:** Update `src/exe/run_linter.zig` stdin reader (line 60-61)
 - [x] **TASK-6.2:** Update `src/exe/run_linter.zig` diagnostics formatting (line 309-310)
-  - Separated `.@"0.13"` from `.@"0.15", .@"0.16"` in the diagnostics format specifier version switch â 0.13's `CustomDiagnostics` uses `{}` (default format, matching 0.14) instead of `{f}` (float specifier)
+  - Separated `.@"0.13"` from `.@"0.15", .@"0.16"` in the diagnostics format specifier version switch Ã¢Â€Â” 0.13's `CustomDiagnostics` uses `{}` (default format, matching 0.14) instead of `{f}` (float specifier)
   - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig
   - Status: DONE
 - [x] **TASK-6.3:** Update `src/exe/run_linter.zig` file reading (line 522-540)
-  - Added `.@"0.13"` alongside `.@"0.14"` in the file reading version switch â 0.13 uses same `readAllAlloc` API as 0.14
+  - Added `.@"0.13"` alongside `.@"0.14"` in the file reading version switch Ã¢Â€Â” 0.13 uses same `readAllAlloc` API as 0.14
   - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig
   - Status: DONE
-- [x] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)`r`n  - Added `.@"0.13"` alongside `.@"0.14"` in the file writing version switch  0.13 uses same old-style `file.writer()` API as 0.14 (no buffer parameter)`r`n  - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig`r`n  - Status: DONE
-- [x] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)`r`n  - Added separate `.@`"0.13"` case using `shims.ArrayList(u8){}` (0.13 `ArrayListUnmanaged` has no `.empty` constant, uses default field values instead) â same `renderError` API as 0.14`r`n  - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig`r`n  - Status: DONE
+- [x] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)`r`n  - Added `.@"0.13"` alongside `.@"0.14"` in the file writing version switch Â— 0.13 uses same old-style `file.writer()` API as 0.14 (no buffer parameter)`r`n  - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig`r`n  - Status: DONE
+- [x] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)`r`n  - Added separate `.@`"0.13"` case using `shims.ArrayList(u8){}` (0.13 `ArrayListUnmanaged` has no `.empty` constant, uses default field values instead) Ã¢Â€Â” same `renderError` API as 0.14`r`n  - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig`r`n  - Status: DONE
 - [x] **TASK-6.6:** Update `src/exe/wasm.zig` verify 0.13 compatibility
   - Verified: All APIs (`std.heap.wasm_allocator`, `ArenaAllocator.init`, `Allocator.dupeZ`, `@memcpy`, `builtin.cpu.arch.isWasm()`) exist in Zig 0.13
   - Verified: `zig ast-check` passes on wasm.zig, no changes needed
@@ -485,7 +485,21 @@ Key ZLS API differences to investigate:
   - @truncate: zero occurrences, @floatCast: zero occurrences
   - @intCast in Zig 0.13 uses result-location semantics (same as in fixtures) - no changes needed
   - Status: DONE
-- [ ] **TASK-7.3:** Audit `std.ArrayList` vs `std.ArrayListUnmanaged` usage
+- [x] **TASK-7.3:** Audit `std.ArrayList` vs `std.ArrayListUnmanaged` usage
+  - Searched all .zig source files for ArrayList, ArrayListUnmanaged, and .empty patterns
+  - Key finding: `shims.ArrayList(T)` maps to `std.ArrayListUnmanaged(T)` for Zig 0.13 (src/lib/shims.zig:188), and `ArrayListUnmanaged` has NO `.empty` constant in Zig 0.13
+  - Also confirmed: managed `std.ArrayList(T)` has NO `.empty` constant in 0.13, `std.MultiArrayList` has NO `.empty`, `std.StringHashMapUnmanaged` has NO `.empty`
+  - Fixed 58 occurrences across 32 files:
+    - 44x `shims.ArrayList(T).empty` -> `shims.ArrayList(T){}` (run_linter.zig, Args.zig, ast.zig, comments.zig, explorer.zig, rendering.zig, session.zig, testing.zig, and all rule files)
+    - 11x `shims.ArrayList(T) = .empty` -> `shims.ArrayList(T) = .{}` (Args.zig, ast.zig, field_naming.zig, import_ordering.zig, no_comment_out_code.zig, no_empty_block.zig, no_todo.zig, require_errdefer_dealloc.zig)
+    - 1x `array_sink.* = .empty` -> `array_sink.* = .{}` (rendering.zig:352, shims.ArrayList(u8) pointer assignment)
+    - 1x `.queue = .empty` -> `.queue = .{}` (session.zig:61, struct literal for NodeLineageIterator)
+    - 1x `.lineage = .empty` -> `.lineage = .{}` (session.zig:304, MultiArrayList field in struct literal)
+    - 1x `std.StringHashMapUnmanaged(void).empty` -> `std.StringHashMapUnmanaged(void){}` (no_unused.zig:45)
+  - Verified: `std.ArrayList(T).init(allocator)` (managed, build.zig, zon.zig), `std.ArrayListUnmanaged(T){}` (build.zig, integration_tests), `initBuffer()` (no_empty_block.zig, require_braces.zig) all correct for 0.13
+  - Skipped: `std.ArrayList(u8) = .empty` at run_linter.zig:527 (in 0.15+ branch, not compiled for 0.13)
+  - Verified: `zig ast-check` passes on all modified files; no new compilation errors introduced
+  - Status: DONE
 - [ ] **TASK-7.4:** Audit `std.heap.DebugAllocator` usage
 - [ ] **TASK-7.5:** Audit `std.testing` API usage
 - [ ] **TASK-7.6:** Audit `std.json` usage
@@ -542,10 +556,10 @@ zig build integration-check --summary all
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
 | Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
 | Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
-| Phase 7: Language Audit | PENDING | 0/7 | 7 |
+| Phase 7: Language Audit | IN PROGRESS | 1/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **53/97** | **97** |
+| **Total** | | **54/97** | **97** |
 
 ### Files Changed So Far
 

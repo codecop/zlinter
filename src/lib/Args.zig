@@ -104,22 +104,22 @@ pub fn allocParse(
     var lint_args = Args{};
     errdefer lint_args.deinit(allocator);
 
-    var unknown_args = shims.ArrayList([]const u8).empty;
+    var unknown_args = shims.ArrayList([]const u8){};
     defer unknown_args.deinit(allocator);
 
-    var include_paths = shims.ArrayList([]const u8).empty;
+    var include_paths = shims.ArrayList([]const u8){};
     defer include_paths.deinit(allocator);
     errdefer for (include_paths.items) |p| allocator.free(p);
 
-    var exclude_paths = shims.ArrayList([]const u8).empty;
+    var exclude_paths = shims.ArrayList([]const u8){};
     defer exclude_paths.deinit(allocator);
     errdefer for (exclude_paths.items) |p| allocator.free(p);
 
-    var filter_paths = shims.ArrayList([]const u8).empty;
+    var filter_paths = shims.ArrayList([]const u8){};
     defer filter_paths.deinit(allocator);
     errdefer for (filter_paths.items) |p| allocator.free(p);
 
-    var rules = shims.ArrayList([]const u8).empty;
+    var rules = shims.ArrayList([]const u8){};
     defer rules.deinit(allocator);
     errdefer for (rules.items) |r| allocator.free(r);
 
@@ -596,7 +596,7 @@ test "allocParse with only exclude_paths" {
         \\}
     ;
 
-    var backing: shims.ArrayList(u8) = .empty;
+    var backing: shims.ArrayList(u8) = .{};
     defer backing.deinit(std.testing.allocator);
 
     try backing.writer(std.testing.allocator).writeInt(usize, bytes.len, .little);
@@ -626,7 +626,7 @@ test "allocParse with only include_paths" {
         \\}
     ;
 
-    var backing: shims.ArrayList(u8) = .empty;
+    var backing: shims.ArrayList(u8) = .{};
     defer backing.deinit(std.testing.allocator);
 
     try backing.writer(std.testing.allocator).writeInt(usize, bytes.len, .little);
@@ -657,7 +657,7 @@ test "allocParse with include_paths and exclude_paths" {
         \\}
     ;
 
-    var backing: shims.ArrayList(u8) = .empty;
+    var backing: shims.ArrayList(u8) = .{};
     defer backing.deinit(std.testing.allocator);
 
     try backing.writer(std.testing.allocator).writeInt(usize, bytes.len, .little);
