@@ -1,4 +1,4 @@
-﻿var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
 const default_formatter = zlinter.formatters.DefaultFormatter{};
 
 const ExitCode = enum(u8) {
@@ -624,6 +624,13 @@ fn allocAstErrorMsg(
     allocator: std.mem.Allocator,
 ) ![]const u8 {
     switch (zlinter.version.zig) {
+        .@"0.13" => {
+            var error_message = shims.ArrayList(u8){};
+            defer error_message.deinit(allocator);
+
+            try tree.renderError(err, error_message.writer(allocator));
+            return error_message.toOwnedSlice(allocator);
+        },
         .@"0.14" => {
             var error_message = shims.ArrayList(u8).empty;
             defer error_message.deinit(allocator);
