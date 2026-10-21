@@ -500,7 +500,19 @@ Key ZLS API differences to investigate:
   - Skipped: `std.ArrayList(u8) = .empty` at run_linter.zig:527 (in 0.15+ branch, not compiled for 0.13)
   - Verified: `zig ast-check` passes on all modified files; no new compilation errors introduced
   - Status: DONE
-- [ ] **TASK-7.4:** Audit `std.heap.DebugAllocator` usage
+- [x] **TASK-7.4:** Audit `std.heap.DebugAllocator` usage
+  - Searched all .zig source files for DebugAllocator, GeneralPurposeAllocator, smp_allocator, and other std.heap allocator types
+  - Key finding: Zig 0.13 has `std.heap.GeneralPurposeAllocator` (NOT `DebugAllocator` — that name was introduced in 0.14+)
+  - Also: `std.heap.smp_allocator` does NOT exist in 0.13 (introduced later)
+  - Fixed 2 issues in `src/exe/run_linter.zig`:
+    - Line 1: `std.heap.DebugAllocator(.{}) = .init` -> `std.heap.GeneralPurposeAllocator(.{}) = .{}` (0.13 GPA uses struct literal init, no `.init` field)
+    - Line 44: `std.heap.smp_allocator` -> `std.heap.page_allocator` (smp_allocator not available in 0.13)
+  - Verified: `build_docs.zig` and `build_rules.zig` already use `std.heap.GeneralPurposeAllocator(.{}) = .{}` — correct for 0.13
+  - Verified: `std.heap.wasm_allocator`, `std.heap.c_allocator`, `std.heap.page_allocator`, `std.heap.ArenaAllocator`, `std.heap.FixedBufferAllocator` all exist in 0.13
+  - Test fixtures (`.input.zig` files) reference `DebugAllocator` as lint test data — not compiled, no changes needed
+  - `no_hidden_allocations.zig:13` references `"DebugAllocator"` as a string literal for rule matching — not actual code usage
+  - Verified: `zig ast-check` passes on run_linter.zig, build_docs.zig, build_rules.zig
+  - Status: DONE
 - [ ] **TASK-7.5:** Audit `std.testing` API usage
 - [ ] **TASK-7.6:** Audit `std.json` usage
 - [ ] **TASK-7.7:** Audit `std.process` API usage

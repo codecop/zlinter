@@ -1,4 +1,4 @@
-var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+var debug_allocator: std.heap.GeneralPurposeAllocator(.{}) = .{};
 const default_formatter = zlinter.formatters.DefaultFormatter{};
 
 const ExitCode = enum(u8) {
@@ -41,7 +41,7 @@ pub fn main() !u8 {
         if (builtin.os.tag == .wasi) break :gpa .{ std.heap.wasm_allocator, false };
         break :gpa switch (builtin.mode) {
             .Debug, .ReleaseSafe => .{ debug_allocator.allocator(), true },
-            .ReleaseFast, .ReleaseSmall => .{ std.heap.smp_allocator, false },
+            .ReleaseFast, .ReleaseSmall => .{ std.heap.page_allocator, false },
         };
     };
     defer if (is_debug) {
