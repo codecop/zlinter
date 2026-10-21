@@ -51,7 +51,7 @@ fn run(
                 .field_access => if (try isFieldAccessOfRootContainer(context, doc, node.toNodeIndex())) {
                     const node_data = shims.nodeData(tree, node.toNodeIndex());
                     try map.put(gpa, tree.tokenSlice(switch (zlinter.version.zig) {
-                        .@"0.14" => node_data.rhs,
+                        .@"0.13", .@"0.14" => node_data.rhs,
                         .@"0.15", .@"0.16" => node_data.node_and_token.@"1",
                     }), {});
                 },
@@ -141,7 +141,7 @@ fn namedFnDeclProto(
 ) ?Ast.full.FnProto {
     if (switch (shims.nodeTag(tree, node)) {
         .fn_decl => tree.fullFnProto(buffer, switch (zlinter.version.zig) {
-            .@"0.14" => shims.nodeData(tree, node).lhs,
+            .@"0.13", .@"0.14" => shims.nodeData(tree, node).lhs,
             .@"0.15", .@"0.16" => shims.nodeData(tree, node).node_and_node.@"0",
         }),
         else => null,
@@ -162,14 +162,20 @@ fn isFieldAccessOfRootContainer(
 
     const node_data = shims.nodeData(tree, node);
     const lhs = switch (zlinter.version.zig) {
-        .@"0.14" => node_data.lhs,
+        .@"0.13", .@"0.14" => node_data.lhs,
         .@"0.15", .@"0.16" => node_data.node_and_token.@"0",
     };
 
     if (try context.resolveTypeOfNode(doc, lhs)) |t| {
-        switch (t.resolveDeclLiteralResultType().data) {
-            .container => |scope_handle| return isContainerRoot(scope_handle),
-            else => {},
+        switch (zlinter.version.zig) {
+            .@"0.13" => switch (t.data) {
+                .other => |node_handle| return isContainerRoot(node_handle),
+                else => {},
+            },
+            .@"0.14", .@"0.15", .@"0.16" => switch (t.resolveDeclLiteralResultType().data) {
+                .container => |scope_handle| return isContainerRoot(scope_handle),
+                else => {},
+            },
         }
     }
     return false;
@@ -177,6 +183,7 @@ fn isFieldAccessOfRootContainer(
 
 fn isContainerRoot(container: anytype) bool {
     return switch (zlinter.version.zig) {
+        .@"0.13" => NodeIndexShim.init(container.node).isRoot(),
         .@"0.14" => container.toNode() == 0,
         .@"0.15", .@"0.16" => container.scope_handle.toNode() == .root,
     };

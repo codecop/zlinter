@@ -416,7 +416,7 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.14"` in field_access nodeData lhs/rhs version switch (0.13 uses `data.lhs`/`data.rhs` like 0.14)
   - Verified: `zig ast-check` passes, no compilation errors in no_undefined.zig
   - Status: DONE
-- [ ] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
+- [x] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
 - [ ] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
 - [ ] **TASK-5.13:** Audit remaining rule files for ZLS API usage
 
