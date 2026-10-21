@@ -373,9 +373,11 @@ Key ZLS API differences to investigate:
 - [x] **TASK-4.13:** Update `src/lib/zon.zig` see Phase 2 (BLOCKER-1)
   - Status: DONE - Custom ZON parser already implemented in Phase 2 (TASK-2.2). zon.zig has CustomDiagnostics, Parser, parseFileAlloc, parseFromSlice, stringify.serialize all working for 0.13.
 
-### Phase 5: Rules Port **PENDING**
+### Phase 5: Rules Port **IN PROGRESS**
 
-- [ ] **TASK-5.1:** Update `src/rules/field_naming.zig` add `.@"0.13"` alongside `.@"0.14"` (line 164-165)
+- [x] **TASK-5.1:** Update `src/rules/field_naming.zig` add `.@"0.13"` alongside `.@"0.14"` (line 164-165)
+  - Added `.@"0.13"` alongside `.@"0.14"` in error_set_decl rbrace version switch
+  - Status: DONE
 - [ ] **TASK-5.2:** Update `src/rules/function_naming.zig` add `.@"0.13"` alongside `.@"0.14"` (line 99-100)
 - [ ] **TASK-5.3:** Update `src/rules/import_ordering.zig` add `.@"0.13"` alongside `.@"0.14"` (line 241-242)
 - [ ] **TASK-5.4:** Update `src/rules/no_deprecated.zig` add `.@"0.13"` cases, fix ZLS API (lines 70-71, 89, 265-270, 406)
@@ -463,12 +465,12 @@ zig build integration-check --summary all
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
 | Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
-| Phase 5: Rules | PENDING | 0/13 | 13 |
+| Phase 5: Rules | IN PROGRESS | 1/13 | 13 |
 | Phase 6: Executable & Integration | PENDING | 0/12 | 12 |
 | Phase 7: Language Audit | PENDING | 0/7 | 7 |
 | Phase 8: Verification | PENDING | 0/9 | 9 |
 | Phase 9: CI Workflows | PENDING | 0/4 | 4 |
-| **Total** | | **37/97** | **97** |
+| **Total** | | **38/97** | **97** |
 
 ### Files Changed So Far
 
