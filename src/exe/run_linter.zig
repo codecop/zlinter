@@ -1,4 +1,4 @@
-var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
+﻿var debug_allocator: std.heap.DebugAllocator(.{}) = .init;
 const default_formatter = zlinter.formatters.DefaultFormatter{};
 
 const ExitCode = enum(u8) {
@@ -580,7 +580,7 @@ fn runFixes(
             defer new_file.close();
 
             switch (zlinter.version.zig) {
-                .@"0.14" => {
+                .@"0.13", .@"0.14" => {
                     var writer = new_file.writer();
                     for (output_slices.items) |output_slice| {
                         try writer.writeAll(output_slice);
