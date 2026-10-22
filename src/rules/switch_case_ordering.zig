@@ -157,6 +157,25 @@ test "else only" {
     );
 }
 
+test "no else" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: u32 = 1;
+        \\const s = switch (a) {
+        \\    1 => {},
+        \\    2 => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 pub const Ast = std.zig.Ast;
 const zlinter = @import("zlinter");
