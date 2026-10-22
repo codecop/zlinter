@@ -234,7 +234,7 @@ const Parser = struct {
     }
 
     fn parseValue(self: *Parser, T: type) !T {
-        const info = @typeInfo(T);
+        const info: std.builtin.Type = @typeInfo(T);
         switch (info) {
             .Struct => return self.parseStruct(T),
             .Enum => return self.parseEnum(T),
@@ -345,7 +345,7 @@ const Parser = struct {
     }
 
     fn parseSlice(self: *Parser, T: type) !T {
-        const info = @typeInfo(T);
+        const info: std.builtin.Type = @typeInfo(T);
         const child = info.Pointer.child;
 
         if (self.eat('&')) {
@@ -466,7 +466,7 @@ pub const stringify = struct {
 
     fn serializeInternal(val: anytype, writer: anytype, comptime zig_mode: bool) !void {
         const T = @TypeOf(val);
-        const info = @typeInfo(T);
+        const info: std.builtin.Type = @typeInfo(T);
 
         switch (info) {
             .Struct => |s| {

@@ -742,13 +742,17 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
   - `zig build lint` has 3 pre-existing errors in `src/lib/zon.zig` (not related to this change)
   - Status: DONE
 
-- [ ] **TASK-10.5:** Re-verify CI locally after rule changes
+- [x] **TASK-10.5:** Re-verify CI locally after rule changes
   - Run all 4 CI steps:
     1. `zig build unit-test` - must pass
     2. `zig build lint` - must pass (0 errors)
     3. `zig build integration-test` - must pass (all tests, 0 failures)
     4. `zig build integration-check --summary all` - must pass
   - Update PORTING_0.13.md Progress Summary: Phase 9 -> DONE, Phase 10 -> DONE
+  - Changes:
+    - `src/lib/zon.zig` - added `: std.builtin.Type` type annotation to 3 `const info = @typeInfo(T)` declarations (lines 237, 348, 469) to fix `declaration_naming` false positives where `@typeInfo` builtin calls were classified as type declarations requiring TitleCase
+  - Verified: `zig build unit-test` passes, `zig build lint` passes (0 errors, 402 warnings, 9 skipped), `zig build integration-test` passes (all tests), `zig build integration-check --summary all` passes (2/2)
+  - Status: DONE
 
 - [ ] **TASK-10.6:** Update documentation for 0.13 rule limitations
   - File: `README.md`
@@ -775,8 +779,8 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 | Phase 7: Language Audit | **DONE** | 7/7 | 7 |
 | Phase 8: Verification | **DONE** | 9/9 | 9 |
 | Phase 9: CI Workflows | **DONE** | 4/4 | 4 |
-| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 4/6 | 6 |
-| **Total** | | **91/93** | **93** |
+| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 5/6 | 6 |
+| **Total** | | **92/93** | **93** |
 
 ### Files Changed So Far
 
@@ -795,7 +799,7 @@ src/lib/version.zig             added .@"0.13" enum value and detection logic
 src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList, nodeTag/nodeData/nodeMainToken/tokenTag
 src/lib/ast.zig                 added .@"0.13" to iterateChildren and 7 data.lhs/data.rhs version switches; .empty fixes
 src/lib/session.zig             DocumentStore init version-aware (no diagnostics_collection in 0.13), Analyser.init() 5-param 0.13 signature, resolveTypeOfNode/resolveTypeOfTypeNode/resolveTypeKind version-aware for 0.13 (.other variant, error-union instanceTypeVal, no resolveDeclLiteralResultType), dumpType() version-aware, popOrNull fix; .empty fixes
-src/lib/zon.zig                 custom ZON parser (~350 lines) and stringify.serialize for 0.13 (no std.zon); writeEnumLiteral/isZigKeyword for keyword handling; .EnumLiteral case in serialize
+src/lib/zon.zig                 custom ZON parser (~350 lines) and stringify.serialize for 0.13 (no std.zon); writeEnumLiteral/isZigKeyword for keyword handling; .EnumLiteral case in serialize; added : std.builtin.Type annotations to 3 @typeInfo declarations to fix declaration_naming false positives
 src/lib/explorer.zig            added .@"0.13" to tree.render() and renderError() version switches; .empty fixes
 src/lib/rendering.zig           added .@"0.13" to Printer.initAuto() version switch; Tty.init fix; .empty fixes
 src/lib/Args.zig                labeled switch -> while loop for 0.13; removed @FieldType and version-string option; .empty fixes
@@ -902,13 +906,13 @@ cd E:\Develop\Zig\zlinter
 ### Acceptance Criteria (matches CI pipeline)
 
 - [x] `zig build unit-test` passes (CI step 1) - 164/164 tests, exit code 0
-- [x] `zig build lint` runs on self without errors (CI step 2) - 0 errors, 400 warnings, 8 skipped
-- [x] `zig build integration-test` passes (CI step 3) - 40/43 tests pass, 3 known ZLS 0.13 limitations (see Phase 10)
+- [x] `zig build lint` runs on self without errors (CI step 2) - 0 errors, 402 warnings, 9 skipped
+- [x] `zig build integration-test` passes (CI step 3) - 37/37 tests pass, 0 failures (3 rules skipped: no_hidden_allocations, require_errdefer_dealloc, declaration_naming regression_80)
 - [x] `zig build integration-check --summary all` passes (CI step 4) - 2/2 steps succeeded
-- [x] `zig build test` passes (all combined) - unit tests 164/164, integration 40/43
+- [x] `zig build test` passes (all combined) - unit tests 164/164, integration 37/37
 - [x] `zig build docs` regenerates RULES.md without diff - exits 0, no errors
 - [x] `zig build website` builds WASM binary - exits 0, wasm.wasm (198KB) generated
-- [ ] All 24 built-in rules produce correct results on test cases - 40/43 pass; 3 known ZLS 0.13 limitations (no_hidden_allocations, require_errdefer_dealloc, declaration_naming regression_80) tracked in Phase 10
+- [ ] All 24 built-in rules produce correct results on test cases - 37/37 pass (3 rules skipped: no_hidden_allocations, require_errdefer_dealloc, declaration_naming regression_80) tracked in Phase 10
 
 ### Known Risks
 
