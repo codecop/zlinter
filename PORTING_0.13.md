@@ -655,6 +655,51 @@ zig build integration-check --summary all
 
 ---
 
+### Phase 10: ZLS 0.13 Rule Limitations **PENDING**
+
+Three rules cannot work correctly on Zig 0.13 due to ZLS 0.13 type resolution limitations.
+Recommended approach: fix one with a trivial workaround, remove two from the 0.13 build.
+
+- [ ] **TASK-10.1:** Fix `declaration_naming` regression_80 — add `@typeInfo` to builtin shortcut
+  - File: `src/lib/session.zig:546`
+  - In `resolveTypeKind`, the init value switch has a shortcut for `@Type` and `@TypeOf` builtins (returns `.type` without ZLS resolution)
+  - Add `"@typeInfo"` to the list: `inline for (&.{ "@Type", "@TypeOf", "@typeInfo" })`
+  - `@typeInfo(X).@"struct".backing_integer.?` always evaluates to a type, so treating `@typeInfo` as `.type` is correct
+  - Zero precision loss — this is a safe syntactic shortcut
+  - Verify: `zig build integration-test -Dtest_focus_on_rule=declaration_naming` passes (5/5)
+
+- [ ] **TASK-10.2:** Remove `no_hidden_allocations` from 0.13 build
+  - ZLS 0.13 cannot resolve `@import("std")` alias chains (e.g., `std.heap.c_allocator`)
+  - Syntactic workaround would have unacceptable false positives (matching user vars named `heap`)
+  - Files to change:
+    - `build.zig:17` — remove `no_hidden_allocations` from `BuiltinLintRule` enum (version-gated for 0.13)
+    - `build.zig:460` — remove `buildBuiltinRule(b, .no_hidden_allocations, ...)` from lint step (version-gated)
+    - `integration_tests/test_cases/no_hidden_allocations/` — skip for 0.13
+  - Alternative: version-gate the enum so 0.13 has 22 rules, 0.14+ has 23
+
+- [ ] **TASK-10.3:** Remove `require_errdefer_dealloc` from 0.13 build
+  - ZLS 0.13 cannot resolve generic instantiations like `std.AutoHashMap(u8, void)`
+  - Syntactic workaround would miss user-defined container types
+  - Files to change:
+    - `build.zig:27` — remove `require_errdefer_dealloc` from `BuiltinLintRule` enum (version-gated for 0.13)
+    - `build.zig:459` — remove `buildBuiltinRule(b, .require_errdefer_dealloc, ...)` from lint step (version-gated)
+    - `integration_tests/test_cases/require_errdefer_dealloc/` — skip for 0.13
+
+- [ ] **TASK-10.4:** Update integration test runner to skip disabled rules for 0.13
+  - File: `integration_tests/src/integration_test.zig` or `integration_tests/build.zig`
+  - When a rule is not in the 0.13 `BuiltinLintRule` enum, its test case directory should be skipped
+  - Verify: `zig build integration-test` passes with 0 failures (40/40 instead of 40/43)
+
+- [ ] **TASK-10.5:** Re-verify CI locally after rule changes
+  - Run all 4 CI steps:
+    1. `zig build unit-test` — must pass
+    2. `zig build lint` — must pass (0 errors)
+    3. `zig build integration-test` — must pass (all tests, 0 failures)
+    4. `zig build integration-check --summary all` — must pass
+  - Update PORTING_0.13.md Progress Summary: Phase 9 -> DONE, Phase 10 -> DONE
+
+---
+
 ## Progress Summary
 
 | Phase | Status | Tasks Done | Tasks Total |
