@@ -374,6 +374,31 @@ test "packed struct excluded by default" {
     );
 }
 
+test "packed struct included" {
+    const rule = buildRule(.{});
+    const source = "const P = packed struct(u32) { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning }, .exclude_packed_structs = false },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " b: u32, a: u32",
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 30,
+                    .end = 45,
+                    .text = " a: u32, b: u32",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
