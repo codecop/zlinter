@@ -255,3 +255,40 @@ test "switch_comma" {
         },
     );
 }
+
+test "multiple switches" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: enum { x, y } = .x;
+        \\const s1 = switch (a) {
+        \\    else => {},
+        \\    .x => {},
+        \\};
+        \\const s2 = switch (a) {
+        \\    .x => {},
+        \\    else => {},
+        \\    .y => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "switch_case_ordering",
+                .severity = .warning,
+                .slice = "else => {}",
+                .message = "`else` should be last in switch statements",
+            },
+            .{
+                .rule_id = "switch_case_ordering",
+                .severity = .warning,
+                .slice = "else => {}",
+                .message = "`else` should be last in switch statements",
+            },
+        },
+    );
+}
