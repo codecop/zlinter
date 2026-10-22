@@ -285,6 +285,32 @@ test "struct ascending with fix" {
     );
 }
 
+
+test "struct descending" {
+    const rule = buildRule(.{});
+    const source = "const S = struct { a: u32, b: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_descending, .severity = .@"error" } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .@"error",
+                .slice = " a: u32, b: u32",
+                .message = "Struct fields should be in reverse alphabetical order",
+                .fix = .{
+                    .start = 18,
+                    .end = 33,
+                    .text = " b: u32, a: u32",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
