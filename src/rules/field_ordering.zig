@@ -311,6 +311,31 @@ test "struct descending" {
     );
 }
 
+test "enum ordering" {
+    const rule = buildRule(.{});
+    const source = "const E = enum { b, a };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .enum_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " b, a",
+                .message = "Enum fields should be in alphabetical order",
+                .fix = .{
+                    .start = 16,
+                    .end = 21,
+                    .text = " a, b",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
