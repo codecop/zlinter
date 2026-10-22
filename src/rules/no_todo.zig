@@ -260,6 +260,29 @@ test "run excludes todo with url in content" {
     );
 }
 
+test "run detects todo with bare number" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO(10)
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "no_todo",
+                .severity = .warning,
+                .slice = "// TODO(10)\n",
+                .message = "Avoid todo comments that don't link to a tracked issue",
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
