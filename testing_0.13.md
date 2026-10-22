@@ -700,7 +700,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-2.8: switch_case_ordering - multiple switches
 - [x] TASK-3.1: no_comment_out_code - run detects commented var
 - [x] TASK-3.2: no_comment_out_code - run detects commented call
-- [ ] TASK-3.3: no_comment_out_code - run detects commented fn decl
+- [x] TASK-3.3: no_comment_out_code - run detects commented fn decl
 - [ ] TASK-3.4: no_comment_out_code - run ignores plain comment
 - [ ] TASK-3.5: no_comment_out_code - run ignores backtick code
 - [ ] TASK-3.6: no_comment_out_code - run multi-line block
