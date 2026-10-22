@@ -326,6 +326,22 @@ test "run ignores plain comment" {
     );
 }
 
+test "run ignores backtick code" {
+    const rule = buildRule(.{});
+    const source =
+        \\// e.g., `var a = 1;`
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
