@@ -721,7 +721,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-4.10: no_todo - run off
 - [x] TASK-4.11: no_todo - run todo empty parens
 - [x] TASK-4.12: no_todo - run ignores non-todo comment
-- [ ] TASK-5.1: BuildInfo - deinit default
+- [x] TASK-5.1: BuildInfo - deinit default
 - [ ] TASK-5.2: BuildInfo - deinit with paths
 - [ ] TASK-5.3: BuildInfo - default
 - [ ] TASK-5.4: BuildInfo - consumeStdinAlloc empty stdin

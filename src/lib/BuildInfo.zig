@@ -60,3 +60,8 @@ pub fn consumeStdinAlloc(
 const rendering = @import("rendering.zig");
 const std = @import("std");
 const zon = @import("zon.zig");
+
+test "deinit default" {
+    var info = BuildInfo.default;
+    info.deinit(std.testing.allocator); // should not crash
+}
