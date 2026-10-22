@@ -731,10 +731,16 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
     - Remove the empty `integration_tests/test_cases/require_errdefer_dealloc/` directory
     - Remove `require_errdefer_dealloc` from any rule lists in `integration_tests/src/test_case_references.zig`
 
-- [ ] **TASK-10.4:** Update integration test runner to skip disabled rules for 0.13
+- [x] **TASK-10.4:** Update integration test runner to skip disabled rules for 0.13
   - File: `integration_tests/src/integration_test.zig` or `integration_tests/build.zig`
   - When a rule is not in the 0.13 `BuiltinLintRule` enum, its test case directory should be skipped
   - Verify: `zig build integration-test` passes with 0 failures (40/40 instead of 40/43)
+  - Changes:
+    - `integration_tests/build.zig` - added `isRuleAvailable()` helper that checks rule name against `BuiltinLintRule` enum fields (plus allows custom rule `no_cats`)
+    - `integration_tests/build.zig` - added skip check after `rule_name` extraction in test case walk loop
+  - Verified: `zig build integration-test` passes (37/37, exit code 0), `zig build unit-test` passes, `zig build test` passes, `zig build integration-check` passes (2/2)
+  - `zig build lint` has 3 pre-existing errors in `src/lib/zon.zig` (not related to this change)
+  - Status: DONE
 
 - [ ] **TASK-10.5:** Re-verify CI locally after rule changes
   - Run all 4 CI steps:
@@ -769,8 +775,8 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 | Phase 7: Language Audit | **DONE** | 7/7 | 7 |
 | Phase 8: Verification | **DONE** | 9/9 | 9 |
 | Phase 9: CI Workflows | **DONE** | 4/4 | 4 |
-| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 3/6 | 6 |
-| **Total** | | **90/93** | **93** |
+| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 4/6 | 6 |
+| **Total** | | **91/93** | **93** |
 
 ### Files Changed So Far
 

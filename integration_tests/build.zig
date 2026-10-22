@@ -53,6 +53,10 @@ pub fn build(b: *std.Build) !void {
             std.log.err("Test case file skipped as its invalid: {s}", .{item.path});
             continue;
         }];
+        if (!isRuleAvailable(rule_name)) {
+            std.log.warn("Skipping {s} - rule not available for Zig {s}", .{ rule_name, @tagName(zlinter.version.zig) });
+            continue;
+        }
         if (test_focus_on_rule) |r| {
             if (!std.mem.eql(u8, rule_name, r)) {
                 std.log.warn("Skipping {s}", .{rule_name});
@@ -145,6 +149,15 @@ fn addFileArgIfExists(b: *std.Build, step: *std.Build.Step.Run, raw_path: []cons
     if (exists) {
         step.addFileArg(path);
     }
+}
+
+fn isRuleAvailable(rule_name: []const u8) bool {
+    if (std.mem.eql(u8, rule_name, "no_cats")) return true;
+    const fields = std.meta.fieldNames(zlinter.BuiltinLintRule);
+    for (fields) |field_name| {
+        if (std.mem.eql(u8, rule_name, field_name)) return true;
+    }
+    return false;
 }
 
 const std = @import("std");
