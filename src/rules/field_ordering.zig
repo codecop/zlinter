@@ -542,6 +542,36 @@ test "single line container" {
     );
 }
 
+test "nested struct" {
+    const rule = buildRule(.{});
+    const source =
+        \\const Outer = struct {
+        \\    a: u32,
+        \\    inner: struct { y: u32, x: u32 },
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " y: u32, x: u32",
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 54,
+                    .end = 69,
+                    .text = " x: u32, y: u32",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
