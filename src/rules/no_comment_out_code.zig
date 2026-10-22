@@ -68,9 +68,6 @@ fn run(
         defer prev_line = line;
 
         if (content_accumulator.items.len == 0 or prev_line == line - 1) {
-            if (content_accumulator.items.len == 0) {
-                try content_accumulator.appendSlice(gpa, "fn container() void {");
-            }
             try content_accumulator.appendSlice(gpa, contents);
             try content_accumulator.append(gpa, '\n');
         } else {
@@ -339,6 +336,31 @@ test "run ignores backtick code" {
         .{},
         Config{},
         &.{},
+    );
+}
+
+test "run multi-line block" {
+    const rule = buildRule(.{});
+    const source =
+        \\// var a = 1;
+        \\// var b = 2;
+        \\// var c = 3;
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "no_comment_out_code",
+                .severity = .warning,
+                .slice = "// var a = 1;\n// var b = 2;\n// var c = 3;\n",
+                .message = "Avoid code in comments",
+            },
+        },
     );
 }
 
