@@ -352,6 +352,22 @@ test "run message when exclusions off" {
     );
 }
 
+test "run off" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .severity = .off },
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
