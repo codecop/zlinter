@@ -110,7 +110,7 @@ fn isExcluded(content: []const u8, config: Config) bool {
         if (config.exclude_if_contains_issue_number and looksLikeIssueId(word)) {
             return true;
         }
-        if (config.exclude_if_contains_issue_number and looksLikeUrl(word)) {
+        if (config.exclude_if_contains_url and looksLikeUrl(word)) {
             return true;
         }
     }
@@ -301,6 +301,29 @@ test "run issue exclusion disabled" {
                 .severity = .warning,
                 .slice = "// TODO(#10)\n",
                 .message = "Avoid todo comments",
+            },
+        },
+    );
+}
+
+test "run url exclusion disabled" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO(http://example.com/10)
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .exclude_if_contains_url = false },
+        &.{
+            .{
+                .rule_id = "no_todo",
+                .severity = .warning,
+                .slice = "// TODO(http://example.com/10)\n",
+                .message = "Avoid todo comments that don't link to a tracked issue",
             },
         },
     );
