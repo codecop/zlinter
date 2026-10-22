@@ -1,4 +1,4 @@
-﻿# Testing Task List - Zig 0.13 Branch
+# Testing Task List - Zig 0.13 Branch
 
 Goal: improve unit test coverage on low-coverage files. Integration tests exist but do not count toward kcov coverage. All tests use `zlinter.testing.testRunRule` with `LintProblemExpectation` assertions.
 
@@ -698,7 +698,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-2.6: switch_case_ordering - else_is_last error
 - [x] TASK-2.7: switch_case_ordering - switch_comma
 - [x] TASK-2.8: switch_case_ordering - multiple switches
-- [ ] TASK-3.1: no_comment_out_code - run detects commented var
+- [x] TASK-3.1: no_comment_out_code - run detects commented var
 - [ ] TASK-3.2: no_comment_out_code - run detects commented call
 - [ ] TASK-3.3: no_comment_out_code - run detects commented fn decl
 - [ ] TASK-3.4: no_comment_out_code - run ignores plain comment
