@@ -139,6 +139,24 @@ test "else last" {
     );
 }
 
+test "else only" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: u32 = 1;
+        \\const s = switch (a) {
+        \\    else => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 pub const Ast = std.zig.Ast;
 const zlinter = @import("zlinter");

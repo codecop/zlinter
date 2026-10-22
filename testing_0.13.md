@@ -692,7 +692,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.16: field_ordering - fix text multi-line struct
 - [x] TASK-2.1: switch_case_ordering - else not last
 - [x] TASK-2.2: switch_case_ordering - else last
-- [ ] TASK-2.3: switch_case_ordering - else only
+- [x] TASK-2.3: switch_case_ordering - else only
 - [ ] TASK-2.4: switch_case_ordering - no else
 - [ ] TASK-2.5: switch_case_ordering - else_is_last off
 - [ ] TASK-2.6: switch_case_ordering - else_is_last error
