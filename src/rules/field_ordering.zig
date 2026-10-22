@@ -412,6 +412,31 @@ test "extern struct excluded by default" {
     );
 }
 
+test "extern struct included" {
+    const rule = buildRule(.{});
+    const source = "const E = extern struct { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning }, .exclude_extern_structs = false },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " b: u32, a: u32",
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 25,
+                    .end = 40,
+                    .text = " a: u32, b: u32",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
