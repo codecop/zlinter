@@ -450,6 +450,19 @@ test "all orders off" {
     );
 }
 
+test "already sorted" {
+    const rule = buildRule(.{});
+    const source = "const S = struct { a: u32, b: u32 }; const E = enum { a, b }; const U = union { a: u32, b: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
