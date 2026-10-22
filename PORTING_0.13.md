@@ -20,7 +20,7 @@ The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `dat
 ### BLOCKER-1: `std.zon` does not exist in Zig 0.13
 
 | Aspect | Details |
-|--------|---------|
+| -------- | --------- |
 | Impact | HIGH Rule configs parsed from `.zon` files will not work |
 | Affected files | `src/lib/zon.zig`, `src/exe/run_linter.zig`, `build.zig` (rule config serialization) |
 | Current usage | `std.zon.parse.fromSlice(T, gpa, slice, diagnostics, options)` and `std.zon.parse.Status` |
@@ -31,13 +31,14 @@ The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `dat
 ### BLOCKER-2: ZLS 0.13 API compatibility
 
 | Aspect | Details |
-|--------|---------|
+| -------- | --------- |
 | Impact | HIGH Core analyser, document store, and type resolution APIs differ |
 | Current dep | `zls 0.14.0` (`git+https://github.com/zigtools/zls?ref=0.14.0`) |
 | Target dep | `zls 0.13.0` (`git+https://github.com/zigtools/zls?ref=0.13.0`) **FETCHED** |
 | Affected files | `src/lib/session.zig`, `src/lib/ast.zig`, `build.zig` (zls version switch) |
 
 Key ZLS API differences to investigate:
+
 - `zls.DocumentStore` config structure (0.14 uses `.fromMainConfig(config)`, 0.13 may differ)
 - `zls.Analyser.init()` signature (0.14: `(gpa, &document_store, &intern_pool, null)`, 0.13 may differ)
 - `zls.Analyser.resolveTypeOfNode()` signature
@@ -62,10 +63,10 @@ Key ZLS API differences to investigate:
 - [x] **TASK-1.2:** Update `build.zig.zon` for 0.13 syntax and ZLS dependency
   - File: `build.zig.zon`
   - Changes:
-    - `.name = .zlinter` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€Â ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â„Â¢ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¾ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ `.name = "zlinter"` (0.13 requires string literal)
+    - `.name = .zlinter` ??? `.name = "zlinter"` (0.13 requires string literal)
     - Removed `.fingerprint` (not supported in 0.13)
     - Removed `.minimum_zig_version` (not supported in 0.13)
-    - ZLS dependency: `0.14.0` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€Â ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â„Â¢ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¾ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ `0.13.0` (fetched, hash: `122073c0...`)
+    - ZLS dependency: `0.14.0` ??? `0.13.0` (fetched, hash: `122073c0...`)
   - Status: DONE
 
 - [x] **TASK-1.3:** Add `.@"0.13"` case to `shims.ArrayList()` in `src/lib/shims.zig`
@@ -91,7 +92,7 @@ Key ZLS API differences to investigate:
 
 - [x] **TASK-1.7:** Update `integration_tests/build.zig.zon` for 0.13 syntax
   - File: `integration_tests/build.zig.zon`
-  - Changes: `.name = .tests` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€Â ÃƒÂ¢Ã¢Â‚Â¬Ã¢Â„Â¢ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¾ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ `.name = "tests"`, removed `.fingerprint`
+  - Changes: `.name = .tests` ??? `.name = "tests"`, removed `.fingerprint`
   - Status: DONE
 
 ### Phase 2: ZON Parser (BLOCKER-1 resolution) **COMPLETED**
@@ -169,7 +170,7 @@ Key ZLS API differences to investigate:
   - Change: Replaced `b.addLibrary` with `b.addStaticLibrary`, extracted to variable, added `zls` import via `root_module.addImport()`, appended `.compiled(zlinter_lib)` to include list
   - Status: DONE
 
-- [x] **TASK-3.7:** Port `build.zig` ÃƒÂƒÃ†Â’ÃƒÂ†Ã¢Â€Â™ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â€ÂšÃ‚Â¬ÃƒÂ…Ã‚Â¡ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ†Â’ÃƒÂ‚Ã‚Â¢ÃƒÂƒÃ‚Â¢ÃƒÂ¢Ã¢Â‚Â¬Ã…Â¡ÃƒÂ‚Ã‚Â¬ÃƒÂƒÃ¢Â€ÂšÃƒÂ‚Ã‚Â `addWatchInput` function
+- [x] **TASK-3.7:** Port `build.zig` ??? `addWatchInput` function
   - File: `build.zig` (addWatchInput at ~625, docs section at ~528)
   - 0.14: Uses `step.addDirectoryWatchInput()`, `step.addWatchInput()`, `step.addDirectoryWatchInputFromPath()`
   - 0.13: These methods **do not exist** on `Step`
@@ -200,7 +201,6 @@ Key ZLS API differences to investigate:
   - Updated `append()`, `deinit()`, `toOwnedSlice()` calls to managed API (no allocator parameter)
   - Verified: `module.addImport(name, module)` signature matches Zig 0.13 API
   - Status: DONE
-
 
 - [x] **TASK-3.11:** Port `build.zig` `toZonString()` function
   - File: `build.zig:~340-350`
@@ -431,15 +431,15 @@ Key ZLS API differences to investigate:
 
 - [x] **TASK-6.1:** Update `src/exe/run_linter.zig` stdin reader (line 60-61)
 - [x] **TASK-6.2:** Update `src/exe/run_linter.zig` diagnostics formatting (line 309-310)
-  - Separated `.@"0.13"` from `.@"0.15", .@"0.16"` in the diagnostics format specifier version switch Ã¢Â€Â” 0.13's `CustomDiagnostics` uses `{}` (default format, matching 0.14) instead of `{f}` (float specifier)
+  - Separated `.@"0.13"` from `.@"0.15", .@"0.16"` in the diagnostics format specifier version switch - 0.13's `CustomDiagnostics` uses `{}` (default format, matching 0.14) instead of `{f}` (float specifier)
   - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig
   - Status: DONE
 - [x] **TASK-6.3:** Update `src/exe/run_linter.zig` file reading (line 522-540)
-  - Added `.@"0.13"` alongside `.@"0.14"` in the file reading version switch Ã¢Â€Â” 0.13 uses same `readAllAlloc` API as 0.14
+  - Added `.@"0.13"` alongside `.@"0.14"` in the file reading version switch - 0.13 uses same `readAllAlloc` API as 0.14
   - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig
   - Status: DONE
 - [x] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)`r`n  - Added `.@"0.13"` alongside `.@"0.14"` in the file writing version switch Â— 0.13 uses same old-style `file.writer()` API as 0.14 (no buffer parameter)`r`n  - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig`r`n  - Status: DONE
-- [x] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)`r`n  - Added separate `.@`"0.13"` case using `shims.ArrayList(u8){}` (0.13 `ArrayListUnmanaged` has no `.empty` constant, uses default field values instead) Ã¢Â€Â” same `renderError` API as 0.14`r`n  - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig`r`n  - Status: DONE
+- [x] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)`r`n  - Added separate `.@`"0.13"` case using `shims.ArrayList(u8){}` (0.13 `ArrayListUnmanaged` has no `.empty` constant, uses default field values instead) - same `renderError`API as 0.14`r`n  - Verified:`zig ast-check`passes, no syntax errors in run_linter.zig`r`n  - Status: DONE
 - [x] **TASK-6.6:** Update `src/exe/wasm.zig` verify 0.13 compatibility
   - Verified: All APIs (`std.heap.wasm_allocator`, `ArenaAllocator.init`, `Allocator.dupeZ`, `@memcpy`, `builtin.cpu.arch.isWasm()`) exist in Zig 0.13
   - Verified: `zig ast-check` passes on wasm.zig, no changes needed
@@ -588,7 +588,7 @@ zig build integration-check --summary all
 - [x] **TASK-8.1:** Verify compilation: `zig build --help`
 - [x] **TASK-8.2:** Verify unit tests: `zig build unit-test`
 - [x] **TASK-8.3:** Verify self-lint: `zig build lint`
-  - Fixed 5 compilation errors: rendering.zig Tty.init, run_linter.zig RunResult constants, .zon -> _config.zig generation, session.zig popOrNull, DefaultFormatter formatFn signature
+  - Fixed 5 compilation errors: rendering.zig Tty.init, run_linter.zig RunResult constants, .zon ->_config.zig generation, session.zig popOrNull, DefaultFormatter formatFn signature
   - Result: 0 errors, 400 warnings, 8 skipped - PASSES
   - Status: DONE
 - [x] **TASK-8.4:** Verify integration tests: `zig build integration-test`
@@ -658,7 +658,7 @@ zig build integration-check --summary all
 ## Progress Summary
 
 | Phase | Status | Tasks Done | Tasks Total |
-|-------|--------|-----------|-------------|
+| ------- | -------- | ----------- | ------------- |
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
@@ -715,4 +715,113 @@ steps:
 
 For the 0.13 port, the same 4 steps apply but with Zig 0.13.0. The `--summary all` flag on `integration-check` shows all step summaries.
 
-### Local Verification (Windows, 
+### Local Verification (Windows, Zig 0.13.0)
+
+```powershell
+$zig = "C:\Program Files\zig-0.13.0\zig.exe"
+cd E:\Develop\Zig\zlinter
+
+# Pre-flight: build script compiles
+& $zig build --help
+
+# CI Step 1: Unit tests
+& $zig build unit-test
+
+# CI Step 2: Self-lint
+& $zig build lint
+
+# CI Step 3: Integration tests
+& $zig build integration-test
+
+# CI Step 4: Integration check
+& $zig build integration-check --summary all
+
+# Bonus: All-in-one
+& $zig build test
+
+# Bonus: Docs & website
+& $zig build docs
+& $zig build website
+```
+
+### Pre-flight Checks
+
+1. **Version gate:** `version.zig` compiles — verifies Zig 0.13 is detected
+2. **Dependency resolution:** `zig fetch` resolves ZLS 0.13.0
+3. **Build script compilation:** `zig build --help` works
+
+### Incremental Verification (after each phase)
+
+```powershell
+# Phase 1: Foundation
+cd E:\Develop\Zig\zlinter
+& "C:\Program Files\zig-0.13.0\zig.exe" build --help
+
+# Phase 2-3: Build system compiles
+& "C:\Program Files\zig-0.13.0\zig.exe" build unit-test 2>&1 | Select-String "error:"
+
+# Phase 4-5: Library compiles and unit tests pass
+& "C:\Program Files\zig-0.13.0\zig.exe" build unit-test
+
+# Phase 6: Integration tests
+& "C:\Program Files\zig-0.13.0\zig.exe" build integration-test
+
+# Full verification
+& "C:\Program Files\zig-0.13.0\zig.exe" build test
+```
+
+### Acceptance Criteria (matches CI pipeline)
+
+- [ ] `zig build unit-test` passes (CI step 1)
+- [ ] `zig build lint` runs on self without errors (CI step 2)
+- [ ] `zig build integration-test` passes (CI step 3)
+- [ ] `zig build integration-check --summary all` passes (CI step 4)
+- [ ] `zig build test` passes (all combined)
+- [ ] `zig build docs` regenerates RULES.md without diff
+- [ ] `zig build website` builds WASM binary
+- [ ] All 24 built-in rules produce correct results on test cases
+
+### Known Risks
+
+1. **ZON parser:** If ZLS 0.13 doesn't expose a parser, writing one is ~500 lines
+2. **ZLS API drift:** ZLS 0.13 analyser API may differ significantly from 0.14
+3. **Watch inputs:** 0.13 doesn't support `step.addWatchInput()` — `--watch` mode may not work
+4. **AST node tags:** 0.13 has `usingnamespace` tag (removed in 0.15) — rules may need to handle it
+5. **FnProto return type:** 0.13 `fn_proto.ast.return_type` is `Index` (not optional) — simpler than 0.15+
+
+---
+
+## Quick Reference: 0.13 vs 0.14 API Differences
+
+| API | Zig 0.13 | Zig 0.14 |
+| ----- | ---------- | ---------- |
+| `b.addTest()` | `.root_source_file`, `.target`, `.optimize` | `.root_module`, `.use_llvm` |
+| `b.addExecutable()` | `.root_source_file`, `.target`, `.optimize` | `.root_module` |
+| `b.addStaticLibrary()` | `.root_source_file`, `.target`, `.optimize` | `.root_module` |
+| `b.addModule()` | `(name, .{ .root_source_file, .imports, ... })` | Same |
+| `b.createModule()` | `.{ .root_source_file, .imports, ... }` | Same |
+| `b.graph.host` | `ResolvedTarget` | Same |
+| `b.graph.zig_exe` | `[:0]const u8` | Same |
+| `b.graph.global_cache_root` | `Cache.Directory` | Same |
+| `b.graph.zig_lib_directory` | **Does not exist** | Exists |
+| `b.zig_lib_dir` | `?LazyPath` | May not exist |
+| `step.addWatchInput()` | **Does not exist** | Exists |
+| `step.addDirectoryWatchInput()` | **Does not exist** | Exists |
+| `LazyPath` | `.src_path { .owner, .sub_path }` | `.path { ... }` (different) |
+| `std.zon` | **Does not exist** | `std.zon.parse`, `std.zon.stringify` |
+| `std.ArrayList(T)` | Managed (has allocator) | Managed (has allocator) |
+| `std.ArrayListUnmanaged(T)` | Exists | Exists |
+| `std.io.getStdOut().writer()` | Exists (old API) | Exists (old API) |
+| `file.reader()` | Exists (old API) | Exists (old API) |
+| `Ast.Node.Index` | `u32` | `u32` |
+| `Ast.Node.Data` | `struct { lhs, rhs }` | `struct { lhs, rhs }` |
+| `Ast.render()` | `![]u8` | `![]u8` |
+| `Ast.renderError()` | `(err, writer)` | `(err, writer)` |
+| `tree.nodes.items(.tag)` | Exists | Exists |
+| `fn_proto.ast.return_type` | `Index` | `Index` |
+| `fullContainerDecl()` | Exists | Exists |
+| `fullFnProto()` | Exists | Exists |
+| `@intFromEnum(x)` | Type inferred | Type inferred |
+| `std.process.cleanExit()` | May not exist | Exists |
+| `std.heap.DebugAllocator(.{})` | Exists | Exists |
+| Node tag `usingnamespace` | **Exists** | Exists (deprecated) |
