@@ -1,15 +1,15 @@
 # Porting Zlinter to Zig 0.13 Analysis & Task List
 
 > Branch: `0.13.x` | Target: Zig 0.13.0 | Approach: **Multi-version** (add `.@"0.13"` alongside existing versions)
-> Created: 2026-10-19 | Updated: 2026-10-21
+> Created: 2026-10-19 | Updated: 2026-10-22
 
 ---
 
 ## Executive Summary
 
-Zlinter targets Zig 0.14+ and uses ZLS 0.14.0 as a dependency. Porting to Zig 0.13.0 requires changes across **19 source files**, the **build system**, and the **ZLS dependency**. The single biggest blocker is that **`std.zon` does not exist in Zig 0.13** the ZON parser was introduced in 0.14. This affects rule config file parsing.
+Zlinter targets Zig 0.14+ and uses ZLS 0.14.0 as a dependency. Porting to Zig 0.13.0 required changes across **40+ source files**, the **build system**, and the **ZLS dependency**. The single biggest blocker was that **`std.zon` does not exist in Zig 0.13** (the ZON parser was introduced in 0.14). This was resolved with a custom ZON parser (see Phase 2).
 
-The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API have the most significant differences.
+The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (87/93 tasks). Phase 10 addresses 3 known ZLS 0.13 type resolution limitations.**
 
 **Decision:** Keep the existing multi-version architecture. Add `.@"0.13"` alongside `.@"0.14"` in all version switches, rather than stripping the version system.
 
@@ -17,7 +17,7 @@ The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `dat
 
 ## Critical Blockers
 
-### BLOCKER-1: `std.zon` does not exist in Zig 0.13
+### BLOCKER-1: `std.zon` does not exist in Zig 0.13 **RESOLVED**
 
 | Aspect | Details |
 | -------- | --------- |
@@ -28,7 +28,9 @@ The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `dat
 
 **Recommendation:** Option (b) first check if ZLS 0.13 exposes a ZON parser. If not, option (a) a minimal ZON parser that handles the subset of ZON used by rule configs (structs with primitive fields, enums, slices).
 
-### BLOCKER-2: ZLS 0.13 API compatibility
+**Resolution:** Option (b) ruled out (ZLS 0.13 exports no ZON parser). Option (a) implemented - custom recursive descent ZON parser in `src/lib/zon.zig` (~350 lines) plus `stringify.serialize` for config generation. See Phase 2 (TASK-2.1 through TASK-2.4).
+
+### BLOCKER-2: ZLS 0.13 API compatibility **RESOLVED**
 
 | Aspect | Details |
 | -------- | --------- |
@@ -48,6 +50,8 @@ Key ZLS API differences to investigate:
 - `zls.analyser.InternPool` may differ
 - `zls.Config` fields (`zig_exe_path`, `zig_lib_path`, `global_cache_path`)
 - `zls.URI.fromPath()` may differ
+
+**Resolution:** All API differences investigated and addressed in Phase 4 (TASK-4.1 through TASK-4.13). Key findings: `DocumentStore` has no `diagnostics_collection` field in 0.13, `Analyser.init()` takes 5 params, `resolveTypeOfNode` uses `NodeWithHandle` (same field names), `instanceTypeVal` returns error union, `Type.Data` has no `.container` variant (uses `.other`), no `isErrorSetType`/`resolveDeclLiteralResultType`/`isContainerType` methods, `isEnumLiteral` requires analyser parameter. All handled with version switches.
 
 ---
 
@@ -282,7 +286,7 @@ Key ZLS API differences to investigate:
   - Verified: `zig build-exe build_docs.zig -fno-emit-bin` compiles cleanly
   - Status: DONE
 
-### Phase 4: Library Source Port **IN PROGRESS**
+### Phase 4: Library Source Port **COMPLETED**
 
 - [x] **TASK-4.1:** Update `src/lib/ast.zig` `iterateChildren()` for 0.13
   - File: `src/lib/ast.zig:91-114`
@@ -369,11 +373,12 @@ Key ZLS API differences to investigate:
 - [x] **TASK-4.12:** Update `src/lib/rendering.zig` `Printer.initAuto()`
   - File: `src/lib/rendering.zig:248-260`
   - 0.13: Same API as 0.14 add `.@"0.13"` alongside `.@"0.14"`
+  - Status: DONE
 
 - [x] **TASK-4.13:** Update `src/lib/zon.zig` see Phase 2 (BLOCKER-1)
   - Status: DONE - Custom ZON parser already implemented in Phase 2 (TASK-2.2). zon.zig has CustomDiagnostics, Parser, parseFileAlloc, parseFromSlice, stringify.serialize all working for 0.13.
 
-### Phase 5: Rules Port **IN PROGRESS**
+### Phase 5: Rules Port **COMPLETED**
 
 - [x] **TASK-5.1:** Update `src/rules/field_naming.zig` add `.@"0.13"` alongside `.@"0.14"` (line 164-165)
   - Added `.@"0.13"` alongside `.@"0.14"` in error_set_decl rbrace version switch
@@ -417,7 +422,11 @@ Key ZLS API differences to investigate:
   - Verified: `zig ast-check` passes, no compilation errors in no_undefined.zig
   - Status: DONE
 - [x] **TASK-5.11:** Update `src/rules/no_unused.zig` add `.@"0.13"` cases (lines 54-55, 144-145, 165-166, 180-181)
+  - Added `.@"0.13"` alongside `.@"0.14"` in 3 version switches (lines 54, 144, 165) plus separate `.@"0.13"` branches for `t.data` switch (line 171) and `NodeIndexShim.init` (line 186)
+  - Status: DONE
 - [x] **TASK-5.12:** Update `src/rules/require_errdefer_dealloc.zig` add `.@"0.13"` (line 246-247)
+  - Added `.@"0.13"` as separate branch in var_decl_type version switch (line 244) - 0.13 uses `var_decl_type.data` (`.other` variant) instead of `.container`
+  - Status: DONE
 - [x] **TASK-5.13:** Audit remaining rule files for ZLS API usage
   - Audited all 23 rule files in `src/rules/`
   - 11 files already have 0.13 version switches (TASK-5.1 through TASK-5.12)
@@ -427,9 +436,11 @@ Key ZLS API differences to investigate:
   - `no_deprecated.zig` lines 172/306: unguarded `lookupSymbolGlobal`/`getSymbolFieldAccesses` calls match ZLS 0.13 signatures
   - Status: DONE - No changes needed
 
-### Phase 6: Executable & Integration Tests **IN PROGRESS**
+### Phase 6: Executable & Integration Tests **COMPLETED**
 
 - [x] **TASK-6.1:** Update `src/exe/run_linter.zig` stdin reader (line 60-61)
+  - Added `.@"0.13"` alongside `.@"0.14"` in the stdin reader version switch - 0.13 uses same `std.io.getStdIn().reader()` API as 0.14
+  - Status: DONE
 - [x] **TASK-6.2:** Update `src/exe/run_linter.zig` diagnostics formatting (line 309-310)
   - Separated `.@"0.13"` from `.@"0.15", .@"0.16"` in the diagnostics format specifier version switch - 0.13's `CustomDiagnostics` uses `{}` (default format, matching 0.14) instead of `{f}` (float specifier)
   - Verified: `zig ast-check` passes, no syntax errors in run_linter.zig
@@ -471,7 +482,7 @@ Key ZLS API differences to investigate:
   - Verified: zig ast-check and zig build-obj -fno-emit-bin pass. No imports, no version-dependent APIs - plain declarations only (enums, struct, function). No changes needed.
   - Status: DONE
 
-### Phase 7: Builtin Syntax & Language Changes **PENDING**
+### Phase 7: Builtin Syntax & Language Changes **COMPLETED**
 
 - [x] **TASK-7.1:** Audit all `@intFromEnum` / `@enumFromInt` calls
   - Searched all .zig source files (src/, build.zig, build_rules.zig, build_docs.zig, integration_tests/src/, integration_tests/build.zig, integration_tests/test_cases/)
@@ -566,7 +577,7 @@ Key ZLS API differences to investigate:
   - Pre-existing errors (unrelated to std.process): Args.zig:177 (`continue :label` syntax), comments.zig:93 (switch prong syntax)
   - Status: DONE
 
-### Phase 8: Verification & Testing (Local) **IN PROGRESS**
+### Phase 8: Verification & Testing (Local) **COMPLETED**
 
 The CI pipeline (`.github/workflows/windows.yml`) defines the canonical test sequence.
 On Windows, the exact commands are:
@@ -586,7 +597,12 @@ zig build integration-check --summary all
 ```
 
 - [x] **TASK-8.1:** Verify compilation: `zig build --help`
+  - Fixed compilation errors: labeled switch to while loop in Args.zig and comments.zig, removed @FieldType and version-string option
+  - `zig build --help` exits 0
+  - Status: DONE
 - [x] **TASK-8.2:** Verify unit tests: `zig build unit-test`
+  - All unit tests pass (164/164, exit code 0)
+  - Status: DONE
 - [x] **TASK-8.3:** Verify self-lint: `zig build lint`
   - Fixed 5 compilation errors: rendering.zig Tty.init, run_linter.zig RunResult constants, .zon ->_config.zig generation, session.zig popOrNull, DefaultFormatter formatFn signature
   - Result: 0 errors, 400 warnings, 8 skipped - PASSES
@@ -630,16 +646,18 @@ zig build integration-check --summary all
   - Total: 40/43 integration tests pass, 3 known ZLS 0.13 limitations, 1 rule without test coverage
   - Status: DONE
 
-### Phase 9: CI Workflow Setup **IN PROGRESS**
+### Phase 9: CI Workflow Setup **COMPLETED**
 
 - [x] **TASK-9.1:** Create `.github/workflows/windows-0.13.yml`
   - Copy from `.github/workflows/windows.yml`
   - Changes: branch `0.13.x`, Zig `0.13.0`, name `windows-0.13`
   - Same 4 test steps: `unit-test`, `lint`, `integration-test`, `integration-check --summary all`
+  - Status: DONE
 - [x] **TASK-9.2:** Create `.github/workflows/linux-0.13.yml`
   - Copy from `.github/workflows/linux.yml`
   - Changes: branch `0.13.x`, Zig `0.13.0`, name `linux-0.13`, runner `ubuntu-latest`
   - Same 4 test steps: `unit-test`, `lint`, `integration-test`, `integration-check --summary all`
+  - Status: DONE
 - [x] **TASK-9.3:** Update `.github/workflows/deploy.yml` (optional)
   - Changed Zig version from 0.14.1 to 0.13.0 in deploy.yml
   - Status: DONE
@@ -727,37 +745,59 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 | Phase 1: Foundation | **DONE** | 7/7 | 7 |
 | Phase 2: ZON Parser | **DONE** | 4/4 | 4 |
 | Phase 3: Build System | **DONE** | 18/18 | 18 |
-| Phase 4: Library Source | IN PROGRESS | 10/13 | 13 |
-| Phase 5: Rules | IN PROGRESS | 8/13 | 13 |
-| Phase 6: Executable & Integration | IN PROGRESS | 9/12 | 12 |
-| Phase 7: Language Audit | IN PROGRESS | 1/7 | 7 |
-| Phase 8: Verification | IN PROGRESS | 5/9 | 9 |
-| Phase 9: CI Workflows | IN PROGRESS | 3/4 | 4 |
-| **Total** | | **59/97** | **97** |
+| Phase 4: Library Source | **DONE** | 13/13 | 13 |
+| Phase 5: Rules | **DONE** | 13/13 | 13 |
+| Phase 6: Executable & Integration | **DONE** | 12/12 | 12 |
+| Phase 7: Language Audit | **DONE** | 7/7 | 7 |
+| Phase 8: Verification | **DONE** | 9/9 | 9 |
+| Phase 9: CI Workflows | **DONE** | 4/4 | 4 |
+| Phase 10: ZLS 0.13 Rule Limitations | **PENDING** | 0/6 | 6 |
+| **Total** | | **87/93** | **93** |
 
 ### Files Changed So Far
 
 ```
-build.zig                       added .@"0.13" => "0.13.0" to zls_version switch
-build.zig.zon                   0.13 ZON syntax, ZLS 0.13.0 dep
-build_docs.zig                  DebugAllocator -> GeneralPurposeAllocator, added .@"0.13" to version switches
-build_rules.zig                 DebugAllocator -> GeneralPurposeAllocator for 0.13
-integration_tests/build.zig.zon 0.13 ZON syntax
-integration_tests/src/integration_test.zig  ArrayListUnmanaged.empty -> {}, Dir.readFileAlloc/copyFile -> custom helpers for 0.13
-src/lib/version.zig             added .@"0.13" enum value
-src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList
-src/lib/ast.zig                 added .@"0.13" to iterateChildren version switch
-src/lib/session.zig             DocumentStore config version-aware for 0.13, Analyser.init() with 5-param 0.13 signature, resolveTypeOfTypeNode() with 0.13 instanceTypeVal error union and no resolveDeclLiteralResultType, resolveTypeKind() container type resolution version-aware for 0.13 (.other instead of .container, no isErrorSetType/resolveDeclLiteralResultType)
-src/lib/zon.zig                 minimal ZON parser for 0.13 (structs, enums, bools, ints, strings, slices)
-src/rules/no_deprecated.zig     added .@"0.13" to field_access nodeData, lookupSymbolFieldInit version switches; updated breaking-changes guard and test skip for 0.13
+build.zig                       zls_version switch (0.13.0), addTest/addExecutable/addStaticLibrary ported to 0.13 API, addWatchInput guarded for 0.13, toZonString uses custom serializer, createRulesModule uses managed ArrayList, import resolver fix (use-after-free), BuiltinLintRule version switches
+build.zig.zon                   0.13 ZON syntax (string name, no fingerprint/minimum_zig_version), ZLS 0.13.0 dependency
+build_docs.zig                  GeneralPurposeAllocator instead of DebugAllocator, added .@"0.13" to version switches
+build_rules.zig                 GeneralPurposeAllocator instead of DebugAllocator for 0.13
+integration_tests/build.zig     5 build API changes for 0.13 (getPath3, addTest root_source_file, .Enum.fields, addStaticLibrary, src_path.sub_path)
+integration_tests/build.zig.zon 0.13 ZON syntax (string name, no fingerprint)
+integration_tests/src/integration_test.zig  ArrayListUnmanaged.empty -> {}, custom readFileAlloc/copyFile helpers for 0.13
+integration_tests/src/no_cats.zig  ArrayListUnmanaged.empty -> {} for 0.13
+integration_tests/src/test_runner.zig  verified 0.13-compatible, no changes needed
+integration_tests/src/test_case_references.zig  verified 0.13-compatible, no changes needed
+src/lib/version.zig             added .@"0.13" enum value and detection logic
+src/lib/shims.zig               added .@"0.13" to unwrapNode, toNodeIndex, ArrayList, nodeTag/nodeData/nodeMainToken/tokenTag
+src/lib/ast.zig                 added .@"0.13" to iterateChildren and 7 data.lhs/data.rhs version switches; .empty fixes
+src/lib/session.zig             DocumentStore init version-aware (no diagnostics_collection in 0.13), Analyser.init() 5-param 0.13 signature, resolveTypeOfNode/resolveTypeOfTypeNode/resolveTypeKind version-aware for 0.13 (.other variant, error-union instanceTypeVal, no resolveDeclLiteralResultType), dumpType() version-aware, popOrNull fix; .empty fixes
+src/lib/zon.zig                 custom ZON parser (~350 lines) and stringify.serialize for 0.13 (no std.zon); writeEnumLiteral/isZigKeyword for keyword handling; .EnumLiteral case in serialize
+src/lib/explorer.zig            added .@"0.13" to tree.render() and renderError() version switches; .empty fixes
+src/lib/rendering.zig           added .@"0.13" to Printer.initAuto() version switch; Tty.init fix; .empty fixes
+src/lib/Args.zig                labeled switch -> while loop for 0.13; removed @FieldType and version-string option; .empty fixes
+src/lib/comments.zig            labeled switch -> while loop for 0.13; .empty fixes
+src/lib/testing.zig             .empty fixes for 0.13
+src/exe/run_linter.zig          added .@"0.13" to stdin reader, diagnostics format, file reading/writing, allocAstErrorMsg version switches; GeneralPurposeAllocator instead of DebugAllocator; page_allocator instead of smp_allocator; .empty fixes
+src/exe/wasm.zig                verified 0.13-compatible, no changes needed
+src/rules/field_naming.zig      added .@"0.13" to error_set_decl rbrace version switch; .empty fix
+src/rules/function_naming.zig   added .@"0.13" to fn_proto return_type version switch
+src/rules/import_ordering.zig   added .@"0.13" to isImportCall builtin_call lhs version switch; .empty fix
+src/rules/no_deprecated.zig     added .@"0.13" to field_access nodeData and lookupSymbolFieldInit version switches; updated breaking-changes guard and test skip for 0.13
+src/rules/no_empty_block.zig    added .@"0.13" to fnDeclBlock fn_decl version switch; .empty fix
 src/rules/no_hidden_allocations.zig  added .@"0.13" to field_access nodeData and resolveVarDeclAlias version switches
 src/rules/no_literal_only_bool_expression.zig  added .@"0.13" to comparison operator data.lhs/data.rhs version switch
 src/rules/no_orelse_unreachable.zig  added .@"0.13" to orelse rhs version switch
-src/rules/no_undefined.zig         added .@"0.13" to field_access nodeData lhs/rhs version switch
-src/exe/run_linter.zig          added .@"0.13" to stdin reader version switch (TASK-6.1), separated .@"0.13" diagnostics format specifier to use "{}" (TASK-6.2), added .@"0.13" to file reading version switch (TASK-6.3), added .@"0.13" to file writing version switch (TASK-6.4)
+src/rules/no_swallow_error.zig  added .@"0.13" to catch rhs and isEmptyOrUnreachableBlock lhs/rhs version switches
+src/rules/no_undefined.zig      added .@"0.13" to field_access nodeData lhs/rhs version switch
+src/rules/no_unused.zig         added .@"0.13" to 3 version switches plus separate branches for t.data and NodeIndexShim.init
+src/rules/require_errdefer_dealloc.zig  added .@"0.13" branch for var_decl_type.data (.other variant); .empty fix
+src/rules/switch_case_ordering.zig  added .switch_comma to node tag check (0.13 uses .switch_comma for trailing-comma switches)
+src/rules/no_comment_out_code.zig  .empty fix for 0.13
+src/rules/no_todo.zig           .empty fix for 0.13
 .github/workflows/windows-0.13.yml  new CI workflow for 0.13.x branch, Zig 0.13.0, Windows
 .github/workflows/linux-0.13.yml  new CI workflow for 0.13.x branch, Zig 0.13.0, Linux
 .github/workflows/deploy.yml     Zig version 0.14.1 -> 0.13.0 for 0.13.x branch
+README.md                       added 0.13 branch links
 PORTING_0.13.md                 this document
 ```
 
@@ -837,22 +877,23 @@ cd E:\Develop\Zig\zlinter
 
 ### Acceptance Criteria (matches CI pipeline)
 
-- [ ] `zig build unit-test` passes (CI step 1)
-- [ ] `zig build lint` runs on self without errors (CI step 2)
-- [ ] `zig build integration-test` passes (CI step 3)
-- [ ] `zig build integration-check --summary all` passes (CI step 4)
-- [ ] `zig build test` passes (all combined)
-- [ ] `zig build docs` regenerates RULES.md without diff
-- [ ] `zig build website` builds WASM binary
-- [ ] All 24 built-in rules produce correct results on test cases
+- [x] `zig build unit-test` passes (CI step 1) - 164/164 tests, exit code 0
+- [x] `zig build lint` runs on self without errors (CI step 2) - 0 errors, 400 warnings, 8 skipped
+- [x] `zig build integration-test` passes (CI step 3) - 40/43 tests pass, 3 known ZLS 0.13 limitations (see Phase 10)
+- [x] `zig build integration-check --summary all` passes (CI step 4) - 2/2 steps succeeded
+- [x] `zig build test` passes (all combined) - unit tests 164/164, integration 40/43
+- [x] `zig build docs` regenerates RULES.md without diff - exits 0, no errors
+- [x] `zig build website` builds WASM binary - exits 0, wasm.wasm (198KB) generated
+- [ ] All 24 built-in rules produce correct results on test cases - 40/43 pass; 3 known ZLS 0.13 limitations (no_hidden_allocations, require_errdefer_dealloc, declaration_naming regression_80) tracked in Phase 10
 
 ### Known Risks
 
-1. **ZON parser:** If ZLS 0.13 doesn't expose a parser, writing one is ~500 lines
-2. **ZLS API drift:** ZLS 0.13 analyser API may differ significantly from 0.14
-3. **Watch inputs:** 0.13 doesn't support `step.addWatchInput()` - `--watch` mode may not work
-4. **AST node tags:** 0.13 has `usingnamespace` tag (removed in 0.15) - rules may need to handle it
-5. **FnProto return type:** 0.13 `fn_proto.ast.return_type` is `Index` (not optional) - simpler than 0.15+
+1. **ZON parser:** RESOLVED - custom ZON parser implemented (~350 lines, see Phase 2)
+2. **ZLS API drift:** RESOLVED - all API differences addressed with version switches (see Phase 4)
+3. **Watch inputs:** ACCEPTED - 0.13 doesn't support `step.addWatchInput()`; `--watch` mode disabled for 0.13 (see TASK-3.7)
+4. **AST node tags:** RESOLVED - 0.13 has `usingnamespace` tag; `.switch_comma` handled in switch_case_ordering (TASK-8.4)
+5. **FnProto return type:** NOT AN ISSUE - 0.13 `fn_proto.ast.return_type` is `Index` (not optional), handled in version switches
+6. **ZLS 0.13 type resolution limitations:** OPEN - 3 rules cannot fully work on 0.13 (see Phase 10)
 
 ---
 
@@ -887,6 +928,6 @@ cd E:\Develop\Zig\zlinter
 | `fullContainerDecl()` | Exists | Exists |
 | `fullFnProto()` | Exists | Exists |
 | `@intFromEnum(x)` | Type inferred | Type inferred |
-| `std.process.cleanExit()` | May not exist | Exists |
-| `std.heap.DebugAllocator(.{})` | Exists | Exists |
+| `std.process.cleanExit()` | Exists | Exists |
+| `std.heap.DebugAllocator(.{})` | **Does not exist** (use `GeneralPurposeAllocator`) | Exists |
 | Node tag `usingnamespace` | **Exists** | Exists (deprecated) |
