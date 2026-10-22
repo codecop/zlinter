@@ -396,6 +396,22 @@ test "run separate blocks" {
     );
 }
 
+test "run off" {
+    const rule = buildRule(.{});
+    const source =
+        \\// var a = 1;
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .severity = .off },
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
