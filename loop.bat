@@ -13,11 +13,12 @@
 @goto end
 
 :scan
-grep "\[ \]" "%2" > nul
+grep "\[ \]" %2 > nul
 @if errorlevel 1 goto end
 @echo ---------- LOOP ---------- 
 call vibe-cli "/ralph-loop %2"
 @echo Error: %errorlevel%
+grep "\[ \]" %2 | wc -l
 @echo ++++++++++ DONE ++++++++++
 loop %1 %2
 
