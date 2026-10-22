@@ -715,7 +715,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-4.4: no_todo - run excludes todo with issue in content
 - [x] TASK-4.5: no_todo - run excludes todo with url in content
 - [x] TASK-4.6: no_todo - run detects todo with bare number
-- [ ] TASK-4.7: no_todo - run issue exclusion disabled
+- [x] TASK-4.7: no_todo - run issue exclusion disabled
 - [ ] TASK-4.8: no_todo - run url exclusion disabled
 - [ ] TASK-4.9: no_todo - run message when exclusions off
 - [ ] TASK-4.10: no_todo - run off

@@ -283,6 +283,29 @@ test "run detects todo with bare number" {
     );
 }
 
+test "run issue exclusion disabled" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO(#10)
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .exclude_if_contains_issue_number = false },
+        &.{
+            .{
+                .rule_id = "no_todo",
+                .severity = .warning,
+                .slice = "// TODO(#10)\n",
+                .message = "Avoid todo comments",
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
