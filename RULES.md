@@ -520,6 +520,8 @@ if (something) {
 
 ## `no_hidden_allocations`
 
+> Requires Zig 0.14+
+
 Avoid encapsulating hidden heap allocations inside functions without
 requiring the caller to pass an allocator.
 
@@ -968,6 +970,8 @@ otherwise simple APIs.
   * **Default:** `.off`
 
 ## `require_errdefer_dealloc`
+
+> Requires Zig 0.14+
 
 > [!WARNING]
 > The `require_errdefer_dealloc` rule is still under testing and development.

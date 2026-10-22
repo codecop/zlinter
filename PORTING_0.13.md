@@ -9,7 +9,7 @@
 
 Zlinter targets Zig 0.14+ and uses ZLS 0.14.0 as a dependency. Porting to Zig 0.13.0 required changes across **40+ source files**, the **build system**, and the **ZLS dependency**. The single biggest blocker was that **`std.zon` does not exist in Zig 0.13** (the ZON parser was introduced in 0.14). This was resolved with a custom ZON parser (see Phase 2).
 
-The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (87/87 tasks). Phase 10 in progress (3/6 tasks): TASK-10.1, TASK-10.2 and TASK-10.3 done, 3 remaining.**
+The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: All phases complete (93/93 tasks). Phase 10 complete (6/6 tasks).**
 
 **Decision:** Keep the existing multi-version architecture. Add `.@"0.13"` alongside `.@"0.14"` in all version switches, rather than stripping the version system.
 
@@ -673,7 +673,7 @@ zig build integration-check --summary all
 
 ---
 
-### Phase 10: ZLS 0.13 Rule Limitations **IN PROGRESS**
+### Phase 10: ZLS 0.13 Rule Limitations **COMPLETED**
 
 Three rules cannot work correctly on Zig 0.13 due to ZLS 0.13 type resolution limitations.
 Recommended approach: fix one with a trivial workaround, remove two from the 0.13 build.
@@ -754,7 +754,7 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
   - Verified: `zig build unit-test` passes, `zig build lint` passes (0 errors, 402 warnings, 9 skipped), `zig build integration-test` passes (all tests), `zig build integration-check --summary all` passes (2/2)
   - Status: DONE
 
-- [ ] **TASK-10.6:** Update documentation for 0.13 rule limitations
+- [x] **TASK-10.6:** Update documentation for 0.13 rule limitations
   - File: `README.md`
     - Add a note in the rules list section: `no_hidden_allocations` and `require_errdefer_dealloc` require Zig 0.14+ (ZLS 0.13 type resolution limitations)
     - Mark both rules with "(0.14+ only)" or similar annotation
@@ -762,7 +762,8 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
     - Add a note at the top of the `no_hidden_allocations` section (line 521): "Requires Zig 0.14+"
     - Add a note at the top of the `require_errdefer_dealloc` section (line 970): "Requires Zig 0.14+"
   - File: `PORTING_0.13.md`
-    - Update Progress Summary: Phase 10 -> DONE, Total -> 102/102 (or appropriate count)
+    - Update Progress Summary: Phase 10 -> DONE, Total -> 93/93
+  - Status: DONE
 
 ---
 
@@ -779,8 +780,8 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 | Phase 7: Language Audit | **DONE** | 7/7 | 7 |
 | Phase 8: Verification | **DONE** | 9/9 | 9 |
 | Phase 9: CI Workflows | **DONE** | 4/4 | 4 |
-| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 5/6 | 6 |
-| **Total** | | **92/93** | **93** |
+| Phase 10: ZLS 0.13 Rule Limitations | **DONE** | 6/6 | 6 |
+| **Total** | | **93/93** | **93** |
 
 ### Files Changed So Far
 
@@ -921,7 +922,7 @@ cd E:\Develop\Zig\zlinter
 3. **Watch inputs:** ACCEPTED - 0.13 doesn't support `step.addWatchInput()`; `--watch` mode disabled for 0.13 (see TASK-3.7)
 4. **AST node tags:** RESOLVED - 0.13 has `usingnamespace` tag; `.switch_comma` handled in switch_case_ordering (TASK-8.4)
 5. **FnProto return type:** NOT AN ISSUE - 0.13 `fn_proto.ast.return_type` is `Index` (not optional), handled in version switches
-6. **ZLS 0.13 type resolution limitations:** OPEN - 3 rules cannot fully work on 0.13 (see Phase 10)
+6. **ZLS 0.13 type resolution limitations:** DOCUMENTED - 2 rules excluded from 0.13 build, 1 fixed with syntactic shortcut (see Phase 10)
 
 ---
 
