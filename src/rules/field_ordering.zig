@@ -361,6 +361,19 @@ test "union ordering" {
     );
 }
 
+test "packed struct excluded by default" {
+    const rule = buildRule(.{});
+    const source = "const P = packed struct(u32) { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
