@@ -684,7 +684,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.8: field_ordering - extern struct included
 - [x] TASK-1.9: field_ordering - all orders off
 - [x] TASK-1.10: field_ordering - already sorted
-- [ ] TASK-1.11: field_ordering - doc comments preserved in fix
+- [x] TASK-1.11: field_ordering - doc comments preserved in fix
 - [ ] TASK-1.12: field_ordering - single line container
 - [ ] TASK-1.13: field_ordering - nested struct
 - [ ] TASK-1.14: field_ordering - fields with default values

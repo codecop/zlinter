@@ -463,6 +463,50 @@ test "already sorted" {
     );
 }
 
+test "doc comments preserved in fix" {
+    const rule = buildRule(.{});
+    const source =
+        \\const S = struct {
+        \\    /// doc for b
+        \\    b: u32,
+        \\    /// doc for a
+        \\    a: u32,
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice =
+                \\
+                \\    /// doc for b
+                \\    b: u32,
+                \\    /// doc for a
+                \\    a: u32,
+                ,
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 18,
+                    .end = 78,
+                    .text =
+                    \\
+                    \\    /// doc for a
+                    \\    a: u32,
+                    \\    /// doc for b
+                    \\    b: u32,
+                    ,
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
