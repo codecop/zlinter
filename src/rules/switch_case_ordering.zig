@@ -119,6 +119,26 @@ test "else not last" {
     );
 }
 
+test "else last" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: enum { x, y } = .x;
+        \\const s = switch (a) {
+        \\    .x => {},
+        \\    .y => {},
+        \\    else => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 pub const Ast = std.zig.Ast;
 const zlinter = @import("zlinter");
