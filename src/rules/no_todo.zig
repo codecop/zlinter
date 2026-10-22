@@ -79,7 +79,7 @@ fn run(
             .severity = config.severity,
             .start = zlinter.results.LintProblemLocation.startOfComment(doc.comments, comment),
             .end = zlinter.results.LintProblemLocation.endOfComment(doc.comments, comment),
-            .message = try gpa.dupe(u8, if (config.exclude_if_contains_issue_number or !config.exclude_if_contains_url)
+            .message = try gpa.dupe(u8, if (config.exclude_if_contains_issue_number)
                 "Avoid todo comments that don't link to a tracked issue"
             else
                 "Avoid todo comments"),
@@ -324,6 +324,29 @@ test "run url exclusion disabled" {
                 .severity = .warning,
                 .slice = "// TODO(http://example.com/10)\n",
                 .message = "Avoid todo comments that don't link to a tracked issue",
+            },
+        },
+    );
+}
+
+test "run message when exclusions off" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .exclude_if_contains_issue_number = false, .exclude_if_contains_url = false },
+        &.{
+            .{
+                .rule_id = "no_todo",
+                .severity = .warning,
+                .slice = "// TODO\n",
+                .message = "Avoid todo comments",
             },
         },
     );
