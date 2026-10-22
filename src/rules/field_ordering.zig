@@ -597,6 +597,46 @@ test "fields with default values" {
     );
 }
 
+test "declarations between fields" {
+    const rule = buildRule(.{});
+    const source =
+        \\const S = struct {
+        \\    const decl = 1;
+        \\    b: u32,
+        \\    a: u32,
+        \\    fn helper() void {}
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice =
+                \\
+                \\    b: u32,
+                \\    a: u32,
+                ,
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 38,
+                    .end = 62,
+                    .text =
+                    \\
+                    \\    a: u32,
+                    \\    b: u32,
+                    ,
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
