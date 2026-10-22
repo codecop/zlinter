@@ -913,7 +913,7 @@ cd E:\Develop\Zig\zlinter
 - [x] `zig build test` passes (all combined) - unit tests 164/164, integration 37/37
 - [x] `zig build docs` regenerates RULES.md without diff - exits 0, no errors
 - [x] `zig build website` builds WASM binary - exits 0, wasm.wasm (198KB) generated
-- [ ] All 24 built-in rules produce correct results on test cases - 37/37 pass (3 rules skipped: no_hidden_allocations, require_errdefer_dealloc, declaration_naming regression_80) tracked in Phase 10
+- [x] All 24 built-in rules produce correct results on test cases - 37/37 pass (3 rules skipped: no_hidden_allocations, require_errdefer_dealloc, declaration_naming regression_80) tracked in Phase 10
 
 ### Known Risks
 
