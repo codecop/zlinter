@@ -260,6 +260,31 @@ test {
     std.testing.refAllDecls(@This());
 }
 
+test "struct ascending with fix" {
+    const rule = buildRule(.{});
+    const source = "const S = struct { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " b: u32, a: u32",
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 18,
+                    .end = 33,
+                    .text = " a: u32, b: u32",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
