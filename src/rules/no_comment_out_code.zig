@@ -258,6 +258,31 @@ test "run detects commented var" {
     );
 }
 
+test "run detects commented call" {
+    const rule = buildRule(.{});
+    const source =
+        \\// This is a regular comment
+        \\
+        \\// std.debug.print("hi", .{});
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "no_comment_out_code",
+                .severity = .warning,
+                .slice = "// std.debug.print(\"hi\", .{});\n",
+                .message = "Avoid code in comments",
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
