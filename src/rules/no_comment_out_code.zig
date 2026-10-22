@@ -230,6 +230,10 @@ test "looksLikeCode empty" {
     try std.testing.expect(!try looksLikeCode("", std.testing.allocator));
 }
 
+test "looksLikeCode test decl" {
+    try std.testing.expect(try looksLikeCode("test \"foo\" {}", std.testing.allocator));
+}
+
 test {
     std.testing.refAllDecls(@This());
 }
