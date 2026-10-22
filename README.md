@@ -71,6 +71,12 @@ hook it up to a build step, like `zig build lint`:
 
 **1. Save dependency to your zig project:**
 
+   For 0.13.x:
+
+   ```shell
+   zig fetch --save git+https://github.com/kurtwagner/zlinter#0.13.x
+   ```
+
    For 0.14.x:
 
    ```shell
@@ -338,7 +344,7 @@ If your project is large it may be worth setting optimize to `.ReleaseFast` - ke
 
 The plan is to support `master` (mostly because its an important exercise in keeping up to date with whats changing in zig) and the latest previous version.
 
-Currently, [`0.14.x`](https://github.com/KurtWagner/zlinter/tree/0.14.x), [`0.15.x`](https://github.com/KurtWagner/zlinter/tree/0.15.x), [`0.16.x`](https://github.com/KurtWagner/zlinter/tree/0.16.x) and [`master`](https://github.com/KurtWagner/zlinter/tree/master).
+Currently, [`0.13.x`](https://github.com/KurtWagner/zlinter/tree/0.13.x), [`0.14.x`](https://github.com/KurtWagner/zlinter/tree/0.14.x), [`0.15.x`](https://github.com/KurtWagner/zlinter/tree/0.15.x), [`0.16.x`](https://github.com/KurtWagner/zlinter/tree/0.16.x) and [`master`](https://github.com/KurtWagner/zlinter/tree/master).
 
 Fixes and improvements to rules may be cherry-picked to older versions if there's no API compatibility issues.
 
