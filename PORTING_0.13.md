@@ -9,7 +9,7 @@
 
 Zlinter targets Zig 0.14+ and uses ZLS 0.14.0 as a dependency. Porting to Zig 0.13.0 required changes across **40+ source files**, the **build system**, and the **ZLS dependency**. The single biggest blocker was that **`std.zon` does not exist in Zig 0.13** (the ZON parser was introduced in 0.14). This was resolved with a custom ZON parser (see Phase 2).
 
-The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (88/93 tasks). Phase 10 addresses 3 known ZLS 0.13 type resolution limitations.**
+The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (87/87 tasks). Phase 10 in progress (2/6 tasks): TASK-10.1 and TASK-10.2 done, 4 remaining.**
 
 **Decision:** Keep the existing multi-version architecture. Add `.@"0.13"` alongside `.@"0.14"` in all version switches, rather than stripping the version system.
 
@@ -687,7 +687,17 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
   - Verified: zig build integration-test -Dtest_focus_on_rule=declaration_naming passes (5/5)
   - Status: DONE
 
-- [ ] **TASK-10.2:** Remove `no_hidden_allocations` from 0.13 build
+- [x] **TASK-10.2:** Remove `no_hidden_allocations` from 0.13 build
+  - ZLS 0.13 cannot resolve `@import("std")` alias chains (e.g., `std.heap.c_allocator`)
+  - Syntactic workaround would have unacceptable false positives (matching user vars named `heap`)
+  - Changes:
+    - `build.zig:3` - version-gated `BuiltinLintRule` enum: 0.13 has 22 rules (no `no_hidden_allocations`), 0.14+ has 23
+    - `build.zig` lint step - version-gated `lint_rules` array: 0.13 excludes `no_hidden_allocations`
+    - Added `zlinter-disable-next-line declaration_naming` comment (type resolution can't see through `if` expression)
+    - Deleted `integration_tests/test_cases/no_hidden_allocations/` directory and test case files
+    - `integration_tests/src/test_case_references.zig` - no changes needed (no reference to `no_hidden_allocations`)
+  - Verified: `zig build unit-test` passes, `zig build lint` has 3 pre-existing errors (zon.zig), `zig build integration-test` skips `no_hidden_allocations` (only `require_errdefer_dealloc` fails - TASK-10.3), `zig build integration-check` passes (2/2)
+  - Status: DONE
   - ZLS 0.13 cannot resolve `@import("std")` alias chains (e.g., `std.heap.c_allocator`)
   - Syntactic workaround would have unacceptable false positives (matching user vars named `heap`)
   - Files to change:
@@ -752,8 +762,8 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 | Phase 7: Language Audit | **DONE** | 7/7 | 7 |
 | Phase 8: Verification | **DONE** | 9/9 | 9 |
 | Phase 9: CI Workflows | **DONE** | 4/4 | 4 |
-| Phase 10: ZLS 0.13 Rule Limitations | **PENDING** | 0/6 | 6 |
-| **Total** | | **87/93** | **93** |
+| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 2/6 | 6 |
+| **Total** | | **89/93** | **93** |
 
 ### Files Changed So Far
 
