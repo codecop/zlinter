@@ -695,7 +695,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-2.3: switch_case_ordering - else only
 - [x] TASK-2.4: switch_case_ordering - no else
 - [x] TASK-2.5: switch_case_ordering - else_is_last off
-- [ ] TASK-2.6: switch_case_ordering - else_is_last error
+- [x] TASK-2.6: switch_case_ordering - else_is_last error
 - [ ] TASK-2.7: switch_case_ordering - switch_comma
 - [ ] TASK-2.8: switch_case_ordering - multiple switches
 - [ ] TASK-3.1: no_comment_out_code - run detects commented var

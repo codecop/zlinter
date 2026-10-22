@@ -201,3 +201,30 @@ test "else_is_last off" {
         &.{},
     );
 }
+
+test "else_is_last error" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: enum { x, y } = .x;
+        \\const s = switch (a) {
+        \\    .x => {},
+        \\    else => {},
+        \\    .y => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .else_is_last = .@"error" },
+        &.{
+            .{
+                .rule_id = "switch_case_ordering",
+                .severity = .@"error",
+                .slice = "else => {}",
+                .message = "`else` should be last in switch statements",
+            },
+        },
+    );
+}
