@@ -243,6 +243,23 @@ test "run excludes todo with issue in content" {
     );
 }
 
+test "run excludes todo with url in content" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO: fix in https://example.com/10
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
