@@ -707,7 +707,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-3.7: no_comment_out_code - run separate blocks
 - [x] TASK-3.8: no_comment_out_code - run off
 - [x] TASK-3.9: no_comment_out_code - run end of file flush
-- [ ] TASK-3.10: no_comment_out_code - looksLikeCode empty
+- [x] TASK-3.10: no_comment_out_code - looksLikeCode empty
 - [ ] TASK-3.11: no_comment_out_code - looksLikeCode test decl
 - [ ] TASK-4.1: no_todo - run detects todo
 - [ ] TASK-4.2: no_todo - run excludes todo with issue number

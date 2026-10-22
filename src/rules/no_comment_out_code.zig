@@ -226,6 +226,10 @@ test "looksLikeCode when false" {
     }
 }
 
+test "looksLikeCode empty" {
+    try std.testing.expect(!try looksLikeCode("", std.testing.allocator));
+}
+
 test {
     std.testing.refAllDecls(@This());
 }
