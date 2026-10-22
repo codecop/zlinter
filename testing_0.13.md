@@ -719,7 +719,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-4.8: no_todo - run url exclusion disabled
 - [x] TASK-4.9: no_todo - run message when exclusions off
 - [x] TASK-4.10: no_todo - run off
-- [ ] TASK-4.11: no_todo - run todo empty parens
+- [x] TASK-4.11: no_todo - run todo empty parens
 - [ ] TASK-4.12: no_todo - run ignores non-todo comment
 - [ ] TASK-5.1: BuildInfo - deinit default
 - [ ] TASK-5.2: BuildInfo - deinit with paths
