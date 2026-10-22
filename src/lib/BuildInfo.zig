@@ -65,3 +65,16 @@ test "deinit default" {
     var info = BuildInfo.default;
     info.deinit(std.testing.allocator); // should not crash
 }
+
+test "deinit with paths" {
+    const gpa = std.testing.allocator;
+    var include_paths = try gpa.alloc([]const u8, 1);
+    include_paths[0] = try gpa.dupe(u8, "src");
+    var exclude_paths = try gpa.alloc([]const u8, 1);
+    exclude_paths[0] = try gpa.dupe(u8, "vendor");
+    var info = BuildInfo{
+        .include_paths = include_paths,
+        .exclude_paths = exclude_paths,
+    };
+    info.deinit(gpa); // should free without leak (testing.allocator detects leaks)
+}
