@@ -364,6 +364,38 @@ test "run multi-line block" {
     );
 }
 
+test "run separate blocks" {
+    const rule = buildRule(.{});
+    const source =
+        \\// var a = 1;
+        \\
+        \\const x = 1;
+        \\// var b = 2;
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "no_comment_out_code",
+                .severity = .warning,
+                .slice = "// var a = 1;\n",
+                .message = "Avoid code in comments",
+            },
+            .{
+                .rule_id = "no_comment_out_code",
+                .severity = .warning,
+                .slice = "// var b = 2;\n",
+                .message = "Avoid code in comments",
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;

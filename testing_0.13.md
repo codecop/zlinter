@@ -704,7 +704,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-3.4: no_comment_out_code - run ignores plain comment
 - [x] TASK-3.5: no_comment_out_code - run ignores backtick code
 - [x] TASK-3.6: no_comment_out_code - run multi-line block
-- [ ] TASK-3.7: no_comment_out_code - run separate blocks
+- [x] TASK-3.7: no_comment_out_code - run separate blocks
 - [ ] TASK-3.8: no_comment_out_code - run off
 - [ ] TASK-3.9: no_comment_out_code - run end of file flush
 - [ ] TASK-3.10: no_comment_out_code - looksLikeCode empty
