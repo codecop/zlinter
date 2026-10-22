@@ -687,7 +687,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.11: field_ordering - doc comments preserved in fix
 - [x] TASK-1.12: field_ordering - single line container
 - [x] TASK-1.13: field_ordering - nested struct
-- [ ] TASK-1.14: field_ordering - fields with default values
+- [x] TASK-1.14: field_ordering - fields with default values
 - [ ] TASK-1.15: field_ordering - declarations between fields
 - [ ] TASK-1.16: field_ordering - fix text multi-line struct
 - [ ] TASK-2.1: switch_case_ordering - else not last

@@ -572,6 +572,31 @@ test "nested struct" {
     );
 }
 
+test "fields with default values" {
+    const rule = buildRule(.{});
+    const source = "const S = struct { b: u32 = 0, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " b: u32 = 0, a: u32",
+                .message = "Struct fields should be in alphabetical order",
+                .fix = .{
+                    .start = 18,
+                    .end = 37,
+                    .text = " a: u32, b: u32 = 0",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
