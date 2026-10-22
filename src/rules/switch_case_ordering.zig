@@ -1,4 +1,4 @@
-//! Enforces an order of values in `switch` statements.
+﻿//! Enforces an order of values in `switch` statements.
 
 /// Config for switch_case_ordering rule.
 pub const Config = struct {
@@ -222,6 +222,33 @@ test "else_is_last error" {
             .{
                 .rule_id = "switch_case_ordering",
                 .severity = .@"error",
+                .slice = "else => {}",
+                .message = "`else` should be last in switch statements",
+            },
+        },
+    );
+}
+
+test "switch_comma" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: enum { x, y } = .x;
+        \\const s = switch (a) {
+        \\    .x => {},
+        \\    else => {},
+        \\    .y => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "switch_case_ordering",
+                .severity = .warning,
                 .slice = "else => {}",
                 .message = "`else` should be last in switch statements",
             },
