@@ -336,6 +336,31 @@ test "enum ordering" {
     );
 }
 
+test "union ordering" {
+    const rule = buildRule(.{});
+    const source = "const U = union { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .union_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{
+            .{
+                .rule_id = "field_ordering",
+                .severity = .warning,
+                .slice = " b: u32, a: u32",
+                .message = "Union fields should be in alphabetical order",
+                .fix = .{
+                    .start = 17,
+                    .end = 32,
+                    .text = " a: u32, b: u32",
+                },
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;

@@ -677,7 +677,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.1: field_ordering - struct ascending with fix
 - [x] TASK-1.2: field_ordering - struct descending
 - [x] TASK-1.3: field_ordering - enum ordering
-- [ ] TASK-1.4: field_ordering - union ordering
+- [x] TASK-1.4: field_ordering - union ordering
 - [ ] TASK-1.5: field_ordering - packed struct excluded by default
 - [ ] TASK-1.6: field_ordering - packed struct included
 - [ ] TASK-1.7: field_ordering - extern struct excluded by default
