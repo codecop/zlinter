@@ -194,6 +194,22 @@ test "run detects todo" {
     );
 }
 
+test "run excludes todo with issue number" {
+    const rule = buildRule(.{});
+    const source =
+        \\// TODO(#10)
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
