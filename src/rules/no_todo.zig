@@ -391,6 +391,23 @@ test "run todo empty parens" {
     );
 }
 
+test "run ignores non-todo comment" {
+    const rule = buildRule(.{});
+    const source =
+        \\// This is a regular comment, not a todo
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
