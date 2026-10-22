@@ -680,7 +680,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.4: field_ordering - union ordering
 - [x] TASK-1.5: field_ordering - packed struct excluded by default
 - [x] TASK-1.6: field_ordering - packed struct included
-- [ ] TASK-1.7: field_ordering - extern struct excluded by default
+- [x] TASK-1.7: field_ordering - extern struct excluded by default
 - [ ] TASK-1.8: field_ordering - extern struct included
 - [ ] TASK-1.9: field_ordering - all orders off
 - [ ] TASK-1.10: field_ordering - already sorted

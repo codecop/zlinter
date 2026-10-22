@@ -399,6 +399,19 @@ test "packed struct included" {
     );
 }
 
+test "extern struct excluded by default" {
+    const rule = buildRule(.{});
+    const source = "const E = extern struct { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{ .struct_field_order = .{ .order = .alphabetical_ascending, .severity = .warning } },
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
