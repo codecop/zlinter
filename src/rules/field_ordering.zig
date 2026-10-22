@@ -437,6 +437,19 @@ test "extern struct included" {
     );
 }
 
+test "all orders off" {
+    const rule = buildRule(.{});
+    const source = "const S = struct { b: u32, a: u32 };";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;

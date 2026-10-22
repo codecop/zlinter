@@ -682,7 +682,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.6: field_ordering - packed struct included
 - [x] TASK-1.7: field_ordering - extern struct excluded by default
 - [x] TASK-1.8: field_ordering - extern struct included
-- [ ] TASK-1.9: field_ordering - all orders off
+- [x] TASK-1.9: field_ordering - all orders off
 - [ ] TASK-1.10: field_ordering - already sorted
 - [ ] TASK-1.11: field_ordering - doc comments preserved in fix
 - [ ] TASK-1.12: field_ordering - single line container
