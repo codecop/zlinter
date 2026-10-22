@@ -412,6 +412,26 @@ test "run off" {
     );
 }
 
+test "run end of file flush" {
+    const rule = buildRule(.{});
+    const source = "// var a = 1;";
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "no_comment_out_code",
+                .severity = .warning,
+                .slice = "// var a = 1;\x00",
+                .message = "Avoid code in comments",
+            },
+        },
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
