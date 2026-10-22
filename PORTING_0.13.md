@@ -9,7 +9,7 @@
 
 Zlinter targets Zig 0.14+ and uses ZLS 0.14.0 as a dependency. Porting to Zig 0.13.0 required changes across **40+ source files**, the **build system**, and the **ZLS dependency**. The single biggest blocker was that **`std.zon` does not exist in Zig 0.13** (the ZON parser was introduced in 0.14). This was resolved with a custom ZON parser (see Phase 2).
 
-The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (87/93 tasks). Phase 10 addresses 3 known ZLS 0.13 type resolution limitations.**
+The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (88/93 tasks). Phase 10 addresses 3 known ZLS 0.13 type resolution limitations.**
 
 **Decision:** Keep the existing multi-version architecture. Add `.@"0.13"` alongside `.@"0.14"` in all version switches, rather than stripping the version system.
 
@@ -673,18 +673,19 @@ zig build integration-check --summary all
 
 ---
 
-### Phase 10: ZLS 0.13 Rule Limitations **PENDING**
+### Phase 10: ZLS 0.13 Rule Limitations **IN PROGRESS**
 
 Three rules cannot work correctly on Zig 0.13 due to ZLS 0.13 type resolution limitations.
 Recommended approach: fix one with a trivial workaround, remove two from the 0.13 build.
 
-- [ ] **TASK-10.1:** Fix `declaration_naming` regression_80 - add `@typeInfo` to builtin shortcut
+- [x] **TASK-10.1:** Fix `declaration_naming` regression_80 - add `@typeInfo` to builtin shortcut
   - File: `src/lib/session.zig:546`
   - In `resolveTypeKind`, the init value switch has a shortcut for `@Type` and `@TypeOf` builtins (returns `.type` without ZLS resolution)
-  - Add `"@typeInfo"` to the list: `inline for (&.{ "@Type", "@TypeOf", "@typeInfo" })`
+  - Added `"@typeInfo"` to the list: `inline for (&.{ "@Type", "@TypeOf", "@typeInfo" })`
   - `@typeInfo(X).@"struct".backing_integer.?` always evaluates to a type, so treating `@typeInfo` as `.type` is correct
   - Zero precision loss - this is a safe syntactic shortcut
-  - Verify: `zig build integration-test -Dtest_focus_on_rule=declaration_naming` passes (5/5)
+  - Verified: zig build integration-test -Dtest_focus_on_rule=declaration_naming passes (5/5)
+  - Status: DONE
 
 - [ ] **TASK-10.2:** Remove `no_hidden_allocations` from 0.13 build
   - ZLS 0.13 cannot resolve `@import("std")` alias chains (e.g., `std.heap.c_allocator`)
