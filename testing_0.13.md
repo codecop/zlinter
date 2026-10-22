@@ -709,7 +709,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-3.9: no_comment_out_code - run end of file flush
 - [x] TASK-3.10: no_comment_out_code - looksLikeCode empty
 - [x] TASK-3.11: no_comment_out_code - looksLikeCode test decl
-- [ ] TASK-4.1: no_todo - run detects todo
+- [x] TASK-4.1: no_todo - run detects todo
 - [ ] TASK-4.2: no_todo - run excludes todo with issue number
 - [ ] TASK-4.3: no_todo - run excludes todo with url
 - [ ] TASK-4.4: no_todo - run excludes todo with issue in content
