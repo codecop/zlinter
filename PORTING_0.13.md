@@ -438,7 +438,7 @@ Key ZLS API differences to investigate:
   - Added `.@"0.13"` alongside `.@"0.14"` in the file reading version switch - 0.13 uses same `readAllAlloc` API as 0.14
   - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig
   - Status: DONE
-- [x] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)`r`n  - Added `.@"0.13"` alongside `.@"0.14"` in the file writing version switch Â— 0.13 uses same old-style `file.writer()` API as 0.14 (no buffer parameter)`r`n  - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig`r`n  - Status: DONE
+- [x] **TASK-6.4:** Update `src/exe/run_linter.zig` file writing (line 583-595, 627-640)`r`n  - Added `.@"0.13"` alongside `.@"0.14"` in the file writing version switch Â- 0.13 uses same old-style `file.writer()` API as 0.14 (no buffer parameter)`r`n  - Verified: `zig ast-check` passes, no compilation errors in run_linter.zig`r`n  - Status: DONE
 - [x] **TASK-6.5:** Update `src/exe/run_linter.zig` `allocAstErrorMsg()` (line 648-665)`r`n  - Added separate `.@`"0.13"` case using `shims.ArrayList(u8){}` (0.13 `ArrayListUnmanaged` has no `.empty` constant, uses default field values instead) - same `renderError`API as 0.14`r`n  - Verified:`zig ast-check`passes, no syntax errors in run_linter.zig`r`n  - Status: DONE
 - [x] **TASK-6.6:** Update `src/exe/wasm.zig` verify 0.13 compatibility
   - Verified: All APIs (`std.heap.wasm_allocator`, `ArenaAllocator.init`, `Allocator.dupeZ`, `@memcpy`, `builtin.cpu.arch.isWasm()`) exist in Zig 0.13
@@ -502,15 +502,15 @@ Key ZLS API differences to investigate:
   - Status: DONE
 - [x] **TASK-7.4:** Audit `std.heap.DebugAllocator` usage
   - Searched all .zig source files for DebugAllocator, GeneralPurposeAllocator, smp_allocator, and other std.heap allocator types
-  - Key finding: Zig 0.13 has `std.heap.GeneralPurposeAllocator` (NOT `DebugAllocator` — that name was introduced in 0.14+)
+  - Key finding: Zig 0.13 has `std.heap.GeneralPurposeAllocator` (NOT `DebugAllocator` - that name was introduced in 0.14+)
   - Also: `std.heap.smp_allocator` does NOT exist in 0.13 (introduced later)
   - Fixed 2 issues in `src/exe/run_linter.zig`:
     - Line 1: `std.heap.DebugAllocator(.{}) = .init` -> `std.heap.GeneralPurposeAllocator(.{}) = .{}` (0.13 GPA uses struct literal init, no `.init` field)
     - Line 44: `std.heap.smp_allocator` -> `std.heap.page_allocator` (smp_allocator not available in 0.13)
-  - Verified: `build_docs.zig` and `build_rules.zig` already use `std.heap.GeneralPurposeAllocator(.{}) = .{}` — correct for 0.13
+  - Verified: `build_docs.zig` and `build_rules.zig` already use `std.heap.GeneralPurposeAllocator(.{}) = .{}` - correct for 0.13
   - Verified: `std.heap.wasm_allocator`, `std.heap.c_allocator`, `std.heap.page_allocator`, `std.heap.ArenaAllocator`, `std.heap.FixedBufferAllocator` all exist in 0.13
-  - Test fixtures (`.input.zig` files) reference `DebugAllocator` as lint test data — not compiled, no changes needed
-  - `no_hidden_allocations.zig:13` references `"DebugAllocator"` as a string literal for rule matching — not actual code usage
+  - Test fixtures (`.input.zig` files) reference `DebugAllocator` as lint test data - not compiled, no changes needed
+  - `no_hidden_allocations.zig:13` references `"DebugAllocator"` as a string literal for rule matching - not actual code usage
   - Verified: `zig ast-check` passes on run_linter.zig, build_docs.zig, build_rules.zig
   - Status: DONE
 - [x] **TASK-7.5:** Audit `std.testing` API usage
@@ -603,8 +603,8 @@ zig build integration-check --summary all
   - Status: DONE (3 known ZLS 0.13 limitations documented)
 - [x] **TASK-8.5:** Verify integration check: `zig build integration-check --summary all`
   - Fixed 2 issues:
-    1. `src/lib/zon.zig`: Added `writeEnumLiteral()` and `isZigKeyword()` to handle Zig keywords (like `error`) in enum literals — generated `.error` is invalid Zig, needs `.@"error"`
-    2. `build.zig`: Added recursive `@import` resolver for compiled_unit in 0.13 branch — Zig 0.13 has no `step.inputs` API, so imported files (like `used.zig`) were not being linted
+    1. `src/lib/zon.zig`: Added `writeEnumLiteral()` and `isZigKeyword()` to handle Zig keywords (like `error`) in enum literals - generated `.error` is invalid Zig, needs `.@"error"`
+    2. `build.zig`: Added recursive `@import` resolver for compiled_unit in 0.13 branch - Zig 0.13 has no `step.inputs` API, so imported files (like `used.zig`) were not being linted
   - Result: `zig build integration-check --summary all` passes (2/2 steps succeeded)
   - Status: DONE
 - [x] **TASK-8.6:** Verify all tests: `zig build test`
@@ -622,11 +622,11 @@ zig build integration-check --summary all
   - Ran `zig build integration-test -Dtest_focus_on_rule=<rule>` for each of the 24 builtin rules plus `no_cats` custom rule
   - Results per rule:
     - PASS (21 rules, 36 tests): field_naming (3), field_ordering (4), function_naming (2), import_ordering (2), no_unused (1), no_deprecated (1), no_empty_block (1), no_inferred_error_unions (1), no_orelse_unreachable (1), no_undefined (1), no_literal_only_bool_expression (1), switch_case_ordering (1), max_positional_args (1), no_comment_out_code (1), no_todo (1), no_literal_args (1), no_swallow_error (1), no_panic (1), require_braces (2), require_doc_comment (1), no_cats (4)
-    - PARTIAL (1 rule, 4/5 tests pass): declaration_naming — Regression 80 fails (ZLS 0.13 cannot resolve `@typeInfo(...).@"struct".backing_integer.?` chains)
+    - PARTIAL (1 rule, 4/5 tests pass): declaration_naming - Regression 80 fails (ZLS 0.13 cannot resolve `@typeInfo(...).@"struct".backing_integer.?` chains)
     - FAIL (2 rules, known ZLS 0.13 limitations):
       - no_hidden_allocations: ZLS 0.13 cannot resolve `std.heap.c_allocator`/`heap.page_allocator` through `@import("std")` aliases
       - require_errdefer_dealloc: ZLS 0.13 cannot resolve generic instantiations like `std.AutoHashMap(u8, void)`
-    - NO TESTS (1 rule): file_naming — no test case directory exists in `integration_tests/test_cases/`
+    - NO TESTS (1 rule): file_naming - no test case directory exists in `integration_tests/test_cases/`
   - Total: 40/43 integration tests pass, 3 known ZLS 0.13 limitations, 1 rule without test coverage
   - Status: DONE
 
@@ -660,30 +660,40 @@ zig build integration-check --summary all
 Three rules cannot work correctly on Zig 0.13 due to ZLS 0.13 type resolution limitations.
 Recommended approach: fix one with a trivial workaround, remove two from the 0.13 build.
 
-- [ ] **TASK-10.1:** Fix `declaration_naming` regression_80 — add `@typeInfo` to builtin shortcut
+- [ ] **TASK-10.1:** Fix `declaration_naming` regression_80 - add `@typeInfo` to builtin shortcut
   - File: `src/lib/session.zig:546`
   - In `resolveTypeKind`, the init value switch has a shortcut for `@Type` and `@TypeOf` builtins (returns `.type` without ZLS resolution)
   - Add `"@typeInfo"` to the list: `inline for (&.{ "@Type", "@TypeOf", "@typeInfo" })`
   - `@typeInfo(X).@"struct".backing_integer.?` always evaluates to a type, so treating `@typeInfo` as `.type` is correct
-  - Zero precision loss — this is a safe syntactic shortcut
+  - Zero precision loss - this is a safe syntactic shortcut
   - Verify: `zig build integration-test -Dtest_focus_on_rule=declaration_naming` passes (5/5)
 
 - [ ] **TASK-10.2:** Remove `no_hidden_allocations` from 0.13 build
   - ZLS 0.13 cannot resolve `@import("std")` alias chains (e.g., `std.heap.c_allocator`)
   - Syntactic workaround would have unacceptable false positives (matching user vars named `heap`)
   - Files to change:
-    - `build.zig:17` — remove `no_hidden_allocations` from `BuiltinLintRule` enum (version-gated for 0.13)
-    - `build.zig:460` — remove `buildBuiltinRule(b, .no_hidden_allocations, ...)` from lint step (version-gated)
-    - `integration_tests/test_cases/no_hidden_allocations/` — skip for 0.13
+    - `build.zig:17` - remove `no_hidden_allocations` from `BuiltinLintRule` enum (version-gated for 0.13)
+    - `build.zig:460` - remove `buildBuiltinRule(b, .no_hidden_allocations, ...)` from lint step (version-gated)
+    - `integration_tests/test_cases/no_hidden_allocations/` - skip for 0.13
   - Alternative: version-gate the enum so 0.13 has 22 rules, 0.14+ has 23
+  - Test removal steps:
+    - Delete `integration_tests/test_cases/no_hidden_allocations/no_hidden_allocations.input.zig`
+    - Delete `integration_tests/test_cases/no_hidden_allocations/no_hidden_allocations.lint_expected.stdout`
+    - Remove the empty `integration_tests/test_cases/no_hidden_allocations/` directory
+    - Remove `no_hidden_allocations` from any rule lists in `integration_tests/src/test_case_references.zig`
 
 - [ ] **TASK-10.3:** Remove `require_errdefer_dealloc` from 0.13 build
   - ZLS 0.13 cannot resolve generic instantiations like `std.AutoHashMap(u8, void)`
   - Syntactic workaround would miss user-defined container types
   - Files to change:
-    - `build.zig:27` — remove `require_errdefer_dealloc` from `BuiltinLintRule` enum (version-gated for 0.13)
-    - `build.zig:459` — remove `buildBuiltinRule(b, .require_errdefer_dealloc, ...)` from lint step (version-gated)
-    - `integration_tests/test_cases/require_errdefer_dealloc/` — skip for 0.13
+    - `build.zig:27` - remove `require_errdefer_dealloc` from `BuiltinLintRule` enum (version-gated for 0.13)
+    - `build.zig:459` - remove `buildBuiltinRule(b, .require_errdefer_dealloc, ...)` from lint step (version-gated)
+    - `integration_tests/test_cases/require_errdefer_dealloc/` - skip for 0.13
+  - Test removal steps:
+    - Delete `integration_tests/test_cases/require_errdefer_dealloc/require_errdefer_dealloc.input.zig`
+    - Delete `integration_tests/test_cases/require_errdefer_dealloc/require_errdefer_dealloc.lint_expected.stdout`
+    - Remove the empty `integration_tests/test_cases/require_errdefer_dealloc/` directory
+    - Remove `require_errdefer_dealloc` from any rule lists in `integration_tests/src/test_case_references.zig`
 
 - [ ] **TASK-10.4:** Update integration test runner to skip disabled rules for 0.13
   - File: `integration_tests/src/integration_test.zig` or `integration_tests/build.zig`
@@ -692,11 +702,21 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 
 - [ ] **TASK-10.5:** Re-verify CI locally after rule changes
   - Run all 4 CI steps:
-    1. `zig build unit-test` — must pass
-    2. `zig build lint` — must pass (0 errors)
-    3. `zig build integration-test` — must pass (all tests, 0 failures)
-    4. `zig build integration-check --summary all` — must pass
+    1. `zig build unit-test` - must pass
+    2. `zig build lint` - must pass (0 errors)
+    3. `zig build integration-test` - must pass (all tests, 0 failures)
+    4. `zig build integration-check --summary all` - must pass
   - Update PORTING_0.13.md Progress Summary: Phase 9 -> DONE, Phase 10 -> DONE
+
+- [ ] **TASK-10.6:** Update documentation for 0.13 rule limitations
+  - File: `README.md`
+    - Add a note in the rules list section: `no_hidden_allocations` and `require_errdefer_dealloc` require Zig 0.14+ (ZLS 0.13 type resolution limitations)
+    - Mark both rules with "(0.14+ only)" or similar annotation
+  - File: `RULES.md`
+    - Add a note at the top of the `no_hidden_allocations` section (line 521): "Requires Zig 0.14+"
+    - Add a note at the top of the `require_errdefer_dealloc` section (line 970): "Requires Zig 0.14+"
+  - File: `PORTING_0.13.md`
+    - Update Progress Summary: Phase 10 -> DONE, Total -> 102/102 (or appropriate count)
 
 ---
 
@@ -791,7 +811,7 @@ cd E:\Develop\Zig\zlinter
 
 ### Pre-flight Checks
 
-1. **Version gate:** `version.zig` compiles — verifies Zig 0.13 is detected
+1. **Version gate:** `version.zig` compiles - verifies Zig 0.13 is detected
 2. **Dependency resolution:** `zig fetch` resolves ZLS 0.13.0
 3. **Build script compilation:** `zig build --help` works
 
@@ -830,9 +850,9 @@ cd E:\Develop\Zig\zlinter
 
 1. **ZON parser:** If ZLS 0.13 doesn't expose a parser, writing one is ~500 lines
 2. **ZLS API drift:** ZLS 0.13 analyser API may differ significantly from 0.14
-3. **Watch inputs:** 0.13 doesn't support `step.addWatchInput()` — `--watch` mode may not work
-4. **AST node tags:** 0.13 has `usingnamespace` tag (removed in 0.15) — rules may need to handle it
-5. **FnProto return type:** 0.13 `fn_proto.ast.return_type` is `Index` (not optional) — simpler than 0.15+
+3. **Watch inputs:** 0.13 doesn't support `step.addWatchInput()` - `--watch` mode may not work
+4. **AST node tags:** 0.13 has `usingnamespace` tag (removed in 0.15) - rules may need to handle it
+5. **FnProto return type:** 0.13 `fn_proto.ast.return_type` is `Index` (not optional) - simpler than 0.15+
 
 ---
 
