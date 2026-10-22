@@ -9,7 +9,7 @@
 
 Zlinter targets Zig 0.14+ and uses ZLS 0.14.0 as a dependency. Porting to Zig 0.13.0 required changes across **40+ source files**, the **build system**, and the **ZLS dependency**. The single biggest blocker was that **`std.zon` does not exist in Zig 0.13** (the ZON parser was introduced in 0.14). This was resolved with a custom ZON parser (see Phase 2).
 
-The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (87/87 tasks). Phase 10 in progress (2/6 tasks): TASK-10.1 and TASK-10.2 done, 4 remaining.**
+The `std.zig.Ast` API is largely compatible between 0.13 and 0.14 (both use `data.lhs`/`data.rhs`), which means the AST shims need minimal changes. The build system API and ZLS API had the most significant differences, all now resolved. **Status: Phases 1-9 complete (87/87 tasks). Phase 10 in progress (3/6 tasks): TASK-10.1, TASK-10.2 and TASK-10.3 done, 3 remaining.**
 
 **Decision:** Keep the existing multi-version architecture. Add `.@"0.13"` alongside `.@"0.14"` in all version switches, rather than stripping the version system.
 
@@ -711,9 +711,16 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
     - Remove the empty `integration_tests/test_cases/no_hidden_allocations/` directory
     - Remove `no_hidden_allocations` from any rule lists in `integration_tests/src/test_case_references.zig`
 
-- [ ] **TASK-10.3:** Remove `require_errdefer_dealloc` from 0.13 build
+- [x] **TASK-10.3:** Remove `require_errdefer_dealloc` from 0.13 build
   - ZLS 0.13 cannot resolve generic instantiations like `std.AutoHashMap(u8, void)`
   - Syntactic workaround would miss user-defined container types
+  - Changes:
+    - `build.zig` - removed `require_errdefer_dealloc` from 0.13 `BuiltinLintRule` enum (0.13 now has 21 rules, 0.14+ has 23)
+    - `build.zig` - removed `require_errdefer_dealloc` from 0.13 `lint_rules` array in lint step
+    - Deleted `integration_tests/test_cases/require_errdefer_dealloc/` directory and test case files
+    - `integration_tests/src/test_case_references.zig` - no changes needed (no reference to `require_errdefer_dealloc`)
+  - Verified: `zig build unit-test` passes, `zig build integration-test` passes (all tests), `zig build integration-check` passes (2/2), `zig build lint` has pre-existing errors only
+  - Status: DONE
   - Files to change:
     - `build.zig:27` - remove `require_errdefer_dealloc` from `BuiltinLintRule` enum (version-gated for 0.13)
     - `build.zig:459` - remove `buildBuiltinRule(b, .require_errdefer_dealloc, ...)` from lint step (version-gated)
@@ -762,8 +769,8 @@ Recommended approach: fix one with a trivial workaround, remove two from the 0.1
 | Phase 7: Language Audit | **DONE** | 7/7 | 7 |
 | Phase 8: Verification | **DONE** | 9/9 | 9 |
 | Phase 9: CI Workflows | **DONE** | 4/4 | 4 |
-| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 2/6 | 6 |
-| **Total** | | **89/93** | **93** |
+| Phase 10: ZLS 0.13 Rule Limitations | **IN PROGRESS** | 3/6 | 6 |
+| **Total** | | **90/93** | **93** |
 
 ### Files Changed So Far
 
