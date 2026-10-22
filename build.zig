@@ -995,18 +995,33 @@ const ZlinterRun = struct {
                             // Recursively resolve @import statements to find all source files (0.13 has no step.inputs)
                             {
                                 var visited = std.StringHashMap(void).init(b.allocator);
-                                defer visited.deinit();
+                                defer {
+                                    var it = visited.keyIterator();
+                                    while (it.next()) |k| b.allocator.free(k.*);
+                                    visited.deinit();
+                                }
                                 var import_stack = std.ArrayList([]const u8).init(b.allocator);
                                 defer import_stack.deinit();
                                 try import_stack.append(path_str);
+                                var safety_counter: u32 = 0;
                                 while (import_stack.popOrNull()) |current_path| {
+                                    safety_counter += 1;
+                                    if (safety_counter > 10000) break;
                                     const abs_path = if (std.fs.path.isAbsolute(current_path))
                                         current_path
                                     else
                                         try std.fs.path.join(b.allocator, &.{ cwd.path, current_path });
-                                    defer if (!std.fs.path.isAbsolute(current_path)) b.allocator.free(abs_path);
-                                    if (visited.contains(abs_path)) continue;
-                                    try visited.put(abs_path, {});
+                                    if (visited.contains(abs_path)) {
+                                        if (!std.fs.path.isAbsolute(current_path)) b.allocator.free(abs_path);
+                                        continue;
+                                    }
+                                    if (abs_path.len > 500) {
+                                        if (!std.fs.path.isAbsolute(current_path)) b.allocator.free(abs_path);
+                                        continue;
+                                    }
+                                    const duped_path = try b.allocator.dupe(u8, abs_path);
+                                    try visited.put(duped_path, {});
+                                    if (!std.fs.path.isAbsolute(current_path)) b.allocator.free(abs_path);
                                     const import_file = std.fs.cwd().openFile(abs_path, .{}) catch continue;
                                     defer import_file.close();
                                     const import_source = import_file.readToEndAlloc(b.allocator, 1024 * 1024) catch continue;

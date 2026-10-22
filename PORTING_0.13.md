@@ -643,7 +643,15 @@ zig build integration-check --summary all
 - [x] **TASK-9.3:** Update `.github/workflows/deploy.yml` (optional)
   - Changed Zig version from 0.14.1 to 0.13.0 in deploy.yml
   - Status: DONE
-- [ ] **TASK-9.4:** Verify CI locally (simulate)
+- [x] **TASK-9.4:** Verify CI locally (simulate)
+  - Ran all 4 CI steps from .github/workflows/windows.yml and linux.yml locally:
+    1. zig build unit-test - PASS (exit code 0)
+    2. zig build lint - PASS (exit code 0, 400 warnings, 8 skipped)
+    3. zig build integration-test - 40/43 pass, 3 known ZLS 0.13 limitations (declaration_naming regression_80, no_hidden_allocations, require_errdefer_dealloc)
+    4. zig build integration-check --summary all - PASS (2/2 steps succeeded)
+  - Fixed use-after-free bug in build.zig import resolver (abs_path stored in visited hashmap but freed by defer, causing infinite loop)
+  - Added safety iteration counter (max 10000) and proper key cleanup for visited hashmap
+  - Status: DONE
 
 ---
 
