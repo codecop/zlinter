@@ -310,6 +310,22 @@ test "run detects commented fn decl" {
     );
 }
 
+test "run ignores plain comment" {
+    const rule = buildRule(.{});
+    const source =
+        \\// this is a regular comment
+        \\
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{},
+    );
+}
+
 const std = @import("std");
 const zlinter = @import("zlinter");
 const shims = zlinter.shims;
