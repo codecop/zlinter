@@ -92,6 +92,33 @@ test {
     std.testing.refAllDecls(@This());
 }
 
+test "else not last" {
+    const rule = buildRule(.{});
+    const source =
+        \\const a: enum { x, y } = .x;
+        \\const s = switch (a) {
+        \\    .x => {},
+        \\    else => {},
+        \\    .y => {},
+        \\};
+    ;
+
+    try zlinter.testing.testRunRule(
+        rule,
+        source,
+        .{},
+        Config{},
+        &.{
+            .{
+                .rule_id = "switch_case_ordering",
+                .severity = .warning,
+                .slice = "else => {}",
+                .message = "`else` should be last in switch statements",
+            },
+        },
+    );
+}
+
 const std = @import("std");
 pub const Ast = std.zig.Ast;
 const zlinter = @import("zlinter");

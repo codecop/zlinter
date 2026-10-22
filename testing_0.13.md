@@ -690,7 +690,7 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-1.14: field_ordering - fields with default values
 - [x] TASK-1.15: field_ordering - declarations between fields
 - [x] TASK-1.16: field_ordering - fix text multi-line struct
-- [ ] TASK-2.1: switch_case_ordering - else not last
+- [x] TASK-2.1: switch_case_ordering - else not last
 - [ ] TASK-2.2: switch_case_ordering - else last
 - [ ] TASK-2.3: switch_case_ordering - else only
 - [ ] TASK-2.4: switch_case_ordering - no else
