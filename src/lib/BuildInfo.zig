@@ -83,3 +83,13 @@ test "deinit with paths" {
     };
     info.deinit(gpa); // should free without leak (testing.allocator detects leaks)
 }
+
+test "consumeStdinAlloc empty stdin" {
+    var stdin_fbs = std.io.fixedBufferStream("");
+    const result = try BuildInfo.consumeStdinAlloc(
+        stdin_fbs.reader(),
+        std.testing.allocator,
+        rendering.process_printer,
+    );
+    try std.testing.expect(result == null);
+}

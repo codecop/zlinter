@@ -724,5 +724,5 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-5.1: BuildInfo - deinit default
 - [x] TASK-5.2: BuildInfo - deinit with paths
 - [x] TASK-5.3: BuildInfo - default
-- [ ] TASK-5.4: BuildInfo - consumeStdinAlloc empty stdin
+- [x] TASK-5.4: BuildInfo - consumeStdinAlloc empty stdin
 - [ ] TASK-5.5: BuildInfo - consumeStdinAlloc invalid zon
