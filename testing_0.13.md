@@ -723,6 +723,6 @@ Check `coverage.txt` - target coverage improvements:
 - [x] TASK-4.12: no_todo - run ignores non-todo comment
 - [x] TASK-5.1: BuildInfo - deinit default
 - [x] TASK-5.2: BuildInfo - deinit with paths
-- [ ] TASK-5.3: BuildInfo - default
+- [x] TASK-5.3: BuildInfo - default
 - [ ] TASK-5.4: BuildInfo - consumeStdinAlloc empty stdin
 - [ ] TASK-5.5: BuildInfo - consumeStdinAlloc invalid zon

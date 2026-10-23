@@ -61,6 +61,11 @@ const rendering = @import("rendering.zig");
 const std = @import("std");
 const zon = @import("zon.zig");
 
+test "default" {
+    try std.testing.expect(BuildInfo.default.include_paths == null);
+    try std.testing.expect(BuildInfo.default.exclude_paths == null);
+}
+
 test "deinit default" {
     var info = BuildInfo.default;
     info.deinit(std.testing.allocator); // should not crash
