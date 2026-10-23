@@ -93,3 +93,22 @@ test "consumeStdinAlloc empty stdin" {
     );
     try std.testing.expect(result == null);
 }
+
+test "consumeStdinAlloc invalid zon" {
+    var stderr_sink = try rendering.process_printer.attachFakeStderrSink(std.testing.allocator);
+    defer stderr_sink.deinit();
+
+    const invalid_zon = "not valid zon";
+    var buf: [@sizeOf(usize) + invalid_zon.len]u8 = undefined;
+    std.mem.writeInt(usize, buf[0..@sizeOf(usize)], invalid_zon.len, .little);
+    @memcpy(buf[@sizeOf(usize)..], invalid_zon);
+    var stdin_fbs = std.io.fixedBufferStream(&buf);
+    try std.testing.expectError(
+        error.InvalidArgs,
+        BuildInfo.consumeStdinAlloc(
+            stdin_fbs.reader(),
+            std.testing.allocator,
+            rendering.process_printer,
+        ),
+    );
+}
